@@ -283,9 +283,8 @@ class ActiveStudentAssistant(models.Model):
 
     STATUS_CHOICES = [
         ('active', 'Active'),
-        ('on_leave', 'On Leave'),
         ('completed', 'Completed'),
-        ('terminated', 'Terminated'),
+        ('expired', 'Expired'),
     ]
 
     # ── Link to the original application ──

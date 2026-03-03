@@ -64,18 +64,18 @@
                 <span class="staff-stat-lbl">Active</span>
             </div>
         </div>
-        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #f59e0b, #d97706);">
-            <div class="staff-stat-icon"><i class="fa-solid fa-clock"></i></div>
-            <div class="staff-stat-info">
-                <span class="staff-stat-val">{{ stats.on_leave }}</span>
-                <span class="staff-stat-lbl">On Leave</span>
-            </div>
-        </div>
         <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #8b5cf6, #7c3aed);">
             <div class="staff-stat-icon"><i class="fa-solid fa-flag-checkered"></i></div>
             <div class="staff-stat-info">
                 <span class="staff-stat-val">{{ stats.completed }}</span>
                 <span class="staff-stat-lbl">Completed</span>
+            </div>
+        </div>
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #ef4444, #dc2626);">
+            <div class="staff-stat-icon"><i class="fa-solid fa-hourglass-end"></i></div>
+            <div class="staff-stat-info">
+                <span class="staff-stat-val">{{ stats.expired }}</span>
+                <span class="staff-stat-lbl">Expired</span>
             </div>
         </div>
     </div>
@@ -94,9 +94,8 @@
             <div class="staff-toolbar-filters">
                 <a href="{% url 'home:director_sa_list' %}" class="staff-filter-btn {% if not current_status %}staff-filter--active{% endif %}"><i class="fa-solid fa-layer-group"></i> All</a>
                 <a href="?status=active" class="staff-filter-btn {% if current_status == 'active' %}staff-filter--active{% endif %}"><i class="fa-solid fa-circle-check"></i> Active</a>
-                <a href="?status=on_leave" class="staff-filter-btn {% if current_status == 'on_leave' %}staff-filter--active{% endif %}"><i class="fa-solid fa-clock"></i> On Leave</a>
                 <a href="?status=completed" class="staff-filter-btn {% if current_status == 'completed' %}staff-filter--active{% endif %}"><i class="fa-solid fa-flag-checkered"></i> Completed</a>
-                <a href="?status=terminated" class="staff-filter-btn {% if current_status == 'terminated' %}staff-filter--active{% endif %}"><i class="fa-solid fa-ban"></i> Terminated</a>
+                <a href="?status=expired" class="staff-filter-btn {% if current_status == 'expired' %}staff-filter--active{% endif %}"><i class="fa-solid fa-hourglass-end"></i> Expired</a>
             </div>
             <div class="staff-toolbar-search">
                 <form method="get" style="display:flex;gap:0.5rem;align-items:center;">
