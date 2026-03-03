@@ -150,9 +150,9 @@
                         <td>{{ a.assigned_office|default:"\u2014" }}</td>
                         <td>
                             {% if a.start_date %}
-                                <span style="font-weight:600; color:#16a34a;">{{ a.start_date|date:"M d, Y" }}</span>
+                                <span style="font-weight:600; color:#22c55e;">{{ a.start_date|date:"M d, Y" }}</span>
                             {% else %}
-                                <span style="color:#9ca3af;">\u2014</span>
+                                <span style="color:#94a3b8;">\u2014</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -199,7 +199,7 @@
                             {% if a.interview_date %}
                                 <span style="font-weight:600; color:#7c3aed;">{{ a.interview_date|date:"M d, Y — h:i A" }}</span>
                             {% else %}
-                                <span style="color:#9ca3af;">Not set</span>
+                                <span style="color:#94a3b8;">Not set</span>
                             {% endif %}
                         </td>
                         <td>
@@ -259,7 +259,7 @@
                             {% if a.preferred_office %}
                                 <span style="font-weight:600; color:#fbbf24;">{{ a.preferred_office.name }}</span>
                             {% else %}
-                                <span style="color:#9ca3af;">Not specified</span>
+                                <span style="color:#94a3b8;">Not specified</span>
                             {% endif %}
                         </td>
                         <td>

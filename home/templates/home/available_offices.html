@@ -503,7 +503,7 @@
         <button class="btn-add-office" data-bs-toggle="modal" data-bs-target="#addOfficeModal">
             <i class="fa-solid fa-plus"></i> Add New Office
         </button>
-        <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.45);">
+        <span style="margin-left:auto; font-size:12px; color:rgba(255,255,255,0.55);">
             <i class="fa-solid fa-info-circle"></i> Edit or delete offices from the sidebar cards below
         </span>
     </div>
@@ -676,8 +676,8 @@
 
             <!-- Assigned Students List -->
             <div class="detail-students-section" id="detailStudentsSection" style="display:none;">
-                <h5 style="font-size:13px; font-weight:700; color:#334155; margin:16px 0 10px; padding-top:14px; border-top:1px solid #e2e8f0;">
-                    <i class="fa-solid fa-user-graduate" style="color:#2563eb; margin-right:6px;"></i>
+                <h5 style="font-size:13px; font-weight:700; color:#e2e8f0; margin:16px 0 10px; padding-top:14px; border-top:1px solid #e2e8f0;">
+                    <i class="fa-solid fa-user-graduate" style="color:#60a5fa; margin-right:6px;"></i>
                     Assigned Student Assistants
                 </h5>
                 <div class="detail-student-list" id="detailStudentList"></div>
@@ -779,7 +779,7 @@
                     {{ office_form.description }}
                 </div>
                 <div class="full-width">
-                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#2563eb; margin-right:4px;"></i> Location &mdash; Click on the map to set pin</label>
+                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#60a5fa; margin-right:4px;"></i> Location &mdash; Click on the map to set pin</label>
                     <div class="pin-picker-wrap">
                         <div class="pin-picker-help"><i class="fa-solid fa-crosshairs"></i> Click to place pin</div>
                         <div class="pin-picker-map" id="addPinMap"></div>
@@ -862,7 +862,7 @@
                     <textarea name="description" class="form-control" id="editDescription" rows="3"></textarea>
                 </div>
                 <div class="full-width">
-                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#2563eb; margin-right:4px;"></i> Location &mdash; Click on the map to move pin</label>
+                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#60a5fa; margin-right:4px;"></i> Location &mdash; Click on the map to move pin</label>
                     <div class="pin-picker-wrap">
                         <div class="pin-picker-help"><i class="fa-solid fa-crosshairs"></i> Click to move pin</div>
                         <div class="pin-picker-map" id="editPinMap"></div>
@@ -1238,7 +1238,7 @@ function renderOfficeList(filter) {
                     '<span class="office-status-badge" style="background:' + color + ';">' + statusLabel(office.status) + '</span>' +
                 '</div>' +
                 (office.students.length > 0 ?
-                    '<div style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.45);">' +
+                    '<div style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.55);">' +
                         '<i class="fa-solid fa-user-graduate" style="margin-right:4px;"></i>' +
                         office.filled + ' student' + (office.filled !== 1 ? 's' : '') + ' assigned' +
                     '</div>' : '') +

@@ -207,7 +207,7 @@
                                 <option value="" selected disabled>Select college / program</option>
                                 <option value="CAS" data-color="#22c55e">CAS — College of Arts and Sciences</option>
                                 <option value="CBMA" data-color="#eab308">CBMA — College of Business Management and Accountancy</option>
-                                <option value="CCS" data-color="#6b7280">CCS — College of Computer Studies</option>
+                                <option value="CCS" data-color="#94a3b8">CCS — College of Computer Studies</option>
                                 <option value="COEd" data-color="#3b82f6">COEd — College of Education</option>
                                 <option value="CIT" data-color="#ef4444">CIT — College of Industrial Technology</option>
                                 <option value="COE" data-color="#f97316">COE — College of Engineering</option>
@@ -639,7 +639,7 @@
                 document.getElementById('photo_' + currentField).value = data.filename;
 
                 var preview = document.getElementById('preview_' + currentField);
-                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <i class="fa-solid fa-camera" style="color:#6b7280;"></i> ' + data.filename;
+                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <i class="fa-solid fa-camera" style="color:#94a3b8;"></i> ' + data.filename;
                 preview.style.display = 'block';
             }
         })
@@ -795,7 +795,7 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Detecting...';
         status.textContent = 'Getting your location...';
-        status.style.color = '#6b7280';
+        status.style.color = '#94a3b8';
 
         navigator.geolocation.getCurrentPosition(
             function(position) {

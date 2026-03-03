@@ -238,7 +238,7 @@
                                             </button>
                                             {% endif %}
                                             {% if s.status == 'interview_done' or s.status == 'office_assigned' %}
-                                            <button type="submit" name="status" value="approved" class="staff-dropdown-item" style="color: #16a34a;">
+                                            <button type="submit" name="status" value="approved" class="staff-dropdown-item" style="color: #22c55e;">
                                                 <i class="fa-solid fa-circle-check"></i> Approve
                                             </button>
                                             {% endif %}
@@ -334,7 +334,7 @@
                     {{ reminder_form.priority }}
                 </div>
                 <div class="mb-2">
-                    <label class="form-label">Expires On <span style="color:#9ca3af; font-weight:400;">(optional)</span></label>
+                    <label class="form-label">Expires On <span style="color:#94a3b8; font-weight:400;">(optional)</span></label>
                     {{ reminder_form.expires_at }}
                 </div>
                 <div class="mb-2 form-check">
@@ -390,11 +390,11 @@
                 </div>
             </form>
             {% empty %}
-            <p style="font-size:13px; color:#9ca3af; text-align:center;">No reminders yet.</p>
+            <p style="font-size:13px; color:#94a3b8; text-align:center;">No reminders yet.</p>
             {% endfor %}
         </div>
         <div class="card">
-            <h3 class="card-title"><i class="fa-regular fa-calendar" style="color:#2563eb;"></i> Important Dates</h3>
+            <h3 class="card-title"><i class="fa-regular fa-calendar" style="color:#60a5fa;"></i> Important Dates</h3>
             <form method="post" action="{% url 'home:staff_add_date' %}" class="staff-mgmt-form">
                 {% csrf_token %}
                 <div class="mb-2">
@@ -406,7 +406,7 @@
                     {{ date_form.date }}
                 </div>
                 <div class="mb-2">
-                    <label class="form-label">Expires On <span style="color:#9ca3af; font-weight:400;">(optional)</span></label>
+                    <label class="form-label">Expires On <span style="color:#94a3b8; font-weight:400;">(optional)</span></label>
                     {{ date_form.expires_at }}
                 </div>
                 <div class="mb-2 form-check">
@@ -458,7 +458,7 @@
                 </div>
             </form>
             {% empty %}
-            <p style="font-size:13px; color:#9ca3af; text-align:center;">No dates yet.</p>
+            <p style="font-size:13px; color:#94a3b8; text-align:center;">No dates yet.</p>
             {% endfor %}
         </div>
 
@@ -494,7 +494,7 @@
                     <label class="form-check-label" style="font-size:13px;">Active</label>
                 </div>
                 <div class="mb-2">
-                    <label class="form-label">Expires On <span style="color:#9ca3af; font-weight:400;">(optional)</span></label>
+                    <label class="form-label">Expires On <span style="color:#94a3b8; font-weight:400;">(optional)</span></label>
                     {{ announcement_form.expires_at }}
                 </div>
                 <button type="submit" class="btn-primary" style="margin-top:8px;">
@@ -540,7 +540,7 @@
                 </div>
                 <div class="file-preview" id="preview_editAnnFileInput-{{ a.pk }}"></div>
                 {% if a.image %}
-                <p style="font-size:11px; color:rgba(255,255,255,0.45); margin:0 0 4px;">Current: {{ a.image.name }}</p>
+                <p style="font-size:11px; color:rgba(255,255,255,0.55); margin:0 0 4px;">Current: {{ a.image.name }}</p>
                 {% endif %}
                 <div class="mb-1">
                     <label class="form-label" style="font-size:11px;">Expires On</label>
@@ -556,7 +556,7 @@
                 </div>
             </form>
             {% empty %}
-            <p style="font-size:13px; color:#9ca3af; text-align:center;">No announcements yet.</p>
+            <p style="font-size:13px; color:#94a3b8; text-align:center;">No announcements yet.</p>
             {% endfor %}
         </div>
 

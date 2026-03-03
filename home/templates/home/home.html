@@ -274,7 +274,7 @@
                                 {% if app.schedule_mismatch_note %}
                                 <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:0.75rem;"><strong>Staff Note:</strong> {{ app.schedule_mismatch_note }}</p>
                                 {% endif %}
-                                <p style="font-size:0.82rem; color:#cbd5e1; margin-bottom:0.75rem;">Your availability schedule does not match your uploaded Schedule of Classes. Please update and resubmit below.</p>
+                                <p style="font-size:0.82rem; color:#e2e8f0; margin-bottom:0.75rem;">Your availability schedule does not match your uploaded Schedule of Classes. Please update and resubmit below.</p>
                                 <form method="post" action="{% url 'home:resubmit_schedule' app.app_type_key app.obj.pk %}">
                                     {% csrf_token %}
                                     <div style="overflow-x:auto; margin-bottom:0.75rem;">
@@ -305,11 +305,11 @@
                             {% if app.raw_status == 'documents_requested' %}
                             <!-- Document Resubmission -->
                             <div style="margin-top:1rem; padding:1rem; border:1px solid #f59e0b; border-radius:8px; background:rgba(245,158,11,0.08);">
-                                <h6 style="color:#f59e0b; margin-bottom:0.5rem;"><i class="fa-solid fa-file-circle-question"></i> Documents Requested — Resubmission Required</h6>
+                                <h6 style="color:#fbbf24; margin-bottom:0.5rem;"><i class="fa-solid fa-file-circle-question"></i> Documents Requested — Resubmission Required</h6>
                                 {% if app.requested_documents_note %}
                                 <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:0.75rem;"><strong>Staff Note:</strong> {{ app.requested_documents_note }}</p>
                                 {% endif %}
-                                <p style="font-size:0.82rem; color:#cbd5e1; margin-bottom:0.75rem;">Please re-upload the requested documents below. Only upload the files that need to be replaced.</p>
+                                <p style="font-size:0.82rem; color:#e2e8f0; margin-bottom:0.75rem;">Please re-upload the requested documents below. Only upload the files that need to be replaced.</p>
                                 <form method="post" action="{% url 'home:resubmit_documents' app.app_type_key app.obj.pk %}" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.82rem;">
