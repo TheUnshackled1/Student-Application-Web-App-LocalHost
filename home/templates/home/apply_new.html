@@ -425,6 +425,41 @@
             </div>
             </div>
             <div class="applyform-submit-area">
+
+            <!-- ━━━ AVAILABILITY SCHEDULE ━━━ -->
+            <div class="applyform-section" id="section-availability" style="margin-bottom: 1.5rem;">
+                <div class="applyform-section-header">
+                    <span class="applyform-section-badge" style="background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 3px 10px rgba(5,150,105,0.25);"><i class="fa-solid fa-calendar-check"></i></span>
+                    <div>
+                        <h4 class="applyform-section-title">Availability Schedule</h4>
+                        <p class="applyform-section-sub">Select all time slots when you are available for duty. Staff will compare this with your uploaded Schedule of Classes.</p>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                <table class="table table-bordered table-sm text-center" id="availabilityGrid" style="font-size: 0.82rem;">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="min-width:80px;">Time</th>
+                            <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ts_val, ts_label in time_slot_choices %}
+                        <tr>
+                            <td class="fw-semibold" style="white-space:nowrap;">{{ ts_label }}</td>
+                            {% for d_val, d_label in day_choices %}
+                            <td>
+                                <input type="checkbox" class="form-check-input avail-cb" data-day="{{ d_val }}" data-time="{{ ts_val }}" style="cursor:pointer;">
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                <input type="hidden" name="availability_schedule" id="id_availability_schedule">
+            </div>
+
                 <div class="applyform-submit-info">
                     <i class="fa-solid fa-shield-check"></i>
                     <span>Your information is secure and will only be used for this application.</span>
@@ -934,6 +969,23 @@
             } else {
                 this.setCustomValidity('');
             }
+        });
+    })();
+
+    // ── Availability Schedule Grid → JSON serialization ──
+    (function() {
+        var form = document.getElementById('applyNewForm');
+        var hidden = document.getElementById('id_availability_schedule');
+        if (!form || !hidden) return;
+        form.addEventListener('submit', function() {
+            var schedule = {};
+            document.querySelectorAll('.avail-cb:checked').forEach(function(cb) {
+                var day = cb.getAttribute('data-day');
+                var time = cb.getAttribute('data-time');
+                if (!schedule[day]) schedule[day] = [];
+                schedule[day].push(time);
+            });
+            hidden.value = JSON.stringify(schedule);
         });
     })();
 </script>

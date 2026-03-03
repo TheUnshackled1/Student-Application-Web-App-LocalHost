@@ -57,4 +57,15 @@ urlpatterns = [
     path('director/sa/<int:pk>/attendance/', views.director_log_attendance, name='director_log_attendance'),
     path('director/sa/<int:pk>/evaluate/', views.director_evaluate_sa, name='director_evaluate_sa'),
     path('director/sa/<int:pk>/status/', views.director_update_sa_status, name='director_update_sa_status'),
+
+    # ---- Student: Schedule & Document Resubmission ----
+    path('resubmit-schedule/<str:app_type>/<int:pk>/', views.resubmit_schedule, name='resubmit_schedule'),
+    path('resubmit-documents/<str:app_type>/<int:pk>/', views.resubmit_documents, name='resubmit_documents'),
+
+    # ---- Staff: Notes & Schedule Verification ----
+    path('staff/applications/<int:pk>/add-note/', views.staff_add_note, name='staff_add_note'),
+    path('staff/applications/<int:pk>/verify-schedule/', views.staff_verify_schedule, name='staff_verify_schedule'),
+
+    # ---- Director: Notes ----
+    path('director/applications/<int:pk>/add-note/', views.director_add_note, name='director_add_note'),
 ]

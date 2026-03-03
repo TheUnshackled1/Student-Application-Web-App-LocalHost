@@ -3,6 +3,7 @@ from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
     ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
+    ApplicationNote,
 )
 
 
@@ -98,3 +99,11 @@ class PerformanceEvaluationAdmin(admin.ModelAdmin):
                     'evaluated_by', 'evaluated_at')
     list_filter = ('evaluation_period',)
     search_fields = ('student_assistant__full_name', 'student_assistant__student_id')
+
+
+@admin.register(ApplicationNote)
+class ApplicationNoteAdmin(admin.ModelAdmin):
+    list_display = ('id', 'note_type', 'author', 'new_application', 'renewal_application', 'created_at')
+    list_filter = ('note_type', 'created_at')
+    search_fields = ('content',)
+    raw_id_fields = ('new_application', 'renewal_application', 'author')

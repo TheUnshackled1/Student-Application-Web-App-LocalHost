@@ -152,6 +152,8 @@ class NewApplication(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('under_review', 'Under Review'),
+        ('schedule_mismatch', 'Schedule Mismatch — Re-input Required'),
+        ('documents_requested', 'Additional Documents Requested'),
         ('interview_scheduled', 'Interview Scheduled'),
         ('interview_done', 'Interview Done'),
         ('office_assigned', 'Office Assigned'),
@@ -194,6 +196,30 @@ class NewApplication(models.Model):
         help_text='Office the student prefers to be assigned to.',
     )
 
+    # ── Availability Schedule ──
+    availability_schedule = models.JSONField(
+        blank=True, null=True,
+        help_text='Student available days/time slots as {"Monday": ["8:00 AM - 9:00 AM", ...], ...}',
+    )
+    schedule_verified = models.BooleanField(
+        default=False,
+        help_text='Staff has verified schedule matches uploaded Schedule of Classes.',
+    )
+    schedule_mismatch_note = models.TextField(
+        blank=True, default='',
+        help_text='Staff note explaining schedule mismatch.',
+    )
+
+    # ── Notes & Internal Remarks ──
+    staff_notes = models.TextField(blank=True, default='', help_text='Internal notes from staff.')
+    director_notes = models.TextField(blank=True, default='', help_text='Internal notes from director.')
+
+    # ── Request Additional Documents ──
+    requested_documents_note = models.TextField(
+        blank=True, default='',
+        help_text='Description of which additional documents are needed from the student.',
+    )
+
     # ── Workflow / Scheduling ──
     interview_date = models.DateTimeField(null=True, blank=True)
     assigned_office = models.CharField(max_length=200, blank=True, default='')
@@ -201,7 +227,7 @@ class NewApplication(models.Model):
 
     # ── Meta ──
     submitted_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='pending')
 
     class Meta:
         ordering = ['-submitted_at']
@@ -252,6 +278,30 @@ class RenewalApplication(models.Model):
     recommendation_letter = models.FileField(upload_to='applications/renewal/', blank=True)
     evaluation_form = models.FileField(upload_to='applications/renewal/', blank=True)
 
+    # ── Availability Schedule ──
+    availability_schedule = models.JSONField(
+        blank=True, null=True,
+        help_text='Student available days/time slots as {"Monday": ["8:00 AM - 9:00 AM", ...], ...}',
+    )
+    schedule_verified = models.BooleanField(
+        default=False,
+        help_text='Staff has verified schedule matches uploaded Schedule of Classes.',
+    )
+    schedule_mismatch_note = models.TextField(
+        blank=True, default='',
+        help_text='Staff note explaining schedule mismatch.',
+    )
+
+    # ── Notes & Internal Remarks ──
+    staff_notes = models.TextField(blank=True, default='', help_text='Internal notes from staff.')
+    director_notes = models.TextField(blank=True, default='', help_text='Internal notes from director.')
+
+    # ── Request Additional Documents ──
+    requested_documents_note = models.TextField(
+        blank=True, default='',
+        help_text='Description of which additional documents are needed from the student.',
+    )
+
     # ── Workflow / Scheduling ──
     interview_date = models.DateTimeField(null=True, blank=True)
     assigned_office = models.CharField(max_length=200, blank=True, default='')
@@ -259,13 +309,47 @@ class RenewalApplication(models.Model):
 
     # ── Meta ──
     submitted_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='pending')
 
     class Meta:
         ordering = ['-submitted_at']
 
     def __str__(self):
         return f"[Renewal] {self.full_name} ({self.student_id})"
+
+
+class ApplicationNote(models.Model):
+    """Audit-trail log of all notes, remarks, and status changes."""
+
+    NOTE_TYPE_CHOICES = [
+        ('staff', 'Staff Note'),
+        ('director', 'Director Note'),
+        ('schedule_mismatch', 'Schedule Mismatch'),
+        ('document_request', 'Document Request'),
+        ('status_change', 'Status Change'),
+    ]
+
+    new_application = models.ForeignKey(
+        NewApplication, null=True, blank=True, on_delete=models.CASCADE,
+        related_name='notes_log',
+    )
+    renewal_application = models.ForeignKey(
+        RenewalApplication, null=True, blank=True, on_delete=models.CASCADE,
+        related_name='notes_log',
+    )
+    author = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+    )
+    note_type = models.CharField(max_length=30, choices=NOTE_TYPE_CHOICES, default='staff')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        app = self.new_application or self.renewal_application
+        return f"{self.get_note_type_display()} by {self.author} on {app}"
 
 
 # ================================================================

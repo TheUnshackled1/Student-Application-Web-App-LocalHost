@@ -4,6 +4,33 @@ from .models import (
     Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication,
     Office, ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
 )
+import json
+
+
+# ── Availability schedule choices ──
+
+DAY_CHOICES = [
+    ('Monday', 'Monday'),
+    ('Tuesday', 'Tuesday'),
+    ('Wednesday', 'Wednesday'),
+    ('Thursday', 'Thursday'),
+    ('Friday', 'Friday'),
+    ('Saturday', 'Saturday'),
+]
+
+TIME_SLOT_CHOICES = [
+    ('7:00 AM - 8:00 AM', '7:00 AM - 8:00 AM'),
+    ('8:00 AM - 9:00 AM', '8:00 AM - 9:00 AM'),
+    ('9:00 AM - 10:00 AM', '9:00 AM - 10:00 AM'),
+    ('10:00 AM - 11:00 AM', '10:00 AM - 11:00 AM'),
+    ('11:00 AM - 12:00 PM', '11:00 AM - 12:00 PM'),
+    ('12:00 PM - 1:00 PM', '12:00 PM - 1:00 PM'),
+    ('1:00 PM - 2:00 PM', '1:00 PM - 2:00 PM'),
+    ('2:00 PM - 3:00 PM', '2:00 PM - 3:00 PM'),
+    ('3:00 PM - 4:00 PM', '3:00 PM - 4:00 PM'),
+    ('4:00 PM - 5:00 PM', '4:00 PM - 5:00 PM'),
+    ('5:00 PM - 6:00 PM', '5:00 PM - 6:00 PM'),
+]
 
 
 # ── Shared file validators ──
@@ -112,6 +139,7 @@ class NewApplicationForm(forms.ModelForm):
             'first_name', 'middle_initial', 'last_name', 'extension_name',
             'date_of_birth', 'gender', 'contact_number', 'email', 'address',
             'student_id', 'course', 'year_level', 'semester', 'preferred_office',
+            'availability_schedule',
             'application_form', 'id_picture', 'barangay_clearance',
             'parents_itr', 'enrolment_form', 'schedule_classes',
             'proof_insurance', 'grades_last_sem', 'official_time',
@@ -239,6 +267,17 @@ class NewApplicationForm(forms.ModelForm):
     def clean_official_time(self):
         return self._validate_doc('official_time')
 
+    def clean_availability_schedule(self):
+        data = self.cleaned_data.get('availability_schedule')
+        if isinstance(data, str):
+            try:
+                data = json.loads(data)
+            except (json.JSONDecodeError, TypeError):
+                data = None
+        if not data:
+            raise forms.ValidationError('Please select at least one available time slot.')
+        return data
+
 
 class RenewalApplicationForm(forms.ModelForm):
     class Meta:
@@ -247,6 +286,7 @@ class RenewalApplicationForm(forms.ModelForm):
             'student_id', 'full_name', 'email', 'contact_number', 'address',
             'course', 'year_level', 'semester',
             'previous_office', 'preferred_office', 'hours_rendered', 'supervisor_name',
+            'availability_schedule',
             'id_picture', 'enrolment_form', 'schedule_classes', 'grades_last_sem',
             'official_time', 'recommendation_letter', 'evaluation_form',
         ]
@@ -351,6 +391,70 @@ class RenewalApplicationForm(forms.ModelForm):
 
     def clean_evaluation_form(self):
         return self._validate_doc('evaluation_form')
+
+    def clean_availability_schedule(self):
+        data = self.cleaned_data.get('availability_schedule')
+        if isinstance(data, str):
+            try:
+                data = json.loads(data)
+            except (json.JSONDecodeError, TypeError):
+                data = None
+        if not data:
+            raise forms.ValidationError('Please select at least one available time slot.')
+        return data
+
+
+# ================================================================
+#  SCHEDULE RESUBMISSION FORM
+# ================================================================
+
+class ScheduleResubmitForm(forms.Form):
+    """Form for students to re-submit their availability schedule."""
+    availability_schedule = forms.CharField(
+        widget=forms.HiddenInput(attrs={'id': 'id_availability_schedule'}),
+        required=True,
+    )
+
+    def clean_availability_schedule(self):
+        data = self.cleaned_data.get('availability_schedule', '{}')
+        if isinstance(data, str):
+            try:
+                data = json.loads(data)
+            except (json.JSONDecodeError, TypeError):
+                data = None
+        if not data:
+            raise forms.ValidationError('Please select at least one available time slot.')
+        return data
+
+
+# ================================================================
+#  DOCUMENT RESUBMISSION FORM
+# ================================================================
+
+class DocumentResubmitForm(forms.Form):
+    """Form for students to re-upload documents requested by staff."""
+    application_form = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
+    id_picture = forms.ImageField(required=False, validators=[validate_file_size, validate_image_type],
+                                   widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.jpg,.jpeg,.png'}))
+    barangay_clearance = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                          widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
+    parents_itr = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                    widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
+    enrolment_form = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                      widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
+    schedule_classes = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
+    proof_insurance = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                       widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
+    grades_last_sem = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                       widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
+    official_time = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                     widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
+    recommendation_letter = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                             widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
+    evaluation_form = forms.FileField(required=False, validators=[validate_file_size, validate_document_type],
+                                       widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}))
 
 
 # ================================================================

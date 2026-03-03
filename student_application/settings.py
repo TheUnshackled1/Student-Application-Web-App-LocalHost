@@ -135,6 +135,20 @@ LOGIN_URL = "/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+# ── Email Configuration ──
+# For production, use SMTP (Gmail example):
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = "your-email@gmail.com"        # TODO: Replace
+# EMAIL_HOST_PASSWORD = "your-gmail-app-password"  # TODO: Replace (App Password, not regular pwd)
+# DEFAULT_FROM_EMAIL = "SWA Application System <your-email@gmail.com>"
+
+# For development — prints emails to the terminal console:
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "SWA Application System <noreply@chmsu.edu.ph>"
+
 # ── Django JET Configuration ──
 JET_DEFAULT_THEME = "light-gray"
 JET_SIDE_MENU_COMPACT = True

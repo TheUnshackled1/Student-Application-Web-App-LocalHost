@@ -1,4 +1,5 @@
 {% load static %}
+{% load app_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,6 +133,10 @@
             {% endif %}
             <button type="submit" name="status" value="rejected" class="review-status-btn review-btn--rejected {% if app.status == 'rejected' %}review-btn--current{% endif %}">
                 <i class="fa-solid fa-circle-xmark"></i> Reject
+            </button>
+            <button type="button" class="review-status-btn {% if app.status == 'documents_requested' %}review-btn--current{% endif %}" style="background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; border-color:#d97706;"
+                    onclick="document.getElementById('docRequestModal').classList.add('active'); document.body.style.overflow='hidden';">
+                <i class="fa-solid fa-file-circle-question"></i> Request Docs
             </button>
         </form>
         {% if app.status == 'interview_done' or app.status == 'office_assigned' %}
@@ -308,6 +313,102 @@
 
     </div>
 
+    <!-- ━━━ AVAILABILITY SCHEDULE PANEL ━━━ -->
+    <div class="staff-panel" style="margin-top:1.5rem;">
+        <div class="staff-panel-header">
+            <i class="fa-solid fa-calendar-check"></i> Availability Schedule
+            {% if app.schedule_verified %}
+                <span class="staff-status-tag staff-status--approved" style="margin-left:auto;font-size:11px;"><i class="fa-solid fa-check"></i> Verified</span>
+            {% elif app.status == 'schedule_mismatch' %}
+                <span class="staff-status-tag staff-status--rejected" style="margin-left:auto;font-size:11px;"><i class="fa-solid fa-xmark"></i> Mismatch</span>
+            {% else %}
+                <span class="staff-status-tag staff-status--pending" style="margin-left:auto;font-size:11px;">Pending Verification</span>
+            {% endif %}
+        </div>
+        <div class="staff-panel-body" style="overflow-x:auto;">
+            {% if availability %}
+            <table class="table table-bordered table-sm text-center" style="font-size:0.8rem; margin-bottom:0.5rem;">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="min-width:80px;">Time</th>
+                        {% for d_val, d_label in day_choices %}
+                        <th>{{ d_label }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ts_val, ts_label in time_slot_choices %}
+                    <tr>
+                        <td class="fw-semibold" style="white-space:nowrap;">{{ ts_label }}</td>
+                        {% for d_val, d_label in day_choices %}
+                        <td>
+                            {% if d_val in availability and ts_val in availability|get_item:d_val %}
+                                <i class="fa-solid fa-check-circle text-success"></i>
+                            {% else %}
+                                <span style="color:#64748b;">–</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if not app.schedule_verified and app.status != 'schedule_mismatch' %}
+            <div style="display:flex; gap:0.5rem; margin-top:0.75rem; flex-wrap:wrap;">
+                <form method="post" action="{% url 'home:staff_verify_schedule' app.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="verify">
+                    <button type="submit" class="btn btn-sm btn-success"><i class="fa-solid fa-check"></i> Verify Schedule</button>
+                </form>
+                <button type="button" class="btn btn-sm btn-danger" onclick="document.getElementById('mismatchModal').classList.add('active'); document.body.style.overflow='hidden';">
+                    <i class="fa-solid fa-xmark"></i> Flag Mismatch
+                </button>
+            </div>
+            {% endif %}
+
+            {% if app.schedule_mismatch_note %}
+            <div class="alert alert-warning mt-2" style="font-size:0.82rem; margin-bottom:0;">
+                <strong>Mismatch Note:</strong> {{ app.schedule_mismatch_note }}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <p class="text-muted" style="font-size:0.85rem;">No availability schedule submitted yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ━━━ NOTES & REMARKS PANEL ━━━ -->
+    <div class="staff-panel" style="margin-top:1.5rem;">
+        <div class="staff-panel-header">
+            <i class="fa-solid fa-sticky-note"></i> Notes &amp; Internal Remarks
+        </div>
+        <div class="staff-panel-body">
+            <form method="post" action="{% url 'home:staff_add_note' app.pk %}" style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+                {% csrf_token %}
+                <input type="text" name="note_content" class="form-control form-control-sm" placeholder="Add a note..." required style="flex:1;">
+                <button type="submit" class="btn btn-sm btn-primary"><i class="fa-solid fa-plus"></i> Add</button>
+            </form>
+            {% if notes_log %}
+            <div style="max-height:300px; overflow-y:auto;">
+                {% for note in notes_log %}
+                <div style="border-left:3px solid {% if note.note_type == 'staff' %}#3b82f6{% elif note.note_type == 'director' %}#8b5cf6{% elif note.note_type == 'schedule_mismatch' %}#ef4444{% elif note.note_type == 'document_request' %}#f59e0b{% else %}#64748b{% endif %}; padding:0.5rem 0.75rem; margin-bottom:0.5rem; background:rgba(255,255,255,0.03); border-radius:0 6px 6px 0;">
+                    <div style="font-size:0.78rem; color:#94a3b8;">
+                        <strong>{{ note.get_note_type_display }}</strong>
+                        {% if note.author %} by {{ note.author.get_full_name|default:note.author.username }}{% endif %}
+                        &mdash; {{ note.created_at|date:"M d, Y h:i A" }}
+                    </div>
+                    <div style="font-size:0.85rem; color:#e2e8f0; margin-top:2px;">{{ note.content }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted" style="font-size:0.85rem;">No notes yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
 </main>
 <div class="file-preview-overlay" id="interviewModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
     <div class="file-preview-modal" style="max-width: 480px;">
@@ -377,6 +478,63 @@
                 <button type="submit" class="doc-action-btn doc-action-btn--view" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #22c55e, #16a34a);">
                     <i class="fa-solid fa-circle-check"></i> Approve Application
                 </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ━━━ SCHEDULE MISMATCH MODAL ━━━ -->
+<div class="file-preview-overlay" id="mismatchModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
+    <div class="file-preview-modal" style="max-width: 480px;">
+        <div class="file-preview-header">
+            <div class="file-preview-title-wrap">
+                <i class="fa-solid fa-calendar-xmark" style="color: #ef4444;"></i>
+                <span class="file-preview-title">Flag Schedule Mismatch</span>
+            </div>
+            <div class="file-preview-actions">
+                <button type="button" class="file-preview-btn file-preview-btn--close" onclick="document.getElementById('mismatchModal').classList.remove('active');document.body.style.overflow='';" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="file-preview-body" style="flex-direction:column;align-items:stretch;background:#fff;padding:24px;">
+            <form method="post" action="{% url 'home:staff_verify_schedule' app.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="mismatch">
+                <p style="font-size:13px;color:#6b7280;margin-bottom:12px;">
+                    Describe which time slots don't match the uploaded Schedule of Classes. The student will be notified and asked to resubmit.
+                </p>
+                <textarea name="mismatch_note" class="form-control" rows="4" required placeholder="e.g. Monday 8-9 AM conflicts with enrolled class BSIT 301..."></textarea>
+                <button type="submit" class="btn btn-danger w-100 mt-3"><i class="fa-solid fa-flag"></i> Flag Mismatch &amp; Notify Student</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ━━━ DOCUMENT REQUEST MODAL ━━━ -->
+<div class="file-preview-overlay" id="docRequestModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
+    <div class="file-preview-modal" style="max-width: 480px;">
+        <div class="file-preview-header">
+            <div class="file-preview-title-wrap">
+                <i class="fa-solid fa-file-circle-question" style="color: #f59e0b;"></i>
+                <span class="file-preview-title">Request Additional Documents</span>
+            </div>
+            <div class="file-preview-actions">
+                <button type="button" class="file-preview-btn file-preview-btn--close" onclick="document.getElementById('docRequestModal').classList.remove('active');document.body.style.overflow='';" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="file-preview-body" style="flex-direction:column;align-items:stretch;background:#fff;padding:24px;">
+            <form method="post" action="{% url 'home:staff_update_application_status' app.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'home:staff_review_application' app.pk %}">
+                <input type="hidden" name="status" value="documents_requested">
+                <p style="font-size:13px;color:#6b7280;margin-bottom:12px;">
+                    Specify which documents are missing, unclear, or need to be re-uploaded. The student will be notified via email.
+                </p>
+                <textarea name="requested_documents_note" class="form-control" rows="4" required placeholder="e.g. ID Picture is blurry, please re-upload a clear 2x2 photo..."></textarea>
+                <button type="submit" class="btn btn-warning w-100 mt-3 text-dark"><i class="fa-solid fa-paper-plane"></i> Request Documents &amp; Notify Student</button>
             </form>
         </div>
     </div>

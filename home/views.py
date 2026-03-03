@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.http import HttpResponseForbidden, JsonResponse
+from django.http import Http404, HttpResponseForbidden, JsonResponse
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.utils import timezone
@@ -10,11 +10,17 @@ from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
     ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
+    ApplicationNote,
 )
 from .forms import (
     ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm,
     RenewalApplicationForm, OfficeForm, AttendanceForm, PerformanceEvaluationForm,
-    ActiveSAStatusForm,
+    ActiveSAStatusForm, ScheduleResubmitForm, DocumentResubmitForm,
+    DAY_CHOICES, TIME_SLOT_CHOICES,
+)
+from .email_utils import (
+    send_application_confirmation, send_status_update_email,
+    send_schedule_mismatch_email, send_document_request_email,
 )
 from datetime import date as _date, timedelta
 import json
@@ -223,6 +229,8 @@ def _build_steps_from_status(status):
     status_to_current = {
         'pending': 2,                # submitted, now waiting for doc verification
         'under_review': 3,           # docs verified, now interview/assessment
+        'schedule_mismatch': 2,      # schedule needs correction, back to doc phase
+        'documents_requested': 2,    # additional docs needed, back to doc phase
         'interview_scheduled': 3,    # interview date set, awaiting interview
         'interview_done': 4,         # interview completed, awaiting approval
         'office_assigned': 4,        # legacy — treat same as interview_done
@@ -245,6 +253,8 @@ def _build_steps_from_status(status):
 STATUS_DISPLAY_MAP = {
     'pending': ('Waiting for Document Check', 'Your application has been submitted. Please wait while your documents are being checked and verified to determine your eligibility as a Student Assistant.'),
     'under_review': ('Under Review', "Your documents are currently being verified by the Registrar's Office."),
+    'schedule_mismatch': ('Schedule Mismatch', 'Your availability schedule does not match your uploaded Schedule of Classes. Please re-submit your availability below.'),
+    'documents_requested': ('Additional Documents Requested', 'Staff has requested additional documents. Please upload the required documents below.'),
     'interview_scheduled': ('Interview Scheduled', 'Your documents have been verified. Please check your scheduled interview date below.'),
     'interview_done': ('Interview Completed', 'Your interview has been completed. Please wait for the final approval and start date.'),
     'office_assigned': ('Office Assigned', 'You have been assigned to an office. Awaiting final approval with your start date.'),
@@ -364,6 +374,7 @@ def home(request):
             'app_type': 'New Application',
             'app_type_icon': 'fa-file-circle-plus',
             'app_type_class': 'new',
+            'app_type_key': 'new',
             'student_name': student_name,
             'application_id': app.student_id,
             'documents': documents,
@@ -378,6 +389,8 @@ def home(request):
             'completed_docs': completed_docs,
             'pending_docs': pending_docs,
             'submitted_at': app.submitted_at,
+            'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
+            'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
         })
 
     for app in renewal_apps:
@@ -400,6 +413,7 @@ def home(request):
             'app_type': 'Renewal Application',
             'app_type_icon': 'fa-arrows-rotate',
             'app_type_class': 'renewal',
+            'app_type_key': 'renewal',
             'student_name': app.full_name,
             'application_id': app.student_id,
             'documents': documents,
@@ -414,6 +428,8 @@ def home(request):
             'completed_docs': completed_docs,
             'pending_docs': pending_docs,
             'submitted_at': app.submitted_at,
+            'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
+            'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
         })
 
     # Sort all applications by submitted date descending
@@ -479,6 +495,8 @@ def home(request):
         'track_error': track_error,
         'track_success': track_success,
         'submission_success': submission_success,
+        'day_choices': DAY_CHOICES,
+        'time_slot_choices': TIME_SLOT_CHOICES,
     }
     return render(request, 'home/home.html', context)
 
@@ -586,7 +604,9 @@ def apply_new(request):
             if application.student_id not in tracked:
                 tracked.append(application.student_id)
             request.session['tracked_student_ids'] = tracked
-            request.session['submission_success'] = f'Your new application has been submitted successfully! Please wait while your documents are being reviewed to determine your eligibility as a Student Assistant.'
+            # Send confirmation email
+            send_application_confirmation(application, app_type='new')
+            request.session['submission_success'] = f'Your new application has been submitted successfully! A confirmation email has been sent to {application.email}. Please wait while your documents are being reviewed to determine your eligibility as a Student Assistant.'
             return redirect('home:home')
     else:
         form = NewApplicationForm()
@@ -613,6 +633,8 @@ def apply_new(request):
     return render(request, 'home/apply_new.html', {
         'form': form,
         'available_offices': available_offices_list,
+        'day_choices': DAY_CHOICES,
+        'time_slot_choices': TIME_SLOT_CHOICES,
     })
 
 
@@ -628,7 +650,9 @@ def apply_renew(request):
             if application.student_id not in tracked:
                 tracked.append(application.student_id)
             request.session['tracked_student_ids'] = tracked
-            request.session['submission_success'] = f'Your renewal application has been submitted successfully! Please wait while your documents are being reviewed to determine your eligibility as a Student Assistant.'
+            # Send confirmation email
+            send_application_confirmation(application, app_type='renewal')
+            request.session['submission_success'] = f'Your renewal application has been submitted successfully! A confirmation email has been sent to {application.email}. Please wait while your documents are being reviewed to determine your eligibility as a Student Assistant.'
             return redirect('home:home')
     else:
         form = RenewalApplicationForm()
@@ -655,6 +679,8 @@ def apply_renew(request):
     return render(request, 'home/apply_renew.html', {
         'form': form,
         'available_offices': available_offices_list,
+        'day_choices': DAY_CHOICES,
+        'time_slot_choices': TIME_SLOT_CHOICES,
     })
 
 
@@ -1168,6 +1194,10 @@ def staff_review_application(request, pk):
         'total_docs': total_docs,
         'uploaded_docs': uploaded_docs,
         'staff_name': request.user.get_full_name() or request.user.username,
+        'availability': app.availability_schedule or {},
+        'day_choices': DAY_CHOICES,
+        'time_slot_choices': TIME_SLOT_CHOICES,
+        'notes_log': app.notes_log.all(),
     }
     return render(request, 'staff/review_application.html', context)
 
@@ -1181,6 +1211,7 @@ def staff_update_application_status(request, pk):
     app = get_object_or_404(NewApplication, pk=pk)
     new_status = request.POST.get('status')
     if new_status in dict(NewApplication.STATUS_CHOICES):
+        old_status = app.status
         app.status = new_status
 
         # Handle interview scheduling
@@ -1211,7 +1242,44 @@ def staff_update_application_status(request, pk):
             if app.preferred_office:
                 app.assigned_office = app.preferred_office.name
 
+        # Handle schedule mismatch
+        if new_status == 'schedule_mismatch':
+            mismatch_note = request.POST.get('schedule_mismatch_note', '')
+            app.schedule_mismatch_note = mismatch_note
+            app.schedule_verified = False
+            send_schedule_mismatch_email(app, mismatch_note)
+            ApplicationNote.objects.create(
+                new_application=app, author=request.user,
+                note_type='schedule_mismatch',
+                content=f'Schedule mismatch flagged: {mismatch_note}',
+            )
+
+        # Handle document request
+        if new_status == 'documents_requested':
+            docs_note = request.POST.get('requested_documents_note', '')
+            app.requested_documents_note = docs_note
+            send_document_request_email(app, docs_note)
+            ApplicationNote.objects.create(
+                new_application=app, author=request.user,
+                note_type='document_request',
+                content=f'Documents requested: {docs_note}',
+            )
+
         app.save()
+
+        # Send status email for all other transitions
+        if new_status not in ('schedule_mismatch', 'documents_requested'):
+            extra = ''
+            if new_status == 'interview_scheduled' and app.interview_date:
+                extra = f'Interview date: {app.interview_date.strftime("%B %d, %Y — %I:%M %p")}'
+            send_status_update_email(app, old_status, new_status, extra)
+
+        # Log status change
+        ApplicationNote.objects.create(
+            new_application=app, author=request.user,
+            note_type='status_change',
+            content=f'Status changed from {old_status} to {new_status}',
+        )
 
         # Auto-create ActiveStudentAssistant record on approval
         if new_status == 'approved':
@@ -1424,6 +1492,14 @@ def director_review_application(request, pk):
     dob = app.date_of_birth
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
+    # Availability schedule
+    availability = app.availability_schedule or {}
+
+    # Notes log
+    notes_log = ApplicationNote.objects.filter(
+        new_application=app
+    ).select_related('author').order_by('-created_at')
+
     context = {
         'app': app,
         'age': age,
@@ -1432,6 +1508,10 @@ def director_review_application(request, pk):
         'uploaded_docs': uploaded_docs,
         'director_name': request.user.get_full_name() or 'Director',
         'offices': offices,
+        'availability': availability,
+        'day_choices': DAY_CHOICES,
+        'time_slot_choices': TIME_SLOT_CHOICES,
+        'notes_log': notes_log,
     }
     return render(request, 'director/review_application.html', context)
 
@@ -1445,6 +1525,7 @@ def director_update_application_status(request, pk):
     app = get_object_or_404(NewApplication, pk=pk)
     new_status = request.POST.get('status')
     if new_status in dict(NewApplication.STATUS_CHOICES):
+        old_status = app.status
         app.status = new_status
 
         # Handle office assignment — auto-fill from preferred_office
@@ -1473,7 +1554,32 @@ def director_update_application_status(request, pk):
                 except (ValueError, TypeError):
                     pass
 
+        # Handle document request
+        if new_status == 'documents_requested':
+            docs_note = request.POST.get('requested_documents_note', '')
+            app.requested_documents_note = docs_note
+            send_document_request_email(app, docs_note)
+            ApplicationNote.objects.create(
+                new_application=app, author=request.user,
+                note_type='document_request',
+                content=f'Documents requested: {docs_note}',
+            )
+
         app.save()
+
+        # Send status email for all non-document-request transitions
+        if new_status != 'documents_requested':
+            extra = ''
+            if new_status == 'interview_scheduled' and app.interview_date:
+                extra = f'Interview date: {app.interview_date.strftime("%B %d, %Y — %I:%M %p")}'
+            send_status_update_email(app, old_status, new_status, extra)
+
+        # Log status change
+        ApplicationNote.objects.create(
+            new_application=app, author=request.user,
+            note_type='status_change',
+            content=f'Status changed from {old_status} to {new_status}',
+        )
 
         # Auto-create ActiveStudentAssistant record on approval
         if new_status == 'approved':
@@ -1931,3 +2037,150 @@ def director_update_sa_status(request, pk):
     else:
         messages.error(request, 'Failed to update SA status.')
     return redirect('home:director_sa_detail', pk=pk)
+
+
+# ── New views for Features: Schedule Resubmit, Document Resubmit, Notes, Verify ──
+
+def _get_application_by_type(app_type, pk):
+    """Return application object or raise 404."""
+    if app_type == 'new':
+        return get_object_or_404(NewApplication, pk=pk)
+    elif app_type == 'renewal':
+        return get_object_or_404(RenewalApplication, pk=pk)
+    raise Http404('Invalid application type')
+
+
+def resubmit_schedule(request, app_type, pk):
+    """Student resubmits their availability schedule after a mismatch flag."""
+    app = _get_application_by_type(app_type, pk)
+    if app.status != 'schedule_mismatch':
+        messages.error(request, 'This application does not require schedule resubmission.')
+        return redirect('home:home')
+
+    if request.method == 'POST':
+        form = ScheduleResubmitForm(request.POST)
+        if form.is_valid():
+            app.availability_schedule = form.cleaned_data['availability_schedule']
+            app.schedule_verified = False
+            app.status = 'under_review'
+            app.schedule_mismatch_note = ''
+            app.save()
+
+            ApplicationNote.objects.create(
+                **{('new_application' if app_type == 'new' else 'renewal_application'): app},
+                note_type='schedule_mismatch',
+                content='Student resubmitted availability schedule.',
+            )
+            send_status_update_email(app, 'schedule_mismatch', 'under_review',
+                                     'Your updated availability schedule has been received and is now under review.')
+            messages.success(request, 'Your availability schedule has been updated and resubmitted.')
+        else:
+            messages.error(request, 'Invalid schedule data. Please try again.')
+    return redirect('home:home')
+
+
+def resubmit_documents(request, app_type, pk):
+    """Student re-uploads requested documents."""
+    app = _get_application_by_type(app_type, pk)
+    if app.status != 'documents_requested':
+        messages.error(request, 'This application does not require document resubmission.')
+        return redirect('home:home')
+
+    if request.method == 'POST':
+        form = DocumentResubmitForm(request.POST, request.FILES)
+        if form.is_valid():
+            for field_name in form.fields:
+                uploaded = form.cleaned_data.get(field_name)
+                if uploaded:
+                    setattr(app, field_name, uploaded)
+            app.status = 'under_review'
+            app.requested_documents_note = ''
+            app.save()
+
+            ApplicationNote.objects.create(
+                **{('new_application' if app_type == 'new' else 'renewal_application'): app},
+                note_type='document_request',
+                content='Student resubmitted requested documents.',
+            )
+            send_status_update_email(app, 'documents_requested', 'under_review',
+                                     'Your updated documents have been received and are now under review.')
+            messages.success(request, 'Your documents have been re-uploaded successfully.')
+        else:
+            messages.error(request, 'Please correct the errors below and try again.')
+    return redirect('home:home')
+
+
+@login_required
+@require_POST
+def staff_add_note(request, pk):
+    """Staff adds an internal note to a new-application."""
+    if not request.user.is_staff:
+        return redirect('home:home')
+    app = get_object_or_404(NewApplication, pk=pk)
+    content = request.POST.get('note_content', '').strip()
+    if content:
+        ApplicationNote.objects.create(
+            new_application=app,
+            author=request.user,
+            note_type='staff',
+            content=content,
+        )
+        messages.success(request, 'Note added.')
+    return redirect('home:staff_review_application', pk=pk)
+
+
+@login_required
+@require_POST
+def staff_verify_schedule(request, pk):
+    """Staff verifies or flags mismatch on the applicant's availability schedule."""
+    if not request.user.is_staff:
+        return redirect('home:home')
+    app = get_object_or_404(NewApplication, pk=pk)
+    action = request.POST.get('action')  # 'verify' or 'mismatch'
+
+    if action == 'verify':
+        app.schedule_verified = True
+        app.save()
+        ApplicationNote.objects.create(
+            new_application=app, author=request.user,
+            note_type='staff',
+            content='Availability schedule verified — matches Schedule of Classes.',
+        )
+        messages.success(request, 'Schedule verified successfully.')
+
+    elif action == 'mismatch':
+        mismatch_note = request.POST.get('mismatch_note', '').strip()
+        old_status = app.status
+        app.status = 'schedule_mismatch'
+        app.schedule_verified = False
+        app.schedule_mismatch_note = mismatch_note
+        app.save()
+
+        ApplicationNote.objects.create(
+            new_application=app, author=request.user,
+            note_type='schedule_mismatch',
+            content=f'Schedule mismatch flagged: {mismatch_note}',
+        )
+        send_schedule_mismatch_email(app, mismatch_note)
+        messages.warning(request, 'Schedule mismatch flagged. Student has been notified.')
+
+    return redirect('home:staff_review_application', pk=pk)
+
+
+@login_required
+@require_POST
+def director_add_note(request, pk):
+    """Director adds an internal note to a new-application."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+    app = get_object_or_404(NewApplication, pk=pk)
+    content = request.POST.get('note_content', '').strip()
+    if content:
+        ApplicationNote.objects.create(
+            new_application=app,
+            author=request.user,
+            note_type='director',
+            content=content,
+        )
+        messages.success(request, 'Note added.')
+    return redirect('home:director_review_application', pk=pk)
