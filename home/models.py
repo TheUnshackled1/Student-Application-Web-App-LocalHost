@@ -266,3 +266,178 @@ class RenewalApplication(models.Model):
 
     def __str__(self):
         return f"[Renewal] {self.full_name} ({self.student_id})"
+
+
+# ================================================================
+#  Active Student Assistant Management
+# ================================================================
+
+class ActiveStudentAssistant(models.Model):
+    """Tracks a student assistant after their application is approved."""
+
+    SEMESTER_CHOICES = [
+        ('1st', '1st Semester'),
+        ('2nd', '2nd Semester'),
+        ('summer', 'Summer'),
+    ]
+
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('on_leave', 'On Leave'),
+        ('completed', 'Completed'),
+        ('terminated', 'Terminated'),
+    ]
+
+    # ── Link to the original application ──
+    new_application = models.OneToOneField(
+        NewApplication, null=True, blank=True, on_delete=models.CASCADE,
+        related_name='active_sa',
+    )
+    renewal_application = models.OneToOneField(
+        RenewalApplication, null=True, blank=True, on_delete=models.CASCADE,
+        related_name='active_sa',
+    )
+
+    # ── Student identity (denormalized for quick access) ──
+    student_id = models.CharField(max_length=8)
+    full_name = models.CharField(max_length=200)
+    email = models.EmailField(blank=True, default='')
+    course = models.CharField(max_length=100, blank=True, default='')
+
+    # ── Assignment details ──
+    assigned_office = models.ForeignKey(
+        Office, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='active_assistants',
+    )
+    semester = models.CharField(max_length=10, choices=SEMESTER_CHOICES)
+    academic_year = models.CharField(
+        max_length=20, blank=True, default='',
+        help_text='e.g. 2024-2025',
+    )
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
+    # ── Attendance summary (cached for dashboard) ──
+    total_hours = models.DecimalField(max_digits=7, decimal_places=2, default=0)
+    required_hours = models.PositiveIntegerField(default=200, help_text='Total hours required for the semester.')
+
+    # ── Status ──
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='active')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Active Student Assistant'
+        verbose_name_plural = 'Active Student Assistants'
+
+    def __str__(self):
+        return f"{self.full_name} ({self.student_id}) — {self.get_status_display()}"
+
+    @property
+    def hours_percentage(self):
+        if self.required_hours == 0:
+            return 100
+        return min(round(float(self.total_hours) / self.required_hours * 100, 1), 100)
+
+    @property
+    def application(self):
+        """Return whichever application this SA record is linked to."""
+        return self.new_application or self.renewal_application
+
+
+class AttendanceRecord(models.Model):
+    """Daily attendance log for an active student assistant."""
+
+    STATUS_CHOICES = [
+        ('present', 'Present'),
+        ('late', 'Late'),
+        ('absent', 'Absent'),
+        ('excused', 'Excused'),
+    ]
+
+    student_assistant = models.ForeignKey(
+        ActiveStudentAssistant, on_delete=models.CASCADE,
+        related_name='attendance_records',
+    )
+    date = models.DateField()
+    time_in = models.TimeField(null=True, blank=True)
+    time_out = models.TimeField(null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='present')
+    remarks = models.TextField(blank=True, default='')
+    logged_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='attendance_logs',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date', '-time_in']
+        unique_together = ['student_assistant', 'date']
+        verbose_name = 'Attendance Record'
+        verbose_name_plural = 'Attendance Records'
+
+    def __str__(self):
+        return f"{self.student_assistant.full_name} — {self.date} ({self.get_status_display()})"
+
+    @property
+    def hours_worked(self):
+        """Calculate hours worked from time_in and time_out."""
+        if self.time_in and self.time_out:
+            from datetime import datetime, timedelta
+            dt_in = datetime.combine(self.date, self.time_in)
+            dt_out = datetime.combine(self.date, self.time_out)
+            if dt_out < dt_in:  # overnight
+                dt_out += timedelta(days=1)
+            diff = (dt_out - dt_in).total_seconds() / 3600
+            return round(diff, 2)
+        return 0
+
+
+class PerformanceEvaluation(models.Model):
+    """
+    End-of-term or periodic performance evaluation for an active SA.
+    Each criterion is scored 1–5.
+    """
+
+    PERIOD_CHOICES = [
+        ('midterm', 'Midterm'),
+        ('final', 'Final / End-of-Term'),
+    ]
+
+    student_assistant = models.ForeignKey(
+        ActiveStudentAssistant, on_delete=models.CASCADE,
+        related_name='evaluations',
+    )
+    evaluation_period = models.CharField(max_length=10, choices=PERIOD_CHOICES)
+
+    # ── Rating criteria (1-5 scale) ──
+    work_quality = models.PositiveSmallIntegerField(help_text='1 = Poor, 5 = Excellent')
+    punctuality = models.PositiveSmallIntegerField(help_text='1 = Poor, 5 = Excellent')
+    initiative = models.PositiveSmallIntegerField(help_text='1 = Poor, 5 = Excellent')
+    cooperation = models.PositiveSmallIntegerField(help_text='1 = Poor, 5 = Excellent')
+    communication = models.PositiveSmallIntegerField(help_text='1 = Poor, 5 = Excellent')
+
+    overall_rating = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
+    remarks = models.TextField(blank=True, default='')
+
+    evaluated_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='evaluations_given',
+    )
+    evaluated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-evaluated_at']
+        unique_together = ['student_assistant', 'evaluation_period']
+        verbose_name = 'Performance Evaluation'
+        verbose_name_plural = 'Performance Evaluations'
+
+    def __str__(self):
+        return f"{self.student_assistant.full_name} — {self.get_evaluation_period_display()}"
+
+    def save(self, *args, **kwargs):
+        # Auto-calculate overall rating as the average of all criteria
+        scores = [self.work_quality, self.punctuality, self.initiative,
+                  self.cooperation, self.communication]
+        self.overall_rating = round(sum(scores) / len(scores), 2)
+        super().save(*args, **kwargs)
