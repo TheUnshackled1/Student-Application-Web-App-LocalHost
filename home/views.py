@@ -1187,6 +1187,14 @@ def staff_review_application(request, pk):
     dob = app.date_of_birth
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
+    availability = app.availability_schedule or {}
+    schedule_grid = []
+    for ts_val, ts_label in TIME_SLOT_CHOICES:
+        row = {'label': ts_label, 'cells': []}
+        for d_val, _d_label in DAY_CHOICES:
+            row['cells'].append(d_val in availability and ts_val in availability.get(d_val, []))
+        schedule_grid.append(row)
+
     context = {
         'app': app,
         'age': age,
@@ -1194,9 +1202,10 @@ def staff_review_application(request, pk):
         'total_docs': total_docs,
         'uploaded_docs': uploaded_docs,
         'staff_name': request.user.get_full_name() or request.user.username,
-        'availability': app.availability_schedule or {},
+        'availability': availability,
         'day_choices': DAY_CHOICES,
         'time_slot_choices': TIME_SLOT_CHOICES,
+        'schedule_grid': schedule_grid,
         'notes_log': app.notes_log.all(),
     }
     return render(request, 'staff/review_application.html', context)
@@ -1494,6 +1503,12 @@ def director_review_application(request, pk):
 
     # Availability schedule
     availability = app.availability_schedule or {}
+    schedule_grid = []
+    for ts_val, ts_label in TIME_SLOT_CHOICES:
+        row = {'label': ts_label, 'cells': []}
+        for d_val, _d_label in DAY_CHOICES:
+            row['cells'].append(d_val in availability and ts_val in availability.get(d_val, []))
+        schedule_grid.append(row)
 
     # Notes log
     notes_log = ApplicationNote.objects.filter(
@@ -1511,6 +1526,7 @@ def director_review_application(request, pk):
         'availability': availability,
         'day_choices': DAY_CHOICES,
         'time_slot_choices': TIME_SLOT_CHOICES,
+        'schedule_grid': schedule_grid,
         'notes_log': notes_log,
     }
     return render(request, 'director/review_application.html', context)

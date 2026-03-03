@@ -1,5 +1,4 @@
 {% load static %}
-{% load app_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -337,15 +336,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for ts_val, ts_label in time_slot_choices %}
+                    {% for row in schedule_grid %}
                     <tr>
-                        <td class="fw-semibold" style="white-space:nowrap;">{{ ts_label }}</td>
-                        {% for d_val, d_label in day_choices %}
+                        <td class="fw-semibold" style="white-space:nowrap;">{{ row.label }}</td>
+                        {% for cell in row.cells %}
                         <td>
-                            {% if d_val in availability and ts_val in availability|get_item:d_val %}
+                            {% if cell %}
                                 <i class="fa-solid fa-check-circle text-success"></i>
                             {% else %}
-                                <span style="color:#64748b;">–</span>
+                                <span style="color:#94a3b8;">–</span>
                             {% endif %}
                         </td>
                         {% endfor %}
