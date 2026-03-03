@@ -17,24 +17,24 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
     <style>
-    /* ── Staff Office Management Styles ── */
+    /* ── Staff Office Management Styles (Light Theme) ── */
     .office-mgmt-toolbar {
         display: flex;
         align-items: center;
         gap: 12px;
         margin-bottom: 16px;
         padding: 14px 20px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.10);
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
         border-radius: 14px;
     }
     .office-mgmt-toolbar .mgmt-label {
         font-size: 13px;
         font-weight: 600;
-        color: #e2e8f0;
+        color: #334155;
     }
     .office-mgmt-toolbar .mgmt-label i {
-        color: #5eead4;
+        color: #2563eb;
         margin-right: 6px;
     }
     .btn-add-office {
@@ -42,7 +42,7 @@
         align-items: center;
         gap: 6px;
         padding: 8px 18px;
-        background: linear-gradient(135deg, #0d9488, #0e7490);
+        background: linear-gradient(135deg, #2563eb, #1e40af);
         color: #fff;
         border: none;
         border-radius: 10px;
@@ -54,9 +54,9 @@
         text-decoration: none;
     }
     .btn-add-office:hover {
-        background: linear-gradient(135deg, #0e7490, #1e40af);
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(13,148,136,0.3);
+        box-shadow: 0 4px 12px rgba(37,99,235,0.3);
         color: #fff;
     }
     .office-card-actions {
@@ -73,14 +73,14 @@
         border-radius: 6px;
         font-size: 11px;
         font-weight: 600;
-        border: 1px solid rgba(255,255,255,0.12);
+        border: 1px solid #e2e8f0;
         cursor: pointer;
         transition: all 0.15s;
         font-family: 'Inter', sans-serif;
-        background: rgba(255,255,255,0.06);
+        background: #f8fafc;
     }
     .oact-btn--edit {
-        color: #93c5fd;
+        color: #2563eb;
     }
     .oact-btn--edit:hover {
         background: #2563eb;
@@ -88,7 +88,7 @@
         border-color: #2563eb;
     }
     .oact-btn--delete {
-        color: #fca5a5;
+        color: #dc2626;
     }
     .oact-btn--delete:hover {
         background: #dc2626;
@@ -96,7 +96,7 @@
         border-color: #dc2626;
     }
     .oact-btn--slots {
-        color: #c4b5fd;
+        color: #7c3aed;
     }
     .oact-btn--slots:hover {
         background: #7c3aed;
@@ -109,10 +109,10 @@
         border: none;
         border-radius: 20px;
         overflow: hidden;
-        background: #0f2942;
+        background: #ffffff;
     }
     .office-modal .modal-header {
-        background: linear-gradient(135deg, #0d9488, #0e7490);
+        background: linear-gradient(135deg, #2563eb, #1e40af);
         color: #fff;
         border: none;
         padding: 20px 24px;
@@ -122,12 +122,12 @@
     }
     .office-modal .modal-body {
         padding: 24px;
-        background: #0f2942;
+        background: #ffffff;
     }
     .office-modal .form-label {
         font-size: 12px;
         font-weight: 600;
-        color: #e2e8f0;
+        color: #334155;
         margin-bottom: 4px;
     }
     .office-modal .form-control,
@@ -135,24 +135,24 @@
         border-radius: 10px;
         font-size: 13px;
         font-family: 'Inter', sans-serif;
-        border: 1px solid rgba(255,255,255,0.15);
+        border: 1px solid #cbd5e1;
         padding: 8px 12px;
-        background: rgba(255,255,255,0.06);
-        color: #5eead4;
+        background: #f8fafc;
+        color: #1e293b;
     }
     .office-modal .form-control:focus,
     .office-modal .form-select:focus {
-        border-color: #0d9488;
-        box-shadow: 0 0 0 3px rgba(13,148,136,0.2);
-        background: rgba(255,255,255,0.08);
-        color: #5eead4;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+        background: #ffffff;
+        color: #1e293b;
     }
     .office-modal .form-select option {
-        background: #0f2942;
-        color: #e2e8f0;
+        background: #ffffff;
+        color: #1e293b;
     }
     .office-modal .form-control::placeholder {
-        color: rgba(255,255,255,0.35);
+        color: #94a3b8;
     }
     .office-form-row {
         display: grid;
@@ -170,7 +170,7 @@
     .pin-picker-wrap {
         border-radius: 12px;
         overflow: hidden;
-        border: 2px solid rgba(255,255,255,0.15);
+        border: 2px solid #e2e8f0;
         margin-top: 4px;
         position: relative;
     }
@@ -183,7 +183,7 @@
         top: 8px;
         left: 8px;
         z-index: 1000;
-        background: rgba(13,148,136,0.9);
+        background: rgba(37,99,235,0.9);
         color: #fff;
         font-size: 11px;
         padding: 4px 10px;
@@ -195,11 +195,11 @@
         gap: 8px;
         margin-top: 6px;
         font-size: 11px;
-        color: #94a3b8;
+        color: #64748b;
     }
     .coords-display code {
-        background: rgba(255,255,255,0.08);
-        color: #5eead4;
+        background: #f1f5f9;
+        color: #2563eb;
         padding: 2px 6px;
         border-radius: 4px;
         font-size: 11px;
@@ -215,7 +215,7 @@
         padding: 3px 10px;
         border-radius: 20px;
         background: rgba(251,191,36,0.15);
-        color: #fbbf24;
+        color: #b45309;
         border: 1px solid rgba(251,191,36,0.25);
     }
 
@@ -223,7 +223,7 @@
     .delete-modal .modal-content {
         border: none;
         border-radius: 16px;
-        background: #0f2942;
+        background: #ffffff;
     }
     .delete-modal .modal-header {
         background: linear-gradient(135deg, #ef4444, #dc2626);
@@ -235,15 +235,15 @@
         filter: brightness(0) invert(1);
     }
     .delete-modal .modal-body p {
-        color: #e2e8f0 !important;
+        color: #334155 !important;
     }
     .delete-modal .modal-footer {
-        border-top: 1px solid rgba(255,255,255,0.08) !important;
+        border-top: 1px solid #e2e8f0 !important;
     }
     .delete-modal .modal-footer .btn-light {
-        background: rgba(255,255,255,0.08);
-        color: #e2e8f0;
-        border: 1px solid rgba(255,255,255,0.12);
+        background: #f1f5f9;
+        color: #334155;
+        border: 1px solid #e2e8f0;
     }
     .btn-confirm-delete {
         background: linear-gradient(135deg, #ef4444, #dc2626);
@@ -267,19 +267,19 @@
         align-items: center;
         gap: 10px;
         padding: 8px 14px;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.15);
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
         border-radius: 10px;
         cursor: pointer;
         transition: all 0.2s;
         font-family: 'Inter', sans-serif;
-        color: #5eead4;
+        color: #1e293b;
         font-size: 13px;
         width: 100%;
     }
     .icon-picker-selected:hover {
-        border-color: #0d9488;
-        background: rgba(255,255,255,0.08);
+        border-color: #2563eb;
+        background: #f1f5f9;
     }
     .icon-picker-selected i.preview-icon {
         font-size: 18px;
@@ -288,16 +288,16 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(13,148,136,0.2);
+        background: rgba(37,99,235,0.1);
         border-radius: 8px;
-        color: #5eead4;
+        color: #2563eb;
     }
     .icon-picker-selected .preview-label {
         flex: 1;
     }
     .icon-picker-selected .preview-arrow {
         font-size: 10px;
-        color: rgba(255,255,255,0.4);
+        color: #94a3b8;
         transition: transform 0.2s;
     }
     .icon-picker-selected.open .preview-arrow {
@@ -309,8 +309,8 @@
         gap: 6px;
         margin-top: 8px;
         padding: 10px;
-        background: rgba(0,0,0,0.25);
-        border: 1px solid rgba(255,255,255,0.10);
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
         max-height: 200px;
         overflow-y: auto;
@@ -320,7 +320,7 @@
     }
     .icon-picker-grid::-webkit-scrollbar { width: 6px; }
     .icon-picker-grid::-webkit-scrollbar-track { background: transparent; }
-    .icon-picker-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+    .icon-picker-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     .icon-picker-item {
         display: flex;
         flex-direction: column;
@@ -331,23 +331,23 @@
         cursor: pointer;
         border: 2px solid transparent;
         transition: all 0.15s;
-        background: rgba(255,255,255,0.04);
+        background: #ffffff;
     }
     .icon-picker-item:hover {
-        background: rgba(13,148,136,0.15);
-        border-color: rgba(13,148,136,0.3);
+        background: rgba(37,99,235,0.08);
+        border-color: rgba(37,99,235,0.2);
     }
     .icon-picker-item.active {
-        background: rgba(13,148,136,0.25);
-        border-color: #0d9488;
+        background: rgba(37,99,235,0.12);
+        border-color: #2563eb;
     }
     .icon-picker-item i {
         font-size: 18px;
-        color: #5eead4;
+        color: #2563eb;
     }
     .icon-picker-item span {
         font-size: 9px;
-        color: rgba(255,255,255,0.5);
+        color: #64748b;
         text-align: center;
         line-height: 1.2;
     }
@@ -676,8 +676,8 @@
 
             <!-- Assigned Students List -->
             <div class="detail-students-section" id="detailStudentsSection" style="display:none;">
-                <h5 style="font-size:13px; font-weight:700; color:#e2e8f0; margin:16px 0 10px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08);">
-                    <i class="fa-solid fa-user-graduate" style="color:#5eead4; margin-right:6px;"></i>
+                <h5 style="font-size:13px; font-weight:700; color:#334155; margin:16px 0 10px; padding-top:14px; border-top:1px solid #e2e8f0;">
+                    <i class="fa-solid fa-user-graduate" style="color:#2563eb; margin-right:6px;"></i>
                     Assigned Student Assistants
                 </h5>
                 <div class="detail-student-list" id="detailStudentList"></div>
@@ -779,7 +779,7 @@
                     {{ office_form.description }}
                 </div>
                 <div class="full-width">
-                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#5eead4; margin-right:4px;"></i> Location &mdash; Click on the map to set pin</label>
+                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#2563eb; margin-right:4px;"></i> Location &mdash; Click on the map to set pin</label>
                     <div class="pin-picker-wrap">
                         <div class="pin-picker-help"><i class="fa-solid fa-crosshairs"></i> Click to place pin</div>
                         <div class="pin-picker-map" id="addPinMap"></div>
@@ -862,7 +862,7 @@
                     <textarea name="description" class="form-control" id="editDescription" rows="3"></textarea>
                 </div>
                 <div class="full-width">
-                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#5eead4; margin-right:4px;"></i> Location &mdash; Click on the map to move pin</label>
+                    <label class="form-label"><i class="fa-solid fa-map-pin" style="color:#2563eb; margin-right:4px;"></i> Location &mdash; Click on the map to move pin</label>
                     <div class="pin-picker-wrap">
                         <div class="pin-picker-help"><i class="fa-solid fa-crosshairs"></i> Click to move pin</div>
                         <div class="pin-picker-map" id="editPinMap"></div>
@@ -1057,7 +1057,7 @@ function showMapToast(message, type) {
     var existing = document.getElementById('mapToast');
     if (existing) existing.remove();
     var colors = {
-        success: { bg: 'linear-gradient(135deg,#0d9488,#0e7490)', icon: 'fa-circle-check' },
+        success: { bg: 'linear-gradient(135deg,#2563eb,#1e40af)', icon: 'fa-circle-check' },
         error:   { bg: 'linear-gradient(135deg,#ef4444,#dc2626)', icon: 'fa-circle-xmark' },
         info:    { bg: 'linear-gradient(135deg,#6366f1,#4f46e5)', icon: 'fa-circle-info' }
     };
