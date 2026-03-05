@@ -657,6 +657,9 @@
                 var preview = document.getElementById('preview_' + currentField);
                 preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <i class="fa-solid fa-camera" style="color:#94a3b8;"></i> ' + data.filename;
                 preview.style.display = 'block';
+
+                var card = preview.closest('.applyform-doc-card');
+                if (card) hideFileUpload(card);
             }
         })
         .catch(function(err) {
@@ -696,6 +699,44 @@
         if(old) old.remove();
     }
 
+    // ── Toggle camera / file upload visibility ──
+    function hideCamera(card) {
+        var camBtn = card.querySelector('.btn-camera-sm');
+        if (camBtn) camBtn.style.display = 'none';
+        addChangeLink(card, 'file');
+    }
+    function hideFileUpload(card) {
+        var upload = card.querySelector('.custom-file-upload');
+        if (upload) upload.style.display = 'none';
+        addChangeLink(card, 'camera');
+    }
+    function addChangeLink(card, source) {
+        if (card.querySelector('.btn-change-input')) return;
+        var link = document.createElement('button');
+        link.type = 'button';
+        link.className = 'btn-change-input';
+        link.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Change';
+        link.style.cssText = 'background:none;border:none;color:#60a5fa;font-size:0.78rem;cursor:pointer;margin-top:4px;padding:0;';
+        link.addEventListener('click', function() {
+            var camBtn = card.querySelector('.btn-camera-sm');
+            var upload = card.querySelector('.custom-file-upload');
+            var preview = card.querySelector('.file-preview');
+            var fileInput = card.querySelector('input[type="file"]');
+            var hiddenPhoto = card.querySelector('input[type="hidden"][id^="photo_"]');
+            if (camBtn) camBtn.style.display = '';
+            if (upload) upload.style.display = '';
+            if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
+            if (fileInput) { fileInput.value = ''; }
+            if (hiddenPhoto) { hiddenPhoto.value = ''; }
+            var textSpan = card.querySelector('.custom-file-text');
+            if (textSpan) { textSpan.textContent = textSpan.dataset.default; textSpan.classList.remove('has-file'); }
+            clearFileWarning(card);
+            link.remove();
+        });
+        var preview = card.querySelector('.file-preview');
+        if (preview) preview.after(link);
+    }
+
     document.querySelectorAll('input[type="file"]').forEach(function(input) {
         input.addEventListener('change', function() {
             // Update custom file text
@@ -722,6 +763,13 @@
                 return;
             }
 
+            // Show file name and hide camera button
+            if (preview) {
+                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + this.files[0].name;
+                preview.style.display = 'block';
+                hideCamera(card);
+            }
+
             var file = this.files[0];
             var ext  = getFileExt(file.name);
             var fieldName = this.name || '';
@@ -743,12 +791,6 @@
                 this.value = '';
                 if (preview) preview.style.display = 'none';
                 return;
-            }
-
-            // Show file name
-            if (preview) {
-                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + file.name;
-                preview.style.display = 'block';
             }
 
             // Server-side OpenCV validation for images
