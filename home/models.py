@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinLengthValidator, RegexValidator
 
 
 class Office(models.Model):
@@ -173,7 +174,10 @@ class NewApplication(models.Model):
     address = models.TextField()
 
     # ── Academic Information ──
-    student_id = models.CharField(max_length=8, unique=True)
+    student_id = models.CharField(
+        max_length=8, unique=True,
+        validators=[MinLengthValidator(8), RegexValidator(r'^\d{8}$', 'Student ID must be exactly 8 digits.')],
+    )
     course = models.CharField(max_length=100)
     year_level = models.IntegerField(choices=YEAR_LEVEL_CHOICES)
     semester = models.CharField(max_length=5, choices=SEMESTER_CHOICES)
@@ -244,7 +248,10 @@ class RenewalApplication(models.Model):
     STATUS_CHOICES = NewApplication.STATUS_CHOICES
 
     # ── Identity ──
-    student_id = models.CharField(max_length=8, unique=True)
+    student_id = models.CharField(
+        max_length=8, unique=True,
+        validators=[MinLengthValidator(8), RegexValidator(r'^\d{8}$', 'Student ID must be exactly 8 digits.')],
+    )
     full_name = models.CharField(max_length=200)
     email = models.EmailField()
     contact_number = models.CharField(max_length=11)

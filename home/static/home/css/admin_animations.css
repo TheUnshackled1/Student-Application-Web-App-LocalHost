@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Custom Admin Animations for Django JET Reboot
+Custom Admin Animations for Django JET Reboot
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Keyframes ── */
@@ -390,6 +390,29 @@ input[type="checkbox"] {
 }
 input[type="checkbox"]:checked {
     animation: pulse 0.3s ease;
+}
+
+/* ── Actions Bar (dropdown + run button) ── */
+.actions,
+#changelist .actions,
+.changelist-form-container .actions {
+    position: relative;
+    z-index: 100;
+}
+.actions select,
+#changelist .actions select {
+    position: relative;
+    z-index: 101;
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+.actions .button,
+#changelist .actions .button,
+#changelist .actions input[type="submit"] {
+    position: relative;
+    z-index: 101;
+    pointer-events: auto !important;
+    cursor: pointer;
 }
 
 /* ── Calendar & Date Widgets ── */

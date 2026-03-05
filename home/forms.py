@@ -178,8 +178,9 @@ class NewApplicationForm(forms.ModelForm):
                 'placeholder': 'Home address (click Detect to auto-fill)',
             }),
             'student_id': forms.TextInput(attrs={
-                'class': 'form-control', 'maxlength': 8,
+                'class': 'form-control', 'maxlength': 8, 'minlength': 8,
                 'placeholder': '12345678', 'inputmode': 'numeric',
+                'pattern': '\\d{8}', 'title': 'Student ID must be exactly 8 digits',
             }),
             'course': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -209,8 +210,8 @@ class NewApplicationForm(forms.ModelForm):
         val = self.cleaned_data['student_id']
         if not val.isdigit():
             raise forms.ValidationError('Student ID must contain only digits.')
-        if len(val) > 8:
-            raise forms.ValidationError('Student ID must be at most 8 digits.')
+        if len(val) != 8:
+            raise forms.ValidationError('Student ID must be exactly 8 digits.')
         if NewApplication.objects.filter(student_id=val).exists():
             raise forms.ValidationError('An application with this Student ID already exists.')
         return val
@@ -292,8 +293,9 @@ class RenewalApplicationForm(forms.ModelForm):
         ]
         widgets = {
             'student_id': forms.TextInput(attrs={
-                'class': 'form-control', 'maxlength': 8,
+                'class': 'form-control', 'maxlength': 8, 'minlength': 8,
                 'placeholder': '12345678', 'inputmode': 'numeric',
+                'pattern': '\\d{8}', 'title': 'Student ID must be exactly 8 digits',
             }),
             'full_name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -349,8 +351,8 @@ class RenewalApplicationForm(forms.ModelForm):
         val = self.cleaned_data['student_id']
         if not val.isdigit():
             raise forms.ValidationError('Student ID must contain only digits.')
-        if len(val) > 8:
-            raise forms.ValidationError('Student ID must be at most 8 digits.')
+        if len(val) != 8:
+            raise forms.ValidationError('Student ID must be exactly 8 digits.')
         if RenewalApplication.objects.filter(student_id=val).exists():
             raise forms.ValidationError('A renewal application with this Student ID already exists.')
         return val
