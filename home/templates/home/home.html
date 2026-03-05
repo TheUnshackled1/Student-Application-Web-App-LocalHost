@@ -498,6 +498,45 @@
 
     </div>
 
+    <!-- ===== APPROVED STUDENT ASSISTANTS ===== -->
+    <div class="app-log-section">
+        <div class="dash-section-header">
+            <span class="dash-section-icon dash-section-icon--teal"><i class="fa-solid fa-user-check"></i></span>
+            <h3 class="dash-section-title">Approved Student Assistants</h3>
+            <p class="dash-section-hint">Students who have been approved for the SA program</p>
+        </div>
+        <div class="dash-status-table-wrap">
+            <table class="dash-status-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Student ID</th>
+                        <th>Course</th>
+                        <th>Assigned Office</th>
+                        <th>Start Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sa in approved_students %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td class="dash-st-name">{{ sa.name }}</td>
+                        <td><code>{{ sa.student_id }}</code></td>
+                        <td>{{ sa.course }}</td>
+                        <td>{{ sa.office }}</td>
+                        <td class="dash-st-date">{% if sa.start_date %}{{ sa.start_date|date:"M d, Y" }}{% else %}—{% endif %}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="dash-st-empty">No approved student assistants yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- ===== REMINDERS & ANNOUNCEMENTS TWO-COLUMN ===== -->
     <div class="home-two-col">
 
@@ -564,7 +603,7 @@
                 <div class="ann-list">
                     {% for announcement in announcements %}
                     <div class="ann-card content-card-clickable" style="cursor:pointer;"
-                         onclick="openContentPopup(event, 'announcement', '{{ announcement.title|escapejs }}', '{{ announcement.summary|escapejs }}', '{{ announcement.published_at|default:'' }}', '{% if announcement.image %}{{ announcement.image.url }}{% endif %}', {% if announcement.is_new %}true{% else %}false{% endif %})">
+                        onclick="openContentPopup(event, 'announcement', '{{ announcement.title|escapejs }}', '{{ announcement.summary|escapejs }}', '{{ announcement.published_at|default:'' }}', '{% if announcement.image %}{{ announcement.image.url }}{% endif %}', {% if announcement.is_new %}true{% else %}false{% endif %})">
                         <div class="ann-thumb">
                             {% if announcement.image %}
                                 <img src="{{ announcement.image.url }}" alt="{{ announcement.title }}">

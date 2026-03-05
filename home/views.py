@@ -486,12 +486,37 @@ def home(request):
         for a in db_announcements
     ]
 
+    # ── Approved Student Assistants (public list) ──
+    approved_new = NewApplication.objects.filter(status='approved').order_by('-submitted_at')
+    approved_renewal = RenewalApplication.objects.filter(status='approved').order_by('-submitted_at')
+    approved_students = []
+    for app in approved_new:
+        approved_students.append({
+            'name': f"{app.first_name} {app.last_name}",
+            'student_id': app.student_id,
+            'course': app.course,
+            'office': app.assigned_office or '—',
+            'start_date': app.start_date,
+            'submitted_at': app.submitted_at,
+        })
+    for app in approved_renewal:
+        approved_students.append({
+            'name': app.full_name,
+            'student_id': app.student_id,
+            'course': app.course,
+            'office': app.assigned_office or '—',
+            'start_date': app.start_date,
+            'submitted_at': app.submitted_at,
+        })
+    approved_students.sort(key=lambda x: x['submitted_at'], reverse=True)
+
     context = {
         'applications': applications,
         'has_application': has_application,
         'upcoming_dates': upcoming_dates,
         'reminders': reminders,
         'announcements': announcements,
+        'approved_students': approved_students,
         'track_error': track_error,
         'track_success': track_success,
         'submission_success': submission_success,
