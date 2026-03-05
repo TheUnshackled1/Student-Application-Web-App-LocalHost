@@ -109,6 +109,7 @@
         </div>
     </div>
 
+    {% if app.status != 'approved' and app.status != 'rejected' %}
     <div class="review-action-bar">
         <span class="review-action-label">Director Actions:</span>
         <div class="review-action-form" style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -135,6 +136,7 @@
             </button>
         </div>
     </div>
+    {% endif %}
     {% if app.interview_date or app.assigned_office or app.start_date %}
     <div class="review-workflow-cards">
         {% if app.interview_date %}

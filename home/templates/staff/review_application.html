@@ -111,17 +111,12 @@
         </div>
     </div>
 
+    {% if app.status != 'approved' and app.status != 'rejected' %}
     <div class="review-action-bar">
         <span class="review-action-label">Update Status:</span>
         <form method="post" action="{% url 'home:staff_update_application_status' app.pk %}" class="review-action-form">
             {% csrf_token %}
             <input type="hidden" name="next" value="{% url 'home:staff_review_application' app.pk %}">
-            <button type="submit" name="status" value="pending" class="review-status-btn review-btn--pending {% if app.status == 'pending' %}review-btn--current{% endif %}">
-                <i class="fa-solid fa-clock"></i> Pending
-            </button>
-            <button type="submit" name="status" value="under_review" class="review-status-btn review-btn--under_review {% if app.status == 'under_review' %}review-btn--current{% endif %}">
-                <i class="fa-solid fa-magnifying-glass"></i> Under Review
-            </button>
             <button type="button" class="review-status-btn review-btn--interview {% if app.status == 'interview_scheduled' %}review-btn--current{% endif %}" onclick="document.getElementById('interviewModal').classList.add('active'); document.body.style.overflow='hidden';">
                 <i class="fa-solid fa-calendar-check"></i> Schedule Interview
             </button>
@@ -145,6 +140,7 @@
         </button>
         {% endif %}
     </div>
+    {% endif %}
 
     {% if app.interview_date or app.assigned_office or app.start_date %}
     <div class="review-workflow-cards">
