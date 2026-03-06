@@ -161,6 +161,15 @@ def _create_active_sa_from_application(app):
         status='active',
     )
 
+    # Auto-calculate end_date (80 weekdays, skipping no-duty days)
+    if app.start_date:
+        from django.db.models import Q as _Q
+        ndd_qs = NoDutyDay.objects.filter(
+            _Q(office=office_fk) | _Q(office__isnull=True)
+        )
+        no_duty_dates = list(ndd_qs.values_list('date', flat=True))
+        sa.end_date = calculate_end_date(app.start_date, duty_days=80, no_duty_dates=no_duty_dates)
+
     if is_renewal:
         sa.renewal_application = app
     else:
@@ -1847,6 +1856,29 @@ def staff_log_attendance(request, pk):
     form = AttendanceForm(request.POST)
     if form.is_valid():
         record = form.save(commit=False)
+        att_date = record.date
+
+        # ── Attendance blocking checks ──
+        # Weekend check
+        if att_date.weekday() >= 5:
+            messages.error(request, f'Cannot log attendance on a weekend ({att_date.strftime("%A")}).')
+            return redirect('home:staff_sa_detail', pk=pk)
+
+        # Expired duty check
+        if sa.end_date and att_date > sa.end_date:
+            messages.error(request, f'Cannot log attendance past the duty end date ({sa.end_date}).')
+            return redirect('home:staff_sa_detail', pk=pk)
+
+        # No-duty day check
+        from django.db.models import Q as _Q
+        is_no_duty = NoDutyDay.objects.filter(
+            _Q(office=sa.assigned_office) | _Q(office__isnull=True),
+            date=att_date,
+        ).exists()
+        if is_no_duty:
+            messages.error(request, f'{att_date} is a No-Duty Day. Attendance cannot be logged.')
+            return redirect('home:staff_sa_detail', pk=pk)
+
         record.student_assistant = sa
         record.logged_by = request.user
         record.save()
@@ -2019,6 +2051,26 @@ def director_log_attendance(request, pk):
     form = AttendanceForm(request.POST)
     if form.is_valid():
         record = form.save(commit=False)
+        att_date = record.date
+
+        # ── Attendance blocking checks ──
+        if att_date.weekday() >= 5:
+            messages.error(request, f'Cannot log attendance on a weekend ({att_date.strftime("%A")}).')
+            return redirect('home:director_sa_detail', pk=pk)
+
+        if sa.end_date and att_date > sa.end_date:
+            messages.error(request, f'Cannot log attendance past the duty end date ({sa.end_date}).')
+            return redirect('home:director_sa_detail', pk=pk)
+
+        from django.db.models import Q as _Q
+        is_no_duty = NoDutyDay.objects.filter(
+            _Q(office=sa.assigned_office) | _Q(office__isnull=True),
+            date=att_date,
+        ).exists()
+        if is_no_duty:
+            messages.error(request, f'{att_date} is a No-Duty Day. Attendance cannot be logged.')
+            return redirect('home:director_sa_detail', pk=pk)
+
         record.student_assistant = sa
         record.logged_by = request.user
         record.save()
