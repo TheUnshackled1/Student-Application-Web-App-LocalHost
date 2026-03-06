@@ -28,6 +28,7 @@ from .email_utils import (
 )
 from datetime import date as _date, datetime as _datetime, timedelta
 import json
+import calendar
 from collections import defaultdict
 from decimal import Decimal
 import base64
@@ -2601,10 +2602,16 @@ def student_dashboard(request):
                     m -= 12
                     y += 1
                 month_label = _date(y, m, 1).strftime('%B %Y')
+                # Count weekdays (Mon-Fri) in this month
+                weekdays_in_month = sum(
+                    1 for d in range(1, calendar.monthrange(y, m)[1] + 1)
+                    if _date(y, m, d).weekday() < 5
+                )
                 hours = hours_by_month.get((y, m), Decimal('0'))
                 payout = round(hours * HOURLY_RATE, 2)
                 monthly_payout.append({
                     'month': month_label,
+                    'weekdays': weekdays_in_month,
                     'hours': float(hours),
                     'rate': float(HOURLY_RATE),
                     'payout': float(payout),
