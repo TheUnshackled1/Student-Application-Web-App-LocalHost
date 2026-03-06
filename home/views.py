@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout as auth_logout
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import Http404, HttpResponseForbidden, JsonResponse
 from django.views.decorators.http import require_POST
@@ -10,17 +11,20 @@ from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
     ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
-    ApplicationNote,
+    ApplicationNote, NoDutyDay,
+    calculate_end_date, recalculate_end_dates_for_office, auto_expire_student_assistants,
 )
 from .forms import (
     ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm,
     RenewalApplicationForm, OfficeForm, AttendanceForm, PerformanceEvaluationForm,
     ActiveSAStatusForm, ScheduleResubmitForm, DocumentResubmitForm,
+    StudentRegistrationForm, StudentLoginForm, NoDutyDayForm,
     DAY_CHOICES, TIME_SLOT_CHOICES,
 )
 from .email_utils import (
     send_application_confirmation, send_status_update_email,
     send_schedule_mismatch_email, send_document_request_email,
+    send_verification_email,
 )
 from datetime import date as _date, timedelta
 import json
@@ -622,7 +626,11 @@ def apply_new(request):
     if request.method == 'POST':
         form = NewApplicationForm(request.POST, request.FILES)
         if form.is_valid():
-            application = form.save()
+            application = form.save(commit=False)
+            # Link authenticated student
+            if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
+                application.user = request.user
+            application.save()
             request.session['application_pk'] = application.pk
             # Persist student_id in session for reliable lookup
             tracked = request.session.get('tracked_student_ids', [])
@@ -668,7 +676,11 @@ def apply_renew(request):
     if request.method == 'POST':
         form = RenewalApplicationForm(request.POST, request.FILES)
         if form.is_valid():
-            application = form.save()
+            application = form.save(commit=False)
+            # Link authenticated student
+            if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
+                application.user = request.user
+            application.save()
             request.session['renewal_pk'] = application.pk
             # Persist student_id in session for reliable lookup
             tracked = request.session.get('tracked_student_ids', [])
@@ -2211,3 +2223,267 @@ def director_add_note(request, pk):
         )
         messages.success(request, 'Note added.')
     return redirect('home:director_review_application', pk=pk)
+
+
+# ================================================================
+#  STUDENT REGISTRATION & AUTHENTICATION
+# ================================================================
+
+def student_register(request):
+    """Registration page for students."""
+    if request.user.is_authenticated:
+        if hasattr(request.user, 'student_profile'):
+            return redirect('home:student_dashboard')
+        return redirect('home:home')
+
+    if request.method == 'POST':
+        form = StudentRegistrationForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            # Create user with is_active=False (verify email first)
+            user = User.objects.create_user(
+                username=cd['student_id'],
+                email=cd['email'],
+                password=cd['password'],
+                first_name=cd['first_name'],
+                last_name=cd['last_name'],
+                is_active=False,
+            )
+            # Create StudentProfile
+            StudentProfile.objects.create(
+                user=user,
+                student_id=cd['student_id'],
+                full_name=f"{cd['first_name']} {cd['last_name']}",
+            )
+            # Send verification email
+            send_verification_email(user, request)
+            messages.success(
+                request,
+                'Registration successful! Please check your email to verify your account before logging in.'
+            )
+            return redirect('home:student_login')
+    else:
+        form = StudentRegistrationForm()
+
+    return render(request, 'student/register.html', {'form': form})
+
+
+def verify_email(request, uidb64, token):
+    """Email verification endpoint."""
+    from django.contrib.auth.tokens import default_token_generator
+    from django.utils.http import urlsafe_base64_decode
+
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save(update_fields=['is_active'])
+        if hasattr(user, 'student_profile'):
+            user.student_profile.email_verified = True
+            user.student_profile.save(update_fields=['email_verified'])
+        messages.success(request, 'Your email has been verified! You can now log in.')
+        return redirect('home:student_login')
+    else:
+        messages.error(request, 'Invalid or expired verification link.')
+        return redirect('home:student_login')
+
+
+def student_login(request):
+    """Login page for students using student_id + password."""
+    if request.user.is_authenticated:
+        if hasattr(request.user, 'student_profile'):
+            return redirect('home:student_dashboard')
+        return redirect('home:home')
+
+    error = None
+    if request.method == 'POST':
+        form = StudentLoginForm(request.POST)
+        if form.is_valid():
+            sid = form.cleaned_data['student_id']
+            pw = form.cleaned_data['password']
+            # username is student_id
+            user = authenticate(request, username=sid, password=pw)
+            if user is not None:
+                if not user.is_active:
+                    error = 'Please verify your email before logging in. Check your inbox.'
+                else:
+                    login(request, user)
+                    return redirect('home:student_dashboard')
+            else:
+                error = 'Invalid Student ID or password.'
+    else:
+        form = StudentLoginForm()
+
+    return render(request, 'student/login.html', {'form': form, 'error': error})
+
+
+# ================================================================
+#  STUDENT DASHBOARD
+# ================================================================
+
+@login_required
+def student_dashboard(request):
+    """Dashboard for authenticated students."""
+    if not hasattr(request.user, 'student_profile'):
+        return redirect('home:home')
+
+    profile = request.user.student_profile
+    student_id = profile.student_id
+
+    # Run auto-expire check
+    auto_expire_student_assistants()
+
+    today = _date.today()
+
+    # ── Applications ──
+    new_apps = list(NewApplication.objects.filter(student_id=student_id).order_by('-submitted_at'))
+    renewal_apps = list(RenewalApplication.objects.filter(student_id=student_id).order_by('-submitted_at'))
+
+    applications = []
+
+    for app in new_apps:
+        documents = _build_documents_from_app(app)
+        steps = _build_steps_from_status(app.status)
+        display_status, status_message = STATUS_DISPLAY_MAP.get(
+            app.status, ('Under Review', "Your documents are currently being verified.")
+        )
+        total_steps = len(steps)
+        done_steps = sum(1 for s in steps if s['status'] == 'done')
+        progress_pct = int((done_steps / total_steps) * 100) if total_steps else 0
+        total_docs = len(documents)
+        completed_docs = sum(1 for d in documents if d['status'] in ('uploaded', 'done'))
+        pending_docs = sum(1 for d in documents if d['status'] in ('pending', 'missing'))
+
+        applications.append({
+            'obj': app, 'app_type': 'New Application', 'app_type_key': 'new',
+            'student_name': f"{app.first_name} {app.last_name}",
+            'application_id': app.student_id, 'documents': documents, 'steps': steps,
+            'application_status': display_status, 'status_message': status_message,
+            'raw_status': app.status, 'progress_percent': progress_pct,
+            'total_steps': total_steps, 'completed_steps': done_steps,
+            'total_docs': total_docs, 'completed_docs': completed_docs, 'pending_docs': pending_docs,
+            'submitted_at': app.submitted_at,
+            'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
+            'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+        })
+
+    for app in renewal_apps:
+        documents = _build_documents_from_renewal(app)
+        steps = _build_steps_from_status(app.status)
+        display_status, status_message = STATUS_DISPLAY_MAP.get(
+            app.status, ('Under Review', "Your documents are currently being verified.")
+        )
+        total_steps = len(steps)
+        done_steps = sum(1 for s in steps if s['status'] == 'done')
+        progress_pct = int((done_steps / total_steps) * 100) if total_steps else 0
+        total_docs = len(documents)
+        completed_docs = sum(1 for d in documents if d['status'] in ('uploaded', 'done'))
+        pending_docs = sum(1 for d in documents if d['status'] in ('pending', 'missing'))
+
+        applications.append({
+            'obj': app, 'app_type': 'Renewal Application', 'app_type_key': 'renewal',
+            'student_name': app.full_name,
+            'application_id': app.student_id, 'documents': documents, 'steps': steps,
+            'application_status': display_status, 'status_message': status_message,
+            'raw_status': app.status, 'progress_percent': progress_pct,
+            'total_steps': total_steps, 'completed_steps': done_steps,
+            'total_docs': total_docs, 'completed_docs': completed_docs, 'pending_docs': pending_docs,
+            'submitted_at': app.submitted_at,
+            'schedule_mismatch_note': app.schedule_mismatch_note if app.status == 'schedule_mismatch' else '',
+            'requested_documents_note': app.requested_documents_note if app.status == 'documents_requested' else '',
+        })
+
+    applications.sort(key=lambda x: x['submitted_at'], reverse=True)
+
+    # ── Active SA records ──
+    from django.db.models import Q
+    active_sa_records = ActiveStudentAssistant.objects.filter(
+        student_id=student_id
+    ).select_related('assigned_office')
+
+    sa_data = []
+    for sa in active_sa_records:
+        attendance = sa.attendance_records.all()[:20]
+        evaluations = sa.evaluations.all()
+
+        # Remaining weekdays
+        remaining_days = 0
+        if sa.end_date and sa.start_date and sa.status == 'active':
+            cursor = today
+            while cursor <= sa.end_date:
+                if cursor.weekday() < 5:
+                    remaining_days += 1
+                cursor += timedelta(days=1)
+
+        # Upcoming no-duty days within duty period
+        ndd_qs = NoDutyDay.objects.filter(
+            Q(office=sa.assigned_office) | Q(office__isnull=True),
+            date__gte=today,
+        )
+        if sa.end_date:
+            ndd_qs = ndd_qs.filter(date__lte=sa.end_date)
+        no_duty_days = list(ndd_qs.order_by('date')[:20])
+
+        sa_data.append({
+            'sa': sa,
+            'attendance': attendance,
+            'evaluations': evaluations,
+            'remaining_days': remaining_days,
+            'no_duty_days': no_duty_days,
+        })
+
+    context = {
+        'profile': profile,
+        'applications': applications,
+        'has_application': len(applications) > 0,
+        'sa_data': sa_data,
+        'today': today,
+        'day_choices': DAY_CHOICES,
+        'time_slot_choices': TIME_SLOT_CHOICES,
+    }
+    return render(request, 'student/dashboard.html', context)
+
+
+# ================================================================
+#  NO-DUTY DAY MANAGEMENT (Staff)
+# ================================================================
+
+@login_required
+@require_POST
+def staff_add_no_duty_day(request):
+    """Staff adds a no-duty day."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    form = NoDutyDayForm(request.POST)
+    if form.is_valid():
+        ndd = form.save(commit=False)
+        ndd.created_by = request.user
+        ndd.save()
+        # Recalculate end dates for affected SAs
+        recalculate_end_dates_for_office(ndd.office)
+        messages.success(request, f'No-Duty Day added: {ndd.date} — {ndd.reason}')
+    else:
+        error_list = '; '.join(
+            f"{field}: {', '.join(errs)}" for field, errs in form.errors.items()
+        )
+        messages.error(request, f'Failed to add No-Duty Day: {error_list}')
+    return redirect('home:staff_dashboard')
+
+
+@login_required
+@require_POST
+def staff_delete_no_duty_day(request, pk):
+    """Staff deletes a no-duty day."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+    ndd = get_object_or_404(NoDutyDay, pk=pk)
+    office = ndd.office
+    ndd.delete()
+    # Recalculate end dates after removal
+    recalculate_end_dates_for_office(office)
+    messages.success(request, 'No-Duty Day removed.')
+    return redirect('home:staff_dashboard')

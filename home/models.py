@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator, RegexValidator
+from datetime import date as _date, timedelta
 
 
 class Office(models.Model):
@@ -26,12 +27,16 @@ class Office(models.Model):
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
-    application_id = models.CharField(max_length=20, unique=True)
+    student_id = models.CharField(
+        max_length=8, unique=True,
+        validators=[MinLengthValidator(8), RegexValidator(r'^\d{8}$', 'Student ID must be exactly 8 digits.')],
+    )
     full_name = models.CharField(max_length=200)
+    email_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.full_name} ({self.application_id})"
+        return f"{self.full_name} ({self.student_id})"
 
 
 class Document(models.Model):
@@ -162,6 +167,12 @@ class NewApplication(models.Model):
         ('rejected', 'Rejected'),
     ]
 
+    # ── Link to authenticated user ──
+    user = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='new_applications',
+    )
+
     # ── Personal Information ──
     first_name = models.CharField(max_length=15)
     middle_initial = models.CharField(max_length=1)
@@ -181,6 +192,12 @@ class NewApplication(models.Model):
     course = models.CharField(max_length=100)
     year_level = models.IntegerField(choices=YEAR_LEVEL_CHOICES)
     semester = models.CharField(max_length=5, choices=SEMESTER_CHOICES)
+
+    # ── GPA ──
+    gpa = models.DecimalField(
+        max_digits=3, decimal_places=2, null=True, blank=True,
+        help_text='General weighted average (1.00–5.00 scale).',
+    )
 
     # ── Document Uploads ──
     application_form = models.FileField(upload_to='applications/new/', blank=True)
@@ -247,6 +264,12 @@ class RenewalApplication(models.Model):
     SEMESTER_CHOICES = NewApplication.SEMESTER_CHOICES
     STATUS_CHOICES = NewApplication.STATUS_CHOICES
 
+    # ── Link to authenticated user ──
+    user = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='renewal_applications',
+    )
+
     # ── Identity ──
     student_id = models.CharField(
         max_length=8, unique=True,
@@ -275,6 +298,12 @@ class RenewalApplication(models.Model):
     )
     hours_rendered = models.PositiveIntegerField()
     supervisor_name = models.CharField(max_length=200, blank=True, default='')
+
+    # ── GPA ──
+    gpa = models.DecimalField(
+        max_digits=3, decimal_places=2, null=True, blank=True,
+        help_text='General weighted average (1.00–5.00 scale).',
+    )
 
     # ── Renewal Documents ──
     id_picture = models.ImageField(upload_to='applications/renewal/', blank=True)
@@ -531,3 +560,89 @@ class PerformanceEvaluation(models.Model):
                   self.cooperation, self.communication]
         self.overall_rating = round(sum(scores) / len(scores), 2)
         super().save(*args, **kwargs)
+
+
+# ================================================================
+#  No-Duty Day (holidays / office closures)
+# ================================================================
+
+class NoDutyDay(models.Model):
+    """A date on which student assistants cannot log duty."""
+    date = models.DateField()
+    reason = models.CharField(max_length=200, help_text='e.g. Holiday, Office Closed')
+    office = models.ForeignKey(
+        Office, null=True, blank=True, on_delete=models.CASCADE,
+        related_name='no_duty_days',
+        help_text='Leave blank to apply to ALL offices.',
+    )
+    created_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='no_duty_days_created',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date']
+        unique_together = ['date', 'office']
+        verbose_name = 'No-Duty Day'
+        verbose_name_plural = 'No-Duty Days'
+
+    def __str__(self):
+        scope = self.office.name if self.office else 'All Offices'
+        return f"{self.date} — {self.reason} ({scope})"
+
+
+# ================================================================
+#  Duty period helper
+# ================================================================
+
+def calculate_end_date(start_date, duty_days=80, no_duty_dates=None):
+    """
+    Calculate the end date by counting `duty_days` weekdays forward
+    from `start_date`, skipping weekends and any dates in `no_duty_dates`.
+    """
+    if not start_date:
+        return None
+    no_duty_set = set(no_duty_dates or [])
+    current = start_date
+    counted = 0
+    while counted < duty_days:
+        current += timedelta(days=1)
+        # Skip weekends (5=Saturday, 6=Sunday)
+        if current.weekday() >= 5:
+            continue
+        # Skip no-duty days
+        if current in no_duty_set:
+            continue
+        counted += 1
+    return current
+
+
+def recalculate_end_dates_for_office(office=None):
+    """
+    Recalculate end_date for all active SAs affected by no-duty-day changes.
+    If office is None, recalculate for all active SAs.
+    """
+    from django.db.models import Q
+    sas = ActiveStudentAssistant.objects.filter(status='active', start_date__isnull=False)
+    if office:
+        sas = sas.filter(Q(assigned_office=office) | Q(assigned_office__isnull=True))
+
+    for sa in sas:
+        # Collect no-duty dates relevant to this SA's office
+        ndd_qs = NoDutyDay.objects.filter(
+            Q(office=sa.assigned_office) | Q(office__isnull=True)
+        )
+        no_duty_dates = list(ndd_qs.values_list('date', flat=True))
+        sa.end_date = calculate_end_date(sa.start_date, duty_days=80, no_duty_dates=no_duty_dates)
+        sa.save(update_fields=['end_date'])
+
+
+def auto_expire_student_assistants():
+    """Mark any active SA whose end_date has passed as expired."""
+    today = _date.today()
+    ActiveStudentAssistant.objects.filter(
+        status='active',
+        end_date__isnull=False,
+        end_date__lt=today,
+    ).update(status='expired')

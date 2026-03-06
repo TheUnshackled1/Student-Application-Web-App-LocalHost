@@ -11,6 +11,13 @@ urlpatterns = [
     path('apply/check-student/', views.check_student_id, name='check_student_id'),
     path('apply/camera-photo/', views.process_camera_photo, name='process_camera_photo'),
     path('apply/validate-document/', views.validate_document, name='validate_document'),
+
+    # ---- Student Auth & Dashboard ----
+    path('register/', views.student_register, name='student_register'),
+    path('student/login/', views.student_login, name='student_login'),
+    path('verify-email/<str:uidb64>/<str:token>/', views.verify_email, name='verify_email'),
+    path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
+
     path('staff/login/', views.staff_login, name='staff_login'),
     path('director/login/', views.director_login, name='director_login'),
     path('staff/', views.staff_dashboard, name='staff_dashboard'),
@@ -68,4 +75,8 @@ urlpatterns = [
 
     # ---- Director: Notes ----
     path('director/applications/<int:pk>/add-note/', views.director_add_note, name='director_add_note'),
+
+    # ---- Staff: No-Duty Days ----
+    path('staff/no-duty/add/', views.staff_add_no_duty_day, name='staff_add_no_duty_day'),
+    path('staff/no-duty/<int:pk>/delete/', views.staff_delete_no_duty_day, name='staff_delete_no_duty_day'),
 ]

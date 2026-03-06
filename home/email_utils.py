@@ -127,3 +127,31 @@ def _send(subject, message, recipient):
     except Exception as e:
         logger.error('Failed to send email to %s: %s', recipient, e)
         return False
+
+
+def send_verification_email(user, request=None):
+    """Send an email-verification link after student registration."""
+    from django.contrib.auth.tokens import default_token_generator
+    from django.utils.http import urlsafe_base64_encode
+    from django.utils.encoding import force_bytes
+
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+
+    # Build absolute link
+    if request:
+        base = request.build_absolute_uri('/')[:-1]
+    else:
+        base = 'http://localhost:8000'
+
+    link = f"{base}/verify-email/{uid}/{token}/"
+    subject = 'SWA Application — Verify Your Email'
+    message = (
+        f"Dear {user.first_name} {user.last_name},\n\n"
+        f"Thank you for registering on the SWA Application System.\n\n"
+        f"Please verify your email by clicking the link below:\n"
+        f"  {link}\n\n"
+        f"If you did not create this account, you can ignore this email.\n\n"
+        f"— SWA Application System"
+    )
+    return _send(subject, message, user.email)

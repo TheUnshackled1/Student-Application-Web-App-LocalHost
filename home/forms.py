@@ -1,8 +1,11 @@
 from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import (
     Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication,
     Office, ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
+    StudentProfile, NoDutyDay,
 )
 import json
 
@@ -138,7 +141,7 @@ class NewApplicationForm(forms.ModelForm):
         fields = [
             'first_name', 'middle_initial', 'last_name', 'extension_name',
             'date_of_birth', 'gender', 'contact_number', 'email', 'address',
-            'student_id', 'course', 'year_level', 'semester', 'preferred_office',
+            'student_id', 'course', 'year_level', 'semester', 'gpa', 'preferred_office',
             'availability_schedule',
             'application_form', 'id_picture', 'barangay_clearance',
             'parents_itr', 'enrolment_form', 'schedule_classes',
@@ -188,6 +191,11 @@ class NewApplicationForm(forms.ModelForm):
             }),
             'year_level': forms.Select(attrs={'class': 'form-select'}),
             'semester': forms.Select(attrs={'class': 'form-select'}),
+            'gpa': forms.NumberInput(attrs={
+                'class': 'form-control', 'step': '0.01',
+                'min': '1.00', 'max': '5.00',
+                'placeholder': 'e.g. 1.75',
+            }),
             'preferred_office': forms.Select(attrs={'class': 'form-select'}),
         }
 
@@ -285,7 +293,7 @@ class RenewalApplicationForm(forms.ModelForm):
         model = RenewalApplication
         fields = [
             'student_id', 'full_name', 'email', 'contact_number', 'address',
-            'course', 'year_level', 'semester',
+            'course', 'year_level', 'semester', 'gpa',
             'previous_office', 'preferred_office', 'hours_rendered', 'supervisor_name',
             'availability_schedule',
             'id_picture', 'enrolment_form', 'schedule_classes', 'grades_last_sem',
@@ -319,6 +327,11 @@ class RenewalApplicationForm(forms.ModelForm):
             }),
             'year_level': forms.Select(attrs={'class': 'form-select'}),
             'semester': forms.Select(attrs={'class': 'form-select'}),
+            'gpa': forms.NumberInput(attrs={
+                'class': 'form-control', 'step': '0.01',
+                'min': '1.00', 'max': '5.00',
+                'placeholder': 'e.g. 1.75',
+            }),
             'previous_office': forms.Select(attrs={'class': 'form-select'}),
             'preferred_office': forms.Select(attrs={'class': 'form-select'}),
             'hours_rendered': forms.NumberInput(attrs={
@@ -621,3 +634,115 @@ class ActiveSAStatusForm(forms.ModelForm):
                 'class': 'form-control', 'min': '1',
             }),
         }
+
+
+# ================================================================
+#  STUDENT REGISTRATION & LOGIN FORMS
+# ================================================================
+
+class StudentRegistrationForm(forms.Form):
+    """Registration form for students."""
+    student_id = forms.CharField(
+        max_length=8, min_length=8,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control', 'placeholder': '12345678',
+            'inputmode': 'numeric', 'pattern': r'\d{8}',
+            'title': 'Student ID must be exactly 8 digits',
+        }),
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control', 'placeholder': 'name@example.com',
+        }),
+    )
+    first_name = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control', 'placeholder': 'First name',
+        }),
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control', 'placeholder': 'Last name',
+        }),
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control', 'placeholder': 'Password',
+        }),
+    )
+    password_confirm = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control', 'placeholder': 'Confirm password',
+        }),
+    )
+
+    def clean_student_id(self):
+        val = self.cleaned_data['student_id']
+        if not val.isdigit():
+            raise ValidationError('Student ID must contain only digits.')
+        if StudentProfile.objects.filter(student_id=val).exists():
+            raise ValidationError('An account with this Student ID already exists.')
+        return val
+
+    def clean_email(self):
+        val = self.cleaned_data['email']
+        if User.objects.filter(email=val).exists():
+            raise ValidationError('An account with this email already exists.')
+        return val
+
+    def clean_password(self):
+        val = self.cleaned_data['password']
+        validate_password(val)
+        return val
+
+    def clean(self):
+        cleaned = super().clean()
+        pw = cleaned.get('password')
+        pw2 = cleaned.get('password_confirm')
+        if pw and pw2 and pw != pw2:
+            self.add_error('password_confirm', 'Passwords do not match.')
+        return cleaned
+
+
+class StudentLoginForm(forms.Form):
+    """Login form using student_id + password."""
+    student_id = forms.CharField(
+        max_length=8, min_length=8,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control', 'placeholder': 'Student ID (8 digits)',
+            'inputmode': 'numeric',
+        }),
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control', 'placeholder': 'Password',
+        }),
+    )
+
+
+# ================================================================
+#  NO-DUTY DAY FORM
+# ================================================================
+
+class NoDutyDayForm(forms.ModelForm):
+    class Meta:
+        model = NoDutyDay
+        fields = ['date', 'reason', 'office']
+        widgets = {
+            'date': forms.DateInput(attrs={
+                'class': 'form-control', 'type': 'date',
+            }),
+            'reason': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Holiday, Office Closed',
+            }),
+            'office': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['office'].queryset = Office.objects.filter(is_active=True).order_by('name')
+        self.fields['office'].empty_label = 'All Offices'
+        self.fields['office'].required = False

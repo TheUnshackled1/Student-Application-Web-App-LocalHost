@@ -3,14 +3,15 @@ from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
     ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
-    ApplicationNote,
+    ApplicationNote, NoDutyDay,
 )
 
 
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'application_id', 'user', 'created_at')
-    search_fields = ('full_name', 'application_id')
+    list_display = ('full_name', 'student_id', 'user', 'email_verified', 'created_at')
+    search_fields = ('full_name', 'student_id')
+    list_filter = ('email_verified',)
 
 
 @admin.register(Document)
@@ -98,6 +99,19 @@ class PerformanceEvaluationAdmin(admin.ModelAdmin):
     list_display = ('student_assistant', 'evaluation_period', 'overall_rating',
                     'evaluated_by', 'evaluated_at')
     list_filter = ('evaluation_period',)
+
+
+@admin.register(ApplicationNote)
+class ApplicationNoteAdmin(admin.ModelAdmin):
+    list_display = ('note_type', 'author', 'created_at')
+    list_filter = ('note_type',)
+
+
+@admin.register(NoDutyDay)
+class NoDutyDayAdmin(admin.ModelAdmin):
+    list_display = ('date', 'reason', 'office', 'created_by', 'created_at')
+    list_filter = ('office', 'date')
+    search_fields = ('reason',)
     search_fields = ('student_assistant__full_name', 'student_assistant__student_id')
 
 
