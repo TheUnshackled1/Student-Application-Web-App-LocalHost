@@ -135,6 +135,36 @@ document.getElementById('navToggle').addEventListener('click',function(){
     var i=this.querySelector('i');i.classList.toggle('fa-bars');i.classList.toggle('fa-xmark');
 });
 </script>
+
+<!-- ========== 3D TILT / PARALLAX EFFECT ========== -->
+<script>
+(function(){
+    var tiltCards = document.querySelectorAll('.card');
+    var maxTilt = 4, perspective = 1000, scale = 1.05, glowStrength = 0.45;
+    tiltCards.forEach(function(card){
+        card.style.perspective = perspective + 'px';
+        card.addEventListener('mouseenter', function(){
+            card.style.transition = 'transform 0.08s ease-out, box-shadow 0.08s ease-out';
+        });
+        card.addEventListener('mousemove', function(e){
+            var rect = card.getBoundingClientRect();
+            var x = e.clientX - rect.left, y = e.clientY - rect.top;
+            var centerX = rect.width / 2, centerY = rect.height / 2;
+            var rotateY = ((x - centerX) / centerX) * maxTilt;
+            var rotateX = ((centerY - y) / centerY) * maxTilt;
+            var shadowX = -rotateY * 2.5, shadowY = rotateX * 2.5;
+            card.style.transform = 'perspective(' + perspective + 'px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(' + scale + ',' + scale + ',' + scale + ')';
+            card.style.boxShadow = shadowX + 'px ' + (8 + shadowY) + 'px 30px rgba(37,99,235,' + glowStrength + '), 0 0 60px rgba(59,130,246,0.08), inset 0 0 0 1px rgba(59,130,246,0.15)';
+        });
+        card.addEventListener('mouseleave', function(){
+            card.style.transition = 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 1s ease';
+            card.style.transform = 'perspective(' + perspective + 'px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+            card.style.boxShadow = '';
+        });
+    });
+})();
+</script>
+
 <footer class="site-footer">
     <p>&copy; 2026 Tyrone, Ramsey, Gracee &amp; Dhenby. All rights reserved.</p>
 </footer>
