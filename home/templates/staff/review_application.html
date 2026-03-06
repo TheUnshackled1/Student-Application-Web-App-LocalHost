@@ -427,6 +427,36 @@
                     Set an interview date for <strong>{{ app.first_name }} {{ app.last_name }}</strong>.
                     The student will see this on their dashboard.
                 </p>
+
+                {% if availability %}
+                <div style="margin-bottom:16px; padding:12px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;">
+                    <p style="font-size:12px; font-weight:700; color:#374151; margin-bottom:8px;">
+                        <i class="fa-solid fa-calendar-check" style="color:#8b5cf6;"></i> Student's Availability
+                    </p>
+                    <table style="width:100%; font-size:11px; border-collapse:collapse; text-align:center;">
+                        <thead>
+                            <tr style="background:#e2e8f0;">
+                                <th style="padding:4px; font-size:10px;">Time</th>
+                                {% for d_val, d_label in day_choices %}
+                                <th style="padding:4px; font-size:10px;">{{ d_label|truncatechars:3 }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in schedule_grid %}
+                            <tr>
+                                <td style="padding:3px; font-weight:600; white-space:nowrap; font-size:10px;">{{ row.label }}</td>
+                                {% for cell in row.cells %}
+                                <td style="padding:3px;">
+                                    {% if cell %}<i class="fa-solid fa-check-circle" style="color:#22c55e; font-size:11px;"></i>{% else %}<span style="color:#cbd5e1;">–</span>{% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
                 <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #374151;">
                     Interview Date &amp; Time
                 </label>
