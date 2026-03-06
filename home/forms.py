@@ -220,8 +220,20 @@ class NewApplicationForm(forms.ModelForm):
             raise forms.ValidationError('Student ID must contain only digits.')
         if len(val) != 8:
             raise forms.ValidationError('Student ID must be exactly 8 digits.')
-        if NewApplication.objects.filter(student_id=val).exists():
-            raise forms.ValidationError('An application with this Student ID already exists.')
+        # Block if an active/pending new application exists (allow re-apply after rejected)
+        blocking_statuses = ['pending', 'under_review', 'schedule_mismatch', 'documents_requested',
+                             'interview_scheduled', 'interview_done', 'office_assigned', 'approved']
+        if NewApplication.objects.filter(student_id=val, status__in=blocking_statuses).exists():
+            raise forms.ValidationError(
+                'You already have an active application. '
+                'Please track your existing application or wait until it is completed.'
+            )
+        # Cross-model: if already approved (new), suggest renewal
+        if NewApplication.objects.filter(student_id=val, status='approved').exists():
+            raise forms.ValidationError(
+                'You already have an approved application. '
+                'Please use the Renewal form instead.'
+            )
         return val
 
     def clean_date_of_birth(self):
@@ -366,8 +378,14 @@ class RenewalApplicationForm(forms.ModelForm):
             raise forms.ValidationError('Student ID must contain only digits.')
         if len(val) != 8:
             raise forms.ValidationError('Student ID must be exactly 8 digits.')
-        if RenewalApplication.objects.filter(student_id=val).exists():
-            raise forms.ValidationError('A renewal application with this Student ID already exists.')
+        # Block if an active/pending renewal exists
+        blocking_statuses = ['pending', 'under_review', 'schedule_mismatch', 'documents_requested',
+                             'interview_scheduled', 'interview_done', 'office_assigned', 'approved']
+        if RenewalApplication.objects.filter(student_id=val, status__in=blocking_statuses).exists():
+            raise forms.ValidationError(
+                'You already have an active renewal application. '
+                'Please track your existing application or wait until it is completed.'
+            )
         return val
 
     # ── Document file validators (size & type) ──

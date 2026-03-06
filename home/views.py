@@ -1016,6 +1016,9 @@ def staff_dashboard(request):
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('home:home')
 
+    # Auto-expire SAs whose duty period has ended
+    auto_expire_student_assistants()
+
     # ── Real application data from NewApplication + RenewalApplication ──
     new_apps = NewApplication.objects.all()
     renewal_apps = RenewalApplication.objects.all()
@@ -1452,6 +1455,9 @@ def director_dashboard(request):
     """Student Director dashboard view. Accessible by superusers only."""
     if not request.user.is_superuser:
         return redirect('home:home')
+
+    # Auto-expire SAs whose duty period has ended
+    auto_expire_student_assistants()
 
     all_apps = NewApplication.objects.all()
 
