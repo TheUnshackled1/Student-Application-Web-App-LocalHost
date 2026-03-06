@@ -1460,6 +1460,7 @@ def director_dashboard(request):
     auto_expire_student_assistants()
 
     all_apps = NewApplication.objects.all()
+    renewal_apps = RenewalApplication.objects.all()
 
     # Applications awaiting interview (interview_scheduled)
     interview_apps = all_apps.filter(
@@ -1491,6 +1492,60 @@ def director_dashboard(request):
 
     offices = Office.objects.filter(is_active=True).order_by('name')
 
+    # ── Build unified list of ALL students for the director table ──
+    all_students = []
+    today = _date.today()
+
+    for app in all_apps.order_by('-submitted_at'):
+        dob = app.date_of_birth
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day)) if dob else None
+        all_students.append({
+            'pk': app.pk,
+            'app_type': 'New',
+            'app_type_class': 'new',
+            'student_id': app.student_id,
+            'first_name': app.first_name,
+            'last_name': app.last_name,
+            'full_name': f"{app.first_name} {app.middle_initial}. {app.last_name}" + (f" {app.extension_name}" if app.extension_name else ""),
+            'email': app.email,
+            'contact_number': app.contact_number,
+            'course': app.course,
+            'year_level_display': app.get_year_level_display(),
+            'semester_display': app.get_semester_display(),
+            'preferred_office': app.preferred_office.name if app.preferred_office else '',
+            'interview_date': app.interview_date,
+            'assigned_office': app.assigned_office,
+            'submitted_at': app.submitted_at,
+            'status': app.status,
+            'status_display': app.get_status_display(),
+            'is_renewal': False,
+        })
+
+    for app in renewal_apps.order_by('-submitted_at'):
+        all_students.append({
+            'pk': app.pk,
+            'app_type': 'Renewal',
+            'app_type_class': 'renewal',
+            'student_id': app.student_id,
+            'full_name': app.full_name,
+            'first_name': app.full_name.split()[0] if app.full_name else '',
+            'last_name': ' '.join(app.full_name.split()[1:]) if app.full_name else '',
+            'email': app.email,
+            'contact_number': app.contact_number,
+            'course': app.course,
+            'year_level_display': app.get_year_level_display(),
+            'semester_display': app.get_semester_display(),
+            'preferred_office': app.preferred_office.name if app.preferred_office else '',
+            'interview_date': app.interview_date,
+            'assigned_office': app.assigned_office,
+            'submitted_at': app.submitted_at,
+            'status': app.status,
+            'status_display': app.get_status_display(),
+            'is_renewal': True,
+        })
+
+    all_students.sort(key=lambda x: x['submitted_at'], reverse=True)
+
     context = {
         'director_name': request.user.get_full_name() or 'Director',
         'interview_apps': interview_apps,
@@ -1498,6 +1553,7 @@ def director_dashboard(request):
         'office_assigned_apps': office_assigned_apps,
         'approved_apps': approved_apps,
         'all_apps': all_apps.order_by('-submitted_at'),
+        'all_students': all_students,
         'stats': stats,
         'offices': offices,
     }

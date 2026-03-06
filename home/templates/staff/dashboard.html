@@ -10,6 +10,28 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+.staff-filter-select {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    min-width: 140px;
+}
+.staff-filter-select:focus {
+    outline: none;
+    border-color: rgba(99,102,241,0.5);
+    box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
+}
+.staff-filter-select option {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+</style>
 </head>
 <body>
 
@@ -144,6 +166,28 @@
                 <input type="text" id="studentSearchInput" class="staff-search-input" placeholder="Search by name, student ID, or email…">
             </div>
         </div>
+        <div class="staff-toolbar" style="padding-top:0; gap:10px; flex-wrap:wrap;">
+            <select id="filterCourse" class="staff-filter-select">
+                <option value="">All Courses</option>
+            </select>
+            <select id="filterYear" class="staff-filter-select">
+                <option value="">All Years</option>
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
+            </select>
+            <select id="filterSemester" class="staff-filter-select">
+                <option value="">All Semesters</option>
+                <option value="1st Semester">1st Semester</option>
+                <option value="2nd Semester">2nd Semester</option>
+            </select>
+            <select id="filterType" class="staff-filter-select">
+                <option value="">All Types</option>
+                <option value="New">New</option>
+                <option value="Renewal">Renewal</option>
+            </select>
+        </div>
 
         <div class="staff-table-wrap">
             <table class="staff-table" id="applicationsTable">
@@ -162,6 +206,7 @@
                 <tbody>
                     {% for s in all_students %}
                     <tr data-status="{{ s.status }}" data-search="{{ s.student_id }} {{ s.full_name }} {{ s.email }}"
+                        data-course="{{ s.course }}" data-year="{{ s.year_level_display }}" data-semester="{{ s.semester_display }}" data-type="{{ s.app_type }}"
                         style="cursor:pointer;"
                         onclick="openStudentModal(this, event)"
                         data-s-name="{{ s.full_name }}"
@@ -895,14 +940,33 @@ function toggleEditForm(id) {
     });
 
     var searchInput = document.getElementById('studentSearchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            applyFilters();
+    var filterCourse = document.getElementById('filterCourse');
+    var filterYear = document.getElementById('filterYear');
+    var filterSemester = document.getElementById('filterSemester');
+    var filterType = document.getElementById('filterType');
+
+    // Auto-populate course dropdown from table data
+    if (filterCourse) {
+        var courses = new Set();
+        rows.forEach(function(r) { var c = r.getAttribute('data-course'); if (c) courses.add(c); });
+        Array.from(courses).sort().forEach(function(c) {
+            var opt = document.createElement('option'); opt.value = c; opt.textContent = c;
+            filterCourse.appendChild(opt);
         });
     }
 
+    if (searchInput) { searchInput.addEventListener('input', function() { applyFilters(); }); }
+    if (filterCourse) { filterCourse.addEventListener('change', function() { applyFilters(); }); }
+    if (filterYear) { filterYear.addEventListener('change', function() { applyFilters(); }); }
+    if (filterSemester) { filterSemester.addEventListener('change', function() { applyFilters(); }); }
+    if (filterType) { filterType.addEventListener('change', function() { applyFilters(); }); }
+
     function applyFilters() {
         var search = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        var courseVal = filterCourse ? filterCourse.value : '';
+        var yearVal = filterYear ? filterYear.value : '';
+        var semesterVal = filterSemester ? filterSemester.value : '';
+        var typeVal = filterType ? filterType.value : '';
         var visibleCount = 0;
 
         var oldEmpty = document.getElementById('filterEmptyRow');
@@ -915,7 +979,11 @@ function toggleEditForm(id) {
                 var searchText = (row.getAttribute('data-search') || '').toLowerCase();
                 matchSearch = searchText.indexOf(search) !== -1;
             }
-            var visible = matchFilter && matchSearch;
+            var matchCourse = !courseVal || row.getAttribute('data-course') === courseVal;
+            var matchYear = !yearVal || row.getAttribute('data-year') === yearVal;
+            var matchSemester = !semesterVal || row.getAttribute('data-semester') === semesterVal;
+            var matchType = !typeVal || row.getAttribute('data-type') === typeVal;
+            var visible = matchFilter && matchSearch && matchCourse && matchYear && matchSemester && matchType;
             row.style.display = visible ? '' : 'none';
             if (visible) visibleCount++;
         });
