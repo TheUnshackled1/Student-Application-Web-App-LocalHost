@@ -57,7 +57,7 @@
             </div>
             <div class="status-text">
                 <h2 class="status-title">Welcome, {{ profile.full_name }}</h2>
-                <p class="status-message">Student ID: {{ profile.student_id }} &mdash; Your application dashboard</p>
+                <p class="status-message">Student ID: {{ profile.student_id }} &mdash; Student Assistant Application Dashboard</p>
             </div>
         </div>
     </div>
@@ -65,7 +65,7 @@
     {% if messages %}
     <div class="container mt-3">
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="border-radius:10px; font-size:.9rem;">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -76,10 +76,10 @@
     <!-- ── Quick Actions ── -->
     <div class="container mt-4">
         <div class="d-flex flex-wrap gap-2 mb-4">
-            <a href="{% url 'home:apply_new' %}" class="btn btn-sm text-white" style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
+            <a href="{% url 'home:apply_new' %}" class="btn btn-sm text-white" style="background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:8px; font-weight:600; letter-spacing:.3px;">
                 <i class="fa-solid fa-file-circle-plus me-1"></i> New Application
             </a>
-            <a href="{% url 'home:apply_renew' %}" class="btn btn-sm text-white" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);">
+            <a href="{% url 'home:apply_renew' %}" class="btn btn-sm text-white" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed); border-radius:8px; font-weight:600; letter-spacing:.3px;">
                 <i class="fa-solid fa-arrows-rotate me-1"></i> Renewal Application
             </a>
         </div>
@@ -88,43 +88,49 @@
     <!-- ── Applications Section ── -->
     {% if applications %}
     <div class="container mb-4">
-        <h4 class="fw-bold mb-3"><i class="fa-solid fa-file-lines me-2"></i>My Applications</h4>
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; font-size:.95rem;">
+                <i class="fa-solid fa-file-lines"></i>
+            </span>
+            <h4 class="fw-bold mb-0" style="letter-spacing:-.3px;">My Applications</h4>
+        </div>
 
         {% for app_card in applications %}
-        <div class="card mb-3" style="border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.06);">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+        <div class="card mb-3" style="border:none; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06); overflow:hidden;">
+            <!-- Status ribbon -->
+            <div style="height:4px; background:{% if app_card.raw_status == 'approved' %}linear-gradient(90deg,#22c55e,#16a34a){% elif app_card.raw_status == 'rejected' %}linear-gradient(90deg,#ef4444,#dc2626){% elif app_card.raw_status == 'pending' %}linear-gradient(90deg,#f59e0b,#d97706){% else %}linear-gradient(90deg,#94a3b8,#64748b){% endif %};"></div>
+            <div class="card-body p-4">
+                <!-- Header row -->
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                     <div>
-                        <span class="badge {% if app_card.app_type_key == 'new' %}bg-primary{% else %}bg-info text-dark{% endif %} mb-1">{{ app_card.app_type }}</span>
-                        <h5 class="mb-0 fw-bold">{{ app_card.student_name }}</h5>
-                        <small class="text-muted">Submitted {{ app_card.submitted_at|date:"M d, Y" }}</small>
+                        <span class="badge {% if app_card.app_type_key == 'new' %}text-white{% else %}text-white{% endif %} mb-2" style="font-size:.72rem; font-weight:600; letter-spacing:.5px; padding:5px 10px; border-radius:6px; background:{% if app_card.app_type_key == 'new' %}#4f46e5{% else %}#0891b2{% endif %};">{{ app_card.app_type|upper }}</span>
+                        <h5 class="mb-1 fw-bold" style="letter-spacing:-.2px;">{{ app_card.student_name }}</h5>
+                        <small class="text-muted" style="font-size:.82rem;">Submitted {{ app_card.submitted_at|date:"M d, Y" }}</small>
                     </div>
-                    <div class="text-end">
-                        <span class="badge
-                            {% if app_card.raw_status == 'approved' %}bg-success
-                            {% elif app_card.raw_status == 'rejected' %}bg-danger
-                            {% elif app_card.raw_status == 'pending' %}bg-warning text-dark
-                            {% else %}bg-secondary{% endif %}
-                            " style="font-size:.85rem;">{{ app_card.application_status }}</span>
-                    </div>
+                    <span class="badge
+                        {% if app_card.raw_status == 'approved' %}bg-success
+                        {% elif app_card.raw_status == 'rejected' %}bg-danger
+                        {% elif app_card.raw_status == 'pending' %}bg-warning text-dark
+                        {% else %}bg-secondary{% endif %}
+                        " style="font-size:.82rem; font-weight:600; padding:6px 14px; border-radius:8px;">{{ app_card.application_status }}</span>
                 </div>
 
-                <p class="text-muted small mb-2">{{ app_card.status_message }}</p>
+                <p class="text-muted mb-3" style="font-size:.88rem; line-height:1.5;">{{ app_card.status_message }}</p>
 
-                <!-- Progress -->
+                <!-- Progress bar -->
                 <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span>Progress</span>
-                        <span>{{ app_card.completed_steps }}/{{ app_card.total_steps }} steps</span>
+                    <div class="d-flex justify-content-between mb-1" style="font-size:.82rem;">
+                        <span class="text-muted">Progress</span>
+                        <span class="fw-semibold">{{ app_card.completed_steps }}/{{ app_card.total_steps }} steps</span>
                     </div>
-                    <div class="progress" style="height:8px; border-radius:4px;">
-                        <div class="progress-bar" role="progressbar" style="width:{{ app_card.progress_percent }}%; background:linear-gradient(90deg,#6366f1,#4f46e5);"></div>
+                    <div class="progress" style="height:6px; border-radius:3px; background:#e2e8f0;">
+                        <div class="progress-bar" role="progressbar" style="width:{{ app_card.progress_percent }}%; background:linear-gradient(90deg,#6366f1,#4f46e5); border-radius:3px;"></div>
                     </div>
                 </div>
 
-                <!-- Documents summary -->
-                <div class="d-flex gap-3 small text-muted mb-2">
-                    <span><i class="fa-solid fa-file-check me-1"></i>{{ app_card.completed_docs }}/{{ app_card.total_docs }} docs uploaded</span>
+                <!-- Document summary -->
+                <div class="d-flex flex-wrap gap-3 mb-3" style="font-size:.84rem;">
+                    <span class="text-muted"><i class="fa-solid fa-file-check me-1 text-success"></i>{{ app_card.completed_docs }}/{{ app_card.total_docs }} documents uploaded</span>
                     {% if app_card.pending_docs > 0 %}
                     <span class="text-warning"><i class="fa-solid fa-triangle-exclamation me-1"></i>{{ app_card.pending_docs }} missing</span>
                     {% endif %}
@@ -132,7 +138,7 @@
 
                 <!-- Schedule mismatch alert -->
                 {% if app_card.schedule_mismatch_note %}
-                <div class="alert alert-warning py-2 px-3 small mb-2">
+                <div class="alert alert-warning py-2 px-3 mb-3" style="font-size:.84rem; border-radius:8px; border-left:4px solid #f59e0b;">
                     <i class="fa-solid fa-calendar-xmark me-1"></i>
                     <strong>Schedule Mismatch:</strong> {{ app_card.schedule_mismatch_note }}
                     <br>
@@ -142,7 +148,7 @@
 
                 <!-- Document request alert -->
                 {% if app_card.requested_documents_note %}
-                <div class="alert alert-info py-2 px-3 small mb-2">
+                <div class="alert alert-info py-2 px-3 mb-3" style="font-size:.84rem; border-radius:8px; border-left:4px solid #0ea5e9;">
                     <i class="fa-solid fa-file-circle-question me-1"></i>
                     <strong>Documents Requested:</strong> {{ app_card.requested_documents_note }}
                     <br>
@@ -150,32 +156,37 @@
                 </div>
                 {% endif %}
 
-                <!-- Interview date -->
-                {% if app_card.obj.interview_date %}
-                <div class="small">
-                    <i class="fa-solid fa-calendar-check me-1 text-primary"></i>
-                    <strong>Interview:</strong> {{ app_card.obj.interview_date|date:"M d, Y — g:i A" }}
-                </div>
-                {% endif %}
+                <!-- Key dates -->
+                <div class="d-flex flex-wrap gap-4" style="font-size:.84rem;">
+                    {% if app_card.obj.interview_date %}
+                    <div>
+                        <i class="fa-solid fa-calendar-check me-1 text-primary"></i>
+                        <span class="text-muted">Interview:</span>
+                        <strong>{{ app_card.obj.interview_date|date:"M d, Y — g:i A" }}</strong>
+                    </div>
+                    {% endif %}
 
-                <!-- Approval info -->
-                {% if app_card.raw_status == 'approved' and app_card.obj.start_date %}
-                <div class="alert alert-success py-2 px-3 small mt-2 mb-0">
-                    <i class="fa-solid fa-circle-check me-1"></i>
-                    <strong>Start Date:</strong> {{ app_card.obj.start_date|date:"M d, Y" }}
-                    {% if app_card.obj.assigned_office %} &mdash; Office: {{ app_card.obj.assigned_office }}{% endif %}
+                    {% if app_card.raw_status == 'approved' and app_card.obj.start_date %}
+                    <div class="d-flex align-items-center gap-2 p-2 rounded" style="background:#f0fdf4; border:1px solid #bbf7d0;">
+                        <i class="fa-solid fa-circle-check text-success"></i>
+                        <span>
+                            <span class="text-muted">Start Date:</span>
+                            <strong>{{ app_card.obj.start_date|date:"M d, Y" }}</strong>
+                            {% if app_card.obj.assigned_office %}<span class="text-muted mx-1">&bull;</span><strong>{{ app_card.obj.assigned_office }}</strong>{% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
     <div class="container mb-4">
-        <div class="card p-4 text-center" style="border-radius:12px;">
-            <i class="fa-solid fa-file-circle-plus fa-3x text-muted mb-3"></i>
-            <h5 class="fw-bold">No Applications Yet</h5>
-            <p class="text-muted">Submit your first application to get started.</p>
+        <div class="card p-5 text-center" style="border:none; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06);">
+            <i class="fa-solid fa-file-circle-plus fa-3x mb-3" style="color:#cbd5e1;"></i>
+            <h5 class="fw-bold mb-1">No Applications Yet</h5>
+            <p class="text-muted mb-0">Submit your first application to get started.</p>
         </div>
     </div>
     {% endif %}
@@ -183,38 +194,56 @@
     <!-- ── Active SA / Duty Section ── -->
     {% for item in sa_data %}
     <div class="container mb-4">
-        <h4 class="fw-bold mb-3"><i class="fa-solid fa-id-badge me-2"></i>Active Duty — {{ item.sa.assigned_office.name|default:"Unassigned" }}</h4>
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; font-size:.95rem;">
+                <i class="fa-solid fa-id-badge"></i>
+            </span>
+            <div>
+                <h4 class="fw-bold mb-0" style="letter-spacing:-.3px;">Active Duty &mdash; {{ item.sa.assigned_office.name|default:"Unassigned" }}</h4>
+                <p class="text-muted mb-0" style="font-size:.82rem;">Duty period details and time tracking</p>
+            </div>
+        </div>
 
-        <div class="card" style="border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.06);">
-            <div class="card-body">
-                <!-- Duty period info -->
-                <div class="row g-3 mb-3">
+        <div class="card" style="border:none; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06); overflow:hidden;">
+            <div style="height:4px; background:linear-gradient(90deg,#22c55e,#16a34a);"></div>
+            <div class="card-body p-4">
+
+                <!-- Duty period stat cards -->
+                <div class="row g-3 mb-4">
                     <div class="col-md-3 col-6">
-                        <div class="text-muted small">Status</div>
-                        <span class="badge {% if item.sa.status == 'active' %}bg-success{% elif item.sa.status == 'completed' %}bg-primary{% else %}bg-secondary{% endif %}">{{ item.sa.get_status_display }}</span>
+                        <div class="p-3 rounded-3 text-center" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                            <div class="text-muted mb-1" style="font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px;">Status</div>
+                            <span class="badge {% if item.sa.status == 'active' %}bg-success{% elif item.sa.status == 'completed' %}bg-primary{% else %}bg-secondary{% endif %}" style="font-size:.82rem; padding:5px 12px; border-radius:6px;">{{ item.sa.get_status_display }}</span>
+                        </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="text-muted small">Start Date</div>
-                        <strong>{{ item.sa.start_date|date:"M d, Y"|default:"—" }}</strong>
+                        <div class="p-3 rounded-3 text-center" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                            <div class="text-muted mb-1" style="font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px;">Start Date</div>
+                            <strong style="font-size:.92rem;">{{ item.sa.start_date|date:"M d, Y"|default:"—" }}</strong>
+                        </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="text-muted small">End Date</div>
-                        <strong>{{ item.sa.end_date|date:"M d, Y"|default:"—" }}</strong>
+                        <div class="p-3 rounded-3 text-center" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                            <div class="text-muted mb-1" style="font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px;">End Date</div>
+                            <strong style="font-size:.92rem;">{{ item.sa.end_date|date:"M d, Y"|default:"—" }}</strong>
+                        </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="text-muted small">Remaining Weekdays</div>
-                        <strong>{{ item.remaining_days }}</strong>
+                        <div class="p-3 rounded-3 text-center" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                            <div class="text-muted mb-1" style="font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px;">Remaining Days</div>
+                            <strong style="font-size:.92rem;">{{ item.remaining_days }}</strong>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Hours progress -->
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span>Hours Rendered</span>
-                        <span>{{ item.sa.total_hours }}/{{ item.sa.required_hours }} hrs ({{ item.sa.hours_percentage }}%)</span>
+                <div class="mb-4 p-3 rounded-3" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-semibold" style="font-size:.88rem;"><i class="fa-solid fa-chart-simple me-1 text-success"></i>Hours Rendered</span>
+                        <span class="fw-bold" style="font-size:.92rem;">{{ item.sa.total_hours }}<span class="text-muted fw-normal">/{{ item.sa.required_hours }} hrs</span> <small class="text-muted">({{ item.sa.hours_percentage }}%)</small></span>
                     </div>
-                    <div class="progress" style="height:8px; border-radius:4px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width:{{ item.sa.hours_percentage }}%;"></div>
+                    <div class="progress" style="height:8px; border-radius:4px; background:#e2e8f0;">
+                        <div class="progress-bar" role="progressbar" style="width:{{ item.sa.hours_percentage }}%; background:linear-gradient(90deg,#22c55e,#16a34a); border-radius:4px;"></div>
                     </div>
                 </div>
 
@@ -592,7 +621,7 @@ document.addEventListener('DOMContentLoaded', function(){
     var tiltCards = document.querySelectorAll(
         '.status-banner, .card, .staff-panel'
     );
-    var maxTilt = 4, perspective = 1000, scale = 1.05, glowStrength = 0.45;
+    var maxTilt = 1.5, perspective = 1200, scale = 1.02, glowStrength = 0.18;
     tiltCards.forEach(function(card){
         card.style.perspective = perspective + 'px';
         card.addEventListener('mouseenter', function(){

@@ -510,7 +510,7 @@ document.getElementById('navToggle').addEventListener('click',function(){
     var tiltCards = document.querySelectorAll(
         '.status-banner, .staff-stat-card, .staff-panel, .review-wf-card'
     );
-    var maxTilt = 4, perspective = 1000, scale = 1.05, glowStrength = 0.45;
+    var maxTilt = 1.5, perspective = 1200, scale = 1.02, glowStrength = 0.18;
     tiltCards.forEach(function(card){
         card.style.perspective = perspective + 'px';
         card.addEventListener('mouseenter', function(){
