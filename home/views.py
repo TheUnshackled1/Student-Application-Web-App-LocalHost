@@ -2602,15 +2602,16 @@ def student_dashboard(request):
                     m -= 12
                     y += 1
                 month_label = _date(y, m, 1).strftime('%B %Y')
-                # Count weekdays (Mon-Fri) in this month
+                days_in_month = calendar.monthrange(y, m)[1]
                 weekdays_in_month = sum(
-                    1 for d in range(1, calendar.monthrange(y, m)[1] + 1)
+                    1 for d in range(1, days_in_month + 1)
                     if _date(y, m, d).weekday() < 5
                 )
                 hours = hours_by_month.get((y, m), Decimal('0'))
                 payout = round(hours * HOURLY_RATE, 2)
                 monthly_payout.append({
                     'month': month_label,
+                    'days': days_in_month,
                     'weekdays': weekdays_in_month,
                     'hours': float(hours),
                     'rate': float(HOURLY_RATE),
@@ -2675,8 +2676,9 @@ def student_clock_in(request, pk):
     if not hasattr(request.user, 'student_profile'):
         return redirect('home:home')
     sa = get_object_or_404(ActiveStudentAssistant, pk=pk, student_id=request.user.student_profile.student_id, status='active')
-    today = _date.today()
-    now = timezone.localtime().time()
+    ph_now = timezone.localtime()
+    today = ph_now.date()
+    now = ph_now.time()
 
     record, created = AttendanceRecord.objects.get_or_create(
         student_assistant=sa,
@@ -2697,8 +2699,9 @@ def student_clock_out(request, pk):
     if not hasattr(request.user, 'student_profile'):
         return redirect('home:home')
     sa = get_object_or_404(ActiveStudentAssistant, pk=pk, student_id=request.user.student_profile.student_id, status='active')
-    today = _date.today()
-    now = timezone.localtime().time()
+    ph_now = timezone.localtime()
+    today = ph_now.date()
+    now = ph_now.time()
 
     try:
         record = AttendanceRecord.objects.get(student_assistant=sa, date=today)

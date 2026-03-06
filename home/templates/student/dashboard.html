@@ -262,6 +262,7 @@
                             <thead>
                                 <tr>
                                     <th>Month</th>
+                                    <th class="text-end">Days</th>
                                     <th class="text-end">Weekdays</th>
                                     <th class="text-end">Hours</th>
                                     <th class="text-end">Rate</th>
@@ -272,6 +273,7 @@
                             {% for mp in item.monthly_payout %}
                             <tr>
                                 <td>{{ mp.month }}</td>
+                                <td class="text-end">{{ mp.days }}</td>
                                 <td class="text-end">{{ mp.weekdays }}</td>
                                 <td class="text-end">{{ mp.hours }}</td>
                                 <td class="text-end">₱{{ mp.rate }}</td>
@@ -282,6 +284,7 @@
                             <tfoot>
                                 <tr class="fw-bold" style="border-top:2px solid #dee2e6;">
                                     <td>Total</td>
+                                    <td class="text-end" id="payoutTotalDays-{{ forloop.counter }}">—</td>
                                     <td class="text-end" id="payoutTotalWd-{{ forloop.counter }}">—</td>
                                     <td class="text-end" id="payoutTotalHrs-{{ forloop.counter }}">—</td>
                                     <td class="text-end">₱35.00</td>
@@ -420,14 +423,16 @@ document.addEventListener('DOMContentLoaded', function(){
         var idx = el.id.split('-')[1];
         var table = el.closest('table');
         var rows = table.querySelectorAll('tbody tr');
-        var totalWd = 0, totalHrs = 0, totalAmt = 0;
+        var totalDays = 0, totalWd = 0, totalHrs = 0, totalAmt = 0;
         rows.forEach(function(row){
             var cells = row.querySelectorAll('td');
-            totalWd += parseInt(cells[1].textContent) || 0;
-            totalHrs += parseFloat(cells[2].textContent) || 0;
-            var amt = cells[4].textContent.replace('₱','').trim();
+            totalDays += parseInt(cells[1].textContent) || 0;
+            totalWd += parseInt(cells[2].textContent) || 0;
+            totalHrs += parseFloat(cells[3].textContent) || 0;
+            var amt = cells[5].textContent.replace('₱','').trim();
             totalAmt += parseFloat(amt) || 0;
         });
+        document.getElementById('payoutTotalDays-' + idx).textContent = totalDays;
         document.getElementById('payoutTotalWd-' + idx).textContent = totalWd;
         el.textContent = totalHrs.toFixed(2);
         document.getElementById('payoutTotalAmt-' + idx).textContent = '₱' + totalAmt.toFixed(2);

@@ -500,7 +500,7 @@ class AttendanceRecord(models.Model):
 
     @property
     def hours_worked(self):
-        """Calculate hours worked from time_in and time_out."""
+        """Calculate hours worked from time_in and time_out, capped at 4 hours per day."""
         if self.time_in and self.time_out:
             from datetime import datetime, timedelta
             dt_in = datetime.combine(self.date, self.time_in)
@@ -508,7 +508,7 @@ class AttendanceRecord(models.Model):
             if dt_out < dt_in:  # overnight
                 dt_out += timedelta(days=1)
             diff = (dt_out - dt_in).total_seconds() / 3600
-            return round(diff, 2)
+            return round(min(diff, 4.0), 2)
         return 0
 
 
