@@ -101,18 +101,11 @@ class PerformanceEvaluationAdmin(admin.ModelAdmin):
     list_filter = ('evaluation_period',)
 
 
-@admin.register(ApplicationNote)
-class ApplicationNoteAdmin(admin.ModelAdmin):
-    list_display = ('note_type', 'author', 'created_at')
-    list_filter = ('note_type',)
-
-
 @admin.register(NoDutyDay)
 class NoDutyDayAdmin(admin.ModelAdmin):
     list_display = ('date', 'reason', 'office', 'created_by', 'created_at')
     list_filter = ('office', 'date')
     search_fields = ('reason',)
-    search_fields = ('student_assistant__full_name', 'student_assistant__student_id')
 
 
 @admin.register(ApplicationNote)
