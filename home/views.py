@@ -2229,6 +2229,8 @@ def resubmit_schedule(request, app_type, pk):
             messages.success(request, 'Your availability schedule has been updated and resubmitted.')
         else:
             messages.error(request, 'Invalid schedule data. Please try again.')
+    if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
+        return redirect('home:student_dashboard')
     return redirect('home:home')
 
 
@@ -2260,6 +2262,8 @@ def resubmit_documents(request, app_type, pk):
             messages.success(request, 'Your documents have been re-uploaded successfully.')
         else:
             messages.error(request, 'Please correct the errors below and try again.')
+    if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
+        return redirect('home:student_dashboard')
     return redirect('home:home')
 
 
@@ -2426,7 +2430,41 @@ def student_login(request):
                     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                     return redirect('home:student_dashboard')
             except StudentProfile.DoesNotExist:
-                error = 'No account found for this Student ID. Please register first.'
+                # Auto-create account if the student has an existing application
+                app = NewApplication.objects.filter(student_id=sid).order_by('-submitted_at').first()
+                if not app:
+                    app = RenewalApplication.objects.filter(student_id=sid).order_by('-submitted_at').first()
+
+                if app:
+                    if isinstance(app, NewApplication):
+                        first_name = app.first_name
+                        last_name = app.last_name
+                        email = app.email
+                    else:
+                        # RenewalApplication – split full_name
+                        parts = (app.full_name or '').split(None, 1)
+                        first_name = parts[0] if parts else ''
+                        last_name = parts[1] if len(parts) > 1 else ''
+                        email = app.email
+
+                    user = User.objects.create_user(
+                        username=sid,
+                        email=email,
+                        first_name=first_name,
+                        last_name=last_name,
+                    )
+                    user.set_unusable_password()
+                    user.save(update_fields=['password'])
+                    StudentProfile.objects.create(
+                        user=user,
+                        student_id=sid,
+                        full_name=f"{first_name} {last_name}".strip(),
+                        email_verified=True,
+                    )
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                    return redirect('home:student_dashboard')
+                else:
+                    error = 'No account found for this Student ID. Please register first.'
     else:
         form = StudentLoginForm()
 

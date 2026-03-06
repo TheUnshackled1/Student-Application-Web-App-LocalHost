@@ -420,6 +420,11 @@
             <i class="fa-solid fa-building-columns"></i>
             <span>Back to Dashboard</span>
         </a>
+        {% elif user.student_profile %}
+        <a href="{% url 'home:student_dashboard' %}" class="btn btn-nav btn-nav--student">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Dashboard</span>
+        </a>
         {% endif %}
         <form method="post" action="{% url 'logout' %}" style="margin:0;">
             {% csrf_token %}
