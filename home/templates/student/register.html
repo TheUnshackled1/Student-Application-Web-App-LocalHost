@@ -86,22 +86,6 @@
                         {% endif %}
                     </div>
 
-                    <div class="mb-3">
-                        <label for="id_password" class="form-label fw-semibold">Password</label>
-                        {{ form.password }}
-                        {% if form.password.errors %}
-                        <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="id_password_confirm" class="form-label fw-semibold">Confirm Password</label>
-                        {{ form.password_confirm }}
-                        {% if form.password_confirm.errors %}
-                        <div class="text-danger small mt-1">{{ form.password_confirm.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
                     <button type="submit" class="btn w-100 text-white fw-semibold" style="background:linear-gradient(135deg,#6366f1,#4f46e5);padding:.65rem;">
                         <i class="fa-solid fa-user-plus me-2"></i>Register
                     </button>

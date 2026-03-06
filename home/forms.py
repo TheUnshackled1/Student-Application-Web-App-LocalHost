@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import (
     Reminder, UpcomingDate, Announcement, NewApplication, RenewalApplication,
@@ -685,16 +684,6 @@ class StudentRegistrationForm(forms.Form):
             'class': 'form-control', 'placeholder': 'Last name',
         }),
     )
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control', 'placeholder': 'Password',
-        }),
-    )
-    password_confirm = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control', 'placeholder': 'Confirm password',
-        }),
-    )
 
     def clean_student_id(self):
         val = self.cleaned_data['student_id']
@@ -710,32 +699,13 @@ class StudentRegistrationForm(forms.Form):
             raise ValidationError('An account with this email already exists.')
         return val
 
-    def clean_password(self):
-        val = self.cleaned_data['password']
-        validate_password(val)
-        return val
-
-    def clean(self):
-        cleaned = super().clean()
-        pw = cleaned.get('password')
-        pw2 = cleaned.get('password_confirm')
-        if pw and pw2 and pw != pw2:
-            self.add_error('password_confirm', 'Passwords do not match.')
-        return cleaned
-
-
 class StudentLoginForm(forms.Form):
-    """Login form using student_id + password."""
+    """Login form using student_id only."""
     student_id = forms.CharField(
         max_length=8, min_length=8,
         widget=forms.TextInput(attrs={
             'class': 'form-control', 'placeholder': 'Student ID (8 digits)',
             'inputmode': 'numeric',
-        }),
-    )
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control', 'placeholder': 'Password',
         }),
     )
 

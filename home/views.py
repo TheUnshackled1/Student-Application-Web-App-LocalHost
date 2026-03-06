@@ -2354,26 +2354,25 @@ def student_register(request):
         form = StudentRegistrationForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            # Create user with is_active=False (verify email first)
+            # Create user (no password — students log in by Student ID)
             user = User.objects.create_user(
                 username=cd['student_id'],
                 email=cd['email'],
-                password=cd['password'],
                 first_name=cd['first_name'],
                 last_name=cd['last_name'],
-                is_active=False,
             )
+            user.set_unusable_password()
+            user.save(update_fields=['password'])
             # Create StudentProfile
             StudentProfile.objects.create(
                 user=user,
                 student_id=cd['student_id'],
                 full_name=f"{cd['first_name']} {cd['last_name']}",
+                email_verified=True,
             )
-            # Send verification email
-            send_verification_email(user, request)
             messages.success(
                 request,
-                'Registration successful! Please check your email to verify your account before logging in.'
+                'Registration successful! You can now log in with your Student ID.'
             )
             return redirect('home:student_login')
     else:
@@ -2407,7 +2406,7 @@ def verify_email(request, uidb64, token):
 
 
 def student_login(request):
-    """Login page for students using student_id + password."""
+    """Login page for students using student_id only."""
     if request.user.is_authenticated:
         if hasattr(request.user, 'student_profile'):
             return redirect('home:student_dashboard')
@@ -2418,17 +2417,16 @@ def student_login(request):
         form = StudentLoginForm(request.POST)
         if form.is_valid():
             sid = form.cleaned_data['student_id']
-            pw = form.cleaned_data['password']
-            # username is student_id
-            user = authenticate(request, username=sid, password=pw)
-            if user is not None:
+            try:
+                profile = StudentProfile.objects.select_related('user').get(student_id=sid)
+                user = profile.user
                 if not user.is_active:
-                    error = 'Please verify your email before logging in. Check your inbox.'
+                    error = 'Your account is not active. Please contact the office.'
                 else:
-                    login(request, user)
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                     return redirect('home:student_dashboard')
-            else:
-                error = 'Invalid Student ID or password.'
+            except StudentProfile.DoesNotExist:
+                error = 'No account found for this Student ID. Please register first.'
     else:
         form = StudentLoginForm()
 
