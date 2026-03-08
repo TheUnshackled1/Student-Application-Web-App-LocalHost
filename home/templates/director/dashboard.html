@@ -401,14 +401,7 @@
             <select id="filterOffice" class="staff-filter-select">
                 <option value="">All Departments</option>
             </select>
-            <select id="filterGpa" class="staff-filter-select">
-                <option value="">All GPA</option>
-                <option value="1.00-1.50">1.00 – 1.50</option>
-                <option value="1.51-2.00">1.51 – 2.00</option>
-                <option value="2.01-2.50">2.01 – 2.50</option>
-                <option value="2.51-3.00">2.51 – 3.00</option>
-                <option value="3.01-5.00">3.01 – 5.00</option>
-            </select>
+
             <select id="filterSchedule" class="staff-filter-select">
                 <option value="">All Days</option>
                 <option value="Monday">Monday</option>
@@ -438,7 +431,7 @@
                     {% for s in all_students %}
                     <tr data-status="{{ s.status }}" data-search="{{ s.student_id }} {{ s.full_name }} {{ s.email }}"
                         data-course="{{ s.course }}" data-year="{{ s.year_level_display }}" data-semester="{{ s.semester_display }}" data-type="{{ s.app_type }}"
-                        data-office="{{ s.preferred_office }}" data-gpa="{{ s.gpa }}" data-schedule="{{ s.available_days }}">
+                        data-office="{{ s.preferred_office }}" data-schedule="{{ s.available_days }}">
                         <td class="staff-td-id">{{ s.student_id }}</td>
                         <td>
                             <div class="staff-student-cell">
@@ -582,7 +575,6 @@ document.getElementById('navToggle').addEventListener('click',function(){
     var filterSemester = document.getElementById('filterSemester');
     var filterType = document.getElementById('filterType');
     var filterOffice = document.getElementById('filterOffice');
-    var filterGpa = document.getElementById('filterGpa');
     var filterSchedule = document.getElementById('filterSchedule');
 
     // Auto-populate course dropdown
@@ -611,7 +603,6 @@ document.getElementById('navToggle').addEventListener('click',function(){
     if (filterSemester) { filterSemester.addEventListener('change', function() { applyFilters(); }); }
     if (filterType) { filterType.addEventListener('change', function() { applyFilters(); }); }
     if (filterOffice) { filterOffice.addEventListener('change', function() { applyFilters(); }); }
-    if (filterGpa) { filterGpa.addEventListener('change', function() { applyFilters(); }); }
     if (filterSchedule) { filterSchedule.addEventListener('change', function() { applyFilters(); }); }
 
     function applyFilters() {
@@ -621,7 +612,6 @@ document.getElementById('navToggle').addEventListener('click',function(){
         var semesterVal = filterSemester ? filterSemester.value : '';
         var typeVal = filterType ? filterType.value : '';
         var officeVal = filterOffice ? filterOffice.value : '';
-        var gpaVal = filterGpa ? filterGpa.value : '';
         var scheduleVal = filterSchedule ? filterSchedule.value : '';
         var visibleCount = 0;
 
@@ -640,21 +630,12 @@ document.getElementById('navToggle').addEventListener('click',function(){
             var matchSemester = !semesterVal || row.getAttribute('data-semester') === semesterVal;
             var matchType = !typeVal || row.getAttribute('data-type') === typeVal;
             var matchOffice = !officeVal || row.getAttribute('data-office') === officeVal;
-            var matchGpa = true;
-            if (gpaVal) {
-                var rowGpa = parseFloat(row.getAttribute('data-gpa'));
-                if (isNaN(rowGpa)) { matchGpa = false; }
-                else {
-                    var range = gpaVal.split('-');
-                    matchGpa = rowGpa >= parseFloat(range[0]) && rowGpa <= parseFloat(range[1]);
-                }
-            }
             var matchSchedule = true;
             if (scheduleVal) {
                 var days = (row.getAttribute('data-schedule') || '');
                 matchSchedule = days.indexOf(scheduleVal) !== -1;
             }
-            var visible = matchFilter && matchSearch && matchCourse && matchYear && matchSemester && matchType && matchOffice && matchGpa && matchSchedule;
+            var visible = matchFilter && matchSearch && matchCourse && matchYear && matchSemester && matchType && matchOffice && matchSchedule;
             row.style.display = visible ? '' : 'none';
             if (visible) visibleCount++;
         });
