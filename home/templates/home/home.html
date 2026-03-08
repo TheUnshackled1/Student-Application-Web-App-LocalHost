@@ -193,12 +193,83 @@
 
     </div>
 
+    {% else %}
+    <!-- ===== WELCOME + TRACK (inline two-column) ===== -->
+    <div class="welcome-track-row">
+
+        <!-- LEFT: Welcome Banner -->
+        <div class="status-banner welcome-banner-col">
+            <div class="status-banner-bg"></div>
+            <div class="status-banner-content">
+                <div class="status-icon-wrap">
+                    <i class="fa-solid fa-hand"></i>
+                </div>
+                <div class="status-text">
+                    <div class="status-label-row">
+                        <span class="status-label">Welcome</span>
+                        <span class="status-badge status-badge--review">
+                            <i class="fa-solid fa-circle" style="font-size:6px;"></i>
+                            No Application
+                        </span>
+                    </div>
+                    <h2 class="status-title">Get Started</h2>
+                    <p class="status-message">You haven't submitted an application yet. Apply now to become a Student Assistant!</p>
+                </div>
+            </div>
+            <div class="status-decoration">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+        </div>
+
+        <!-- RIGHT: Track Your Application -->
+        <div class="track-app-section track-app-col">
+            <div class="track-app-card">
+                <div class="track-app-icon">
+                    <i class="fa-solid fa-magnifying-glass-location"></i>
+                </div>
+                <div class="track-app-content">
+                    <h3 class="track-app-title">Track Your Application</h3>
+                    <p class="track-app-desc">Already applied? Enter your Student ID to retrieve your application status and document records.</p>
+                    <form method="post" action="{% url 'home:home' %}" class="track-app-form">
+                        {% csrf_token %}
+                        <div class="track-app-input-wrap">
+                            <i class="fa-solid fa-id-badge"></i>
+                            <input type="text" name="track_student_id" placeholder="Enter your Student ID (e.g. 20230321)" class="track-app-input" maxlength="8" pattern="\d{8}" inputmode="numeric" required
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                                   onkeypress="return (event.charCode>=48 && event.charCode<=57)"
+                                   onpaste="var d=event.clipboardData.getData('text');if(!/^\d+$/.test(d))event.preventDefault()">
+                        </div>
+                        <button type="submit" class="track-app-btn">
+                            <i class="fa-solid fa-arrow-right"></i>
+                            <span>Track</span>
+                        </button>
+                    </form>
+                    {% if track_error %}
+                    <div class="track-app-alert track-app-alert--error">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span>{{ track_error }}</span>
+                    </div>
+                    {% endif %}
+                    {% if track_success %}
+                    <div class="track-app-alert track-app-alert--success">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>{{ track_success }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endif %}
+
     <!-- ===== APPLICATION HISTORY & DOCUMENT LOG TABLE ===== -->
+    {% if all_applications %}
     <div class="app-log-section">
         <div class="dash-section-header">
             <span class="dash-section-icon dash-section-icon--teal"><i class="fa-solid fa-clipboard-list"></i></span>
             <h3 class="dash-section-title">Application History &amp; Document Log</h3>
-            <p class="dash-section-hint">Persistent record of all your applications and uploaded documents</p>
+            <p class="dash-section-hint">Persistent record of all applications and uploaded documents</p>
         </div>
 
         <div class="app-log-table-wrapper">
@@ -216,7 +287,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for app in applications %}
+                    {% for app in all_applications %}
                     <tr class="app-log-row" onclick="toggleDocRow('doc-detail-{{ forloop.counter }}')">
                         <td class="app-log-num">{{ forloop.counter }}</td>
                         <td>
@@ -338,75 +409,6 @@
             </table>
         </div>
     </div>
-
-    {% else %}
-    <!-- ===== WELCOME + TRACK (inline two-column) ===== -->
-    <div class="welcome-track-row">
-
-        <!-- LEFT: Welcome Banner -->
-        <div class="status-banner welcome-banner-col">
-            <div class="status-banner-bg"></div>
-            <div class="status-banner-content">
-                <div class="status-icon-wrap">
-                    <i class="fa-solid fa-hand"></i>
-                </div>
-                <div class="status-text">
-                    <div class="status-label-row">
-                        <span class="status-label">Welcome</span>
-                        <span class="status-badge status-badge--review">
-                            <i class="fa-solid fa-circle" style="font-size:6px;"></i>
-                            No Application
-                        </span>
-                    </div>
-                    <h2 class="status-title">Get Started</h2>
-                    <p class="status-message">You haven't submitted an application yet. Apply now to become a Student Assistant!</p>
-                </div>
-            </div>
-            <div class="status-decoration">
-                <i class="fa-solid fa-graduation-cap"></i>
-            </div>
-        </div>
-
-        <!-- RIGHT: Track Your Application -->
-        <div class="track-app-section track-app-col">
-            <div class="track-app-card">
-                <div class="track-app-icon">
-                    <i class="fa-solid fa-magnifying-glass-location"></i>
-                </div>
-                <div class="track-app-content">
-                    <h3 class="track-app-title">Track Your Application</h3>
-                    <p class="track-app-desc">Already applied? Enter your Student ID to retrieve your application status and document records.</p>
-                    <form method="post" action="{% url 'home:home' %}" class="track-app-form">
-                        {% csrf_token %}
-                        <div class="track-app-input-wrap">
-                            <i class="fa-solid fa-id-badge"></i>
-                            <input type="text" name="track_student_id" placeholder="Enter your Student ID (e.g. 20230321)" class="track-app-input" maxlength="8" pattern="\d{8}" inputmode="numeric" required
-                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                                   onkeypress="return (event.charCode>=48 && event.charCode<=57)"
-                                   onpaste="var d=event.clipboardData.getData('text');if(!/^\d+$/.test(d))event.preventDefault()">
-                        </div>
-                        <button type="submit" class="track-app-btn">
-                            <i class="fa-solid fa-arrow-right"></i>
-                            <span>Track</span>
-                        </button>
-                    </form>
-                    {% if track_error %}
-                    <div class="track-app-alert track-app-alert--error">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        <span>{{ track_error }}</span>
-                    </div>
-                    {% endif %}
-                    {% if track_success %}
-                    <div class="track-app-alert track-app-alert--success">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>{{ track_success }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-    </div>
     {% endif %}
 
     <!-- ===== UPCOMING DATES + APPLICANT STATUS (two-column) ===== -->
@@ -472,7 +474,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for app in applications %}
+                        {% for app in all_applications %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
                             <td class="dash-st-name">{{ app.student_name }}</td>

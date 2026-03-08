@@ -528,6 +528,7 @@ def home(request):
 
     context = {
         'applications': applications,
+        'all_applications': all_applications,
         'has_application': has_application,
         'upcoming_dates': upcoming_dates,
         'reminders': reminders,
