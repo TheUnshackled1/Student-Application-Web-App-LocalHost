@@ -2855,9 +2855,12 @@ def student_save_duty_schedule(request, pk):
         messages.error(request, 'Please select at least one time slot.')
         return redirect('home:student_dashboard')
 
-    # Validate max 4 hours per day (each slot = 0.5 hrs)
+    # Validate min 1 hour / max 4 hours per day (each slot = 0.5 hrs)
     for day, slots in schedule.items():
         day_hours = len(slots) * 0.5
+        if day_hours < 1:
+            messages.error(request, f'Minimum 1 hour per day — {day} has only {day_hours:.1f} hours.')
+            return redirect('home:student_dashboard')
         if day_hours > 4:
             messages.error(request, f'Maximum 4 hours per day — {day} has {day_hours:.1f} hours.')
             return redirect('home:student_dashboard')

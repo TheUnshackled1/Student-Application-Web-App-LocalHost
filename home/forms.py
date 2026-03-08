@@ -218,6 +218,17 @@ class NewApplicationForm(forms.ModelForm):
         self.fields['preferred_office'].queryset = active_offices
         self.fields['preferred_office'].empty_label = 'Select preferred office'
 
+        # Model has blank=True for DB flexibility, but all these are required on the form
+        required_fields = [
+            'preferred_office', 'availability_schedule',
+            'application_form', 'id_picture', 'barangay_clearance',
+            'parents_itr', 'enrolment_form', 'schedule_classes',
+            'proof_insurance', 'grades_last_sem', 'official_time',
+        ]
+        for fname in required_fields:
+            if fname in self.fields:
+                self.fields[fname].required = True
+
     def clean_contact_number(self):
         val = self.cleaned_data['contact_number']
         if not val.isdigit():
@@ -309,6 +320,12 @@ class NewApplicationForm(forms.ModelForm):
                 data = None
         if not data:
             raise forms.ValidationError('Please select at least one available time slot.')
+        for day, slots in data.items():
+            day_hours = len(slots) * 0.5
+            if day_hours < 1:
+                raise forms.ValidationError(f'Minimum 1 hour per day — {day} has only {day_hours:.1f} hours.')
+            if day_hours > 4:
+                raise forms.ValidationError(f'Maximum 4 hours per day — {day} has {day_hours:.1f} hours.')
         return data
 
 
@@ -375,6 +392,17 @@ class RenewalApplicationForm(forms.ModelForm):
         self.fields['previous_office'].empty_label = 'Select office'
         self.fields['preferred_office'].queryset = active_offices
         self.fields['preferred_office'].empty_label = 'Select office'
+
+        # Model has blank=True for DB flexibility, but all these are required on the form
+        required_fields = [
+            'preferred_office', 'availability_schedule',
+            'id_picture', 'enrolment_form', 'schedule_classes',
+            'grades_last_sem', 'official_time', 'recommendation_letter',
+            'evaluation_form',
+        ]
+        for fname in required_fields:
+            if fname in self.fields:
+                self.fields[fname].required = True
 
     def clean_contact_number(self):
         val = self.cleaned_data['contact_number']
@@ -446,6 +474,12 @@ class RenewalApplicationForm(forms.ModelForm):
                 data = None
         if not data:
             raise forms.ValidationError('Please select at least one available time slot.')
+        for day, slots in data.items():
+            day_hours = len(slots) * 0.5
+            if day_hours < 1:
+                raise forms.ValidationError(f'Minimum 1 hour per day — {day} has only {day_hours:.1f} hours.')
+            if day_hours > 4:
+                raise forms.ValidationError(f'Maximum 4 hours per day — {day} has {day_hours:.1f} hours.')
         return data
 
 
@@ -469,6 +503,12 @@ class ScheduleResubmitForm(forms.Form):
                 data = None
         if not data:
             raise forms.ValidationError('Please select at least one available time slot.')
+        for day, slots in data.items():
+            day_hours = len(slots) * 0.5
+            if day_hours < 1:
+                raise forms.ValidationError(f'Minimum 1 hour per day — {day} has only {day_hours:.1f} hours.')
+            if day_hours > 4:
+                raise forms.ValidationError(f'Maximum 4 hours per day — {day} has {day_hours:.1f} hours.')
         return data
 
 

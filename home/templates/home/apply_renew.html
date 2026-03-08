@@ -997,7 +997,7 @@
             } catch(e) {}
         }
 
-        form.addEventListener('submit', function() {
+        form.addEventListener('submit', function(e) {
             var schedule = {};
             document.querySelectorAll('.avail-cb:checked').forEach(function(cb) {
                 var day = cb.getAttribute('data-day');
@@ -1005,6 +1005,21 @@
                 if (!schedule[day]) schedule[day] = [];
                 schedule[day].push(time);
             });
+            // Validate min 1 hour (2 slots) / max 4 hours (8 slots) per day
+            var days = Object.keys(schedule);
+            for (var i = 0; i < days.length; i++) {
+                var cnt = schedule[days[i]].length;
+                if (cnt < 2) {
+                    e.preventDefault();
+                    alert('Minimum 1 hour per day — ' + days[i] + ' has only ' + (cnt * 0.5).toFixed(1) + ' hours. Please select at least 2 slots.');
+                    return;
+                }
+                if (cnt > 8) {
+                    e.preventDefault();
+                    alert('Maximum 4 hours per day — ' + days[i] + ' has ' + (cnt * 0.5).toFixed(1) + ' hours. Please deselect some slots.');
+                    return;
+                }
+            }
             hidden.value = JSON.stringify(schedule);
         });
     })();
