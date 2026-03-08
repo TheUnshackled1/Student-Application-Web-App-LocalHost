@@ -23,126 +23,187 @@
         </div>
         <a href="{% url 'home:student_dashboard' %}" class="btn btn-nav btn-nav--link">
             <i class="fa-solid fa-arrow-left"></i>
-            <span>DASHBOARD</span>
+            <span>Back to Dashboard</span>
         </a>
     </div>
 </nav>
 
-<main class="container" style="max-width: 720px; padding-top: 2rem; padding-bottom: 4rem;">
+<main class="main-content">
 
-    <!-- Header -->
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <span style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-size:1.2rem;">
-            <i class="fa-solid fa-rotate-left"></i>
-        </span>
-        <div>
-            <h3 class="fw-bold mb-0" style="letter-spacing:-.3px;">Re-upload Documents</h3>
-            <p class="text-muted mb-0" style="font-size:.85rem;">{{ student_name }} &mdash; {{ app.student_id }}</p>
+    <!-- ━━━ STATUS BANNER ━━━ -->
+    <div class="status-banner">
+        <div class="status-banner-bg"></div>
+        <div class="status-banner-content">
+            <div class="status-icon-wrap">
+                <i class="fa-solid fa-rotate-left"></i>
+            </div>
+            <div class="status-text">
+                <div class="status-label-row">
+                    <span class="status-label">Document Resubmission</span>
+                    <span class="status-badge status-badge--review">
+                        <i class="fa-solid fa-circle" style="font-size:6px;"></i>
+                        Action Required
+                    </span>
+                </div>
+                <h2 class="status-title">{{ student_name }}</h2>
+                <p class="status-message">Student ID: {{ app.student_id }} &mdash; Please re-upload the returned documents below</p>
+            </div>
+        </div>
+        <div class="status-decoration">
+            <i class="fa-solid fa-file-arrow-up"></i>
         </div>
     </div>
 
     {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" style="font-size:.85rem; border-radius:10px;">
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mx-auto" style="max-width:900px; font-size:.85rem; border-radius:10px; margin-top:1rem;">
         {{ message }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     {% endfor %}
     {% endif %}
 
-    <!-- Returned Documents Alert -->
-    {% if returned_docs %}
-    <div class="alert alert-warning py-3 px-3 mb-4" style="font-size:.84rem; border-radius:10px; border-left:4px solid #f59e0b;">
-        <div class="d-flex align-items-center gap-2 mb-2">
-            <i class="fa-solid fa-triangle-exclamation" style="color:#d97706; font-size:1rem;"></i>
-            <strong style="font-size:.9rem;">The following documents were returned and need to be re-uploaded:</strong>
-        </div>
-        <ul class="mb-0 ps-3">
-            {% for doc in returned_docs %}
-            <li><strong>{{ doc.label }}</strong> &mdash; {{ doc.reason }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% elif requested_documents_note %}
-    <div class="alert alert-info py-3 px-3 mb-4" style="font-size:.84rem; border-radius:10px; border-left:4px solid #0ea5e9;">
-        <i class="fa-solid fa-file-circle-question me-1"></i>
-        <strong>Staff Note:</strong> {{ requested_documents_note }}
-    </div>
-    {% endif %}
-
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- Returned Documents (highlighted) -->
+        <!-- ━━━ RETURNED DOCUMENTS PANEL ━━━ -->
         {% if returned_docs %}
-        <div class="card mb-4" style="border:none; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06); overflow:hidden;">
-            <div style="height:4px; background:linear-gradient(90deg,#f59e0b,#d97706);"></div>
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-3" style="font-size:.95rem;">
-                    <i class="fa-solid fa-rotate-left me-1" style="color:#d97706;"></i> Returned Documents
-                </h5>
+        <div class="staff-panel" style="margin-top:1.5rem;">
+            <div class="staff-panel-header">
+                <div class="staff-panel-header-left">
+                    <span class="staff-panel-icon staff-panel-icon--amber"><i class="fa-solid fa-rotate-left"></i></span>
+                    <h3 class="staff-panel-title">Returned Documents</h3>
+                </div>
+                <span class="staff-panel-count" style="background:#fef3c7; color:#92400e;">
+                    {{ returned_docs|length }} to fix
+                </span>
+            </div>
+
+            <div class="review-doc-list">
                 {% for doc in returned_docs %}
-                <div class="mb-3 p-3 rounded-3" style="background:#fffbeb; border:1px solid #fde68a;">
-                    <label class="form-label fw-semibold mb-1" style="font-size:.88rem;">
-                        {{ doc.label }}
-                        <span class="badge bg-warning text-dark ms-1" style="font-size:.7rem;">Needs Re-upload</span>
-                    </label>
-                    <div class="mb-2" style="font-size:.8rem; color:#92400e;">
-                        <i class="fa-solid fa-comment-dots me-1"></i> Reason: {{ doc.reason }}
+                <div class="review-doc-item" style="border-left:3px solid #f59e0b; padding-left:12px; flex-direction:column; align-items:stretch; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="review-doc-status">
+                            <i class="fa-solid fa-rotate-left" style="color: #f59e0b;"></i>
+                        </div>
+                        <div class="review-doc-info" style="flex:1;">
+                            <span class="review-doc-name">{{ doc.label }}</span>
+                            <div style="margin-top:2px;">
+                                <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#92400e; background:rgba(251,191,36,0.15); padding:2px 8px; border-radius:4px;">
+                                    <i class="fa-solid fa-comment-dots"></i> {{ doc.reason }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="review-doc-badge">
+                            <span class="staff-status-tag" style="font-size:10px; background:#fef3c7; color:#92400e;">Returned</span>
+                        </div>
                     </div>
-                    {% if doc.has_file %}
-                    <div class="mb-2" style="font-size:.78rem; color:#6b7280;">
-                        <i class="fa-solid fa-file me-1"></i> Current file on record (will be replaced when you upload a new one)
+                    <div style="padding-left:28px;">
+                        <input type="file" name="{{ doc.field }}" class="form-control form-control-sm"
+                               accept=".pdf,.jpg,.jpeg,.png" style="font-size:.82rem; background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.12); color:inherit;">
                     </div>
-                    {% endif %}
-                    <input type="file" name="{{ doc.field }}" class="form-control form-control-sm"
-                           accept=".pdf,.jpg,.jpeg,.png" style="font-size:.85rem;">
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <!-- Other Documents (optional re-upload) -->
+        <!-- ━━━ OTHER DOCUMENTS PANEL ━━━ -->
         {% if other_docs %}
-        <div class="card mb-4" style="border:none; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06); overflow:hidden;">
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-1" style="font-size:.95rem;">
-                    <i class="fa-solid fa-folder-open me-1" style="color:#6b7280;"></i> Other Documents
-                </h5>
-                <p class="text-muted mb-3" style="font-size:.8rem;">These documents are already on file. You can optionally replace any of them.</p>
+        <div class="staff-panel" style="margin-top:1.5rem;">
+            <div class="staff-panel-header">
+                <div class="staff-panel-header-left">
+                    <span class="staff-panel-icon staff-panel-icon--green"><i class="fa-solid fa-folder-open"></i></span>
+                    <h3 class="staff-panel-title">Other Documents</h3>
+                </div>
+                <span class="staff-panel-count" style="background:#dcfce7; color:#166534;">
+                    Optional
+                </span>
+            </div>
+
+            <div style="padding:0 24px 8px; font-size:.78rem; color:#94a3b8;">
+                These documents are already on file. You may optionally replace any of them.
+            </div>
+
+            <div class="review-doc-list">
                 {% for doc in other_docs %}
-                <div class="mb-3">
-                    <label class="form-label fw-medium mb-1" style="font-size:.85rem;">
-                        {{ doc.label }}
-                        {% if doc.has_file %}
-                        <span class="badge bg-success ms-1" style="font-size:.65rem;">On File</span>
-                        {% else %}
-                        <span class="badge bg-secondary ms-1" style="font-size:.65rem;">Missing</span>
-                        {% endif %}
-                    </label>
-                    <input type="file" name="{{ doc.field }}" class="form-control form-control-sm"
-                           accept=".pdf,.jpg,.jpeg,.png" style="font-size:.85rem;">
+                <div class="review-doc-item" style="flex-direction:column; align-items:stretch; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="review-doc-status">
+                            {% if doc.has_file %}
+                                <i class="fa-solid fa-circle-check" style="color: #22c55e;"></i>
+                            {% else %}
+                                <i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i>
+                            {% endif %}
+                        </div>
+                        <div class="review-doc-info" style="flex:1;">
+                            <span class="review-doc-name">{{ doc.label }}</span>
+                        </div>
+                        <div class="review-doc-badge">
+                            {% if doc.has_file %}
+                                <span class="staff-status-tag staff-status--approved" style="font-size:10px;">On File</span>
+                            {% else %}
+                                <span class="staff-status-tag staff-status--rejected" style="font-size:10px;">Missing</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="padding-left:28px;">
+                        <input type="file" name="{{ doc.field }}" class="form-control form-control-sm"
+                               accept=".pdf,.jpg,.jpeg,.png" style="font-size:.82rem; background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.12); color:inherit;">
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <!-- Submit -->
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn px-4 py-2" style="background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:none; border-radius:10px; font-weight:600; font-size:.9rem;">
-                <i class="fa-solid fa-cloud-arrow-up me-1"></i> Submit Documents
-            </button>
-            <a href="{% url 'home:student_dashboard' %}" class="btn btn-outline-secondary px-4 py-2" style="border-radius:10px; font-size:.9rem;">
-                Cancel
-            </a>
+        <!-- ━━━ SUBMIT BAR ━━━ -->
+        <div class="review-action-bar" style="margin-top:1.5rem;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="submit" class="review-status-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; border-color:#d97706;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Submit Documents
+                </button>
+                <a href="{% url 'home:student_dashboard' %}" class="review-status-btn review-btn--rejected" style="text-decoration:none;">
+                    <i class="fa-solid fa-arrow-left"></i> Cancel
+                </a>
+            </div>
         </div>
     </form>
 
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ========== 3D TILT / PARALLAX EFFECT ========== -->
+<script>
+(function(){
+    var tiltCards = document.querySelectorAll(
+        '.status-banner, .staff-panel, .review-action-bar'
+    );
+    var maxTilt = 0.5, perspective = 1200, scale = 1.005, glowStrength = 0.08;
+    tiltCards.forEach(function(card){
+        card.style.perspective = perspective + 'px';
+        card.addEventListener('mouseenter', function(){
+            card.style.transition = 'transform 0.08s ease-out, box-shadow 0.08s ease-out';
+        });
+        card.addEventListener('mousemove', function(e){
+            var rect = card.getBoundingClientRect();
+            var x = e.clientX - rect.left, y = e.clientY - rect.top;
+            var centerX = rect.width / 2, centerY = rect.height / 2;
+            var rotateY = ((x - centerX) / centerX) * maxTilt;
+            var rotateX = ((centerY - y) / centerY) * maxTilt;
+            var shadowX = -rotateY * 2.5, shadowY = rotateX * 2.5;
+            card.style.transform = 'perspective(' + perspective + 'px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(' + scale + ',' + scale + ',' + scale + ')';
+            card.style.boxShadow = shadowX + 'px ' + (8 + shadowY) + 'px 30px rgba(37,99,235,' + glowStrength + '), 0 0 60px rgba(59,130,246,0.08), inset 0 0 0 1px rgba(59,130,246,0.15)';
+        });
+        card.addEventListener('mouseleave', function(){
+            card.style.transition = 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 1s ease';
+            card.style.transform = 'perspective(' + perspective + 'px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+            card.style.boxShadow = '';
+        });
+    });
+})();
+</script>
 
 <footer class="site-footer">
     <p>&copy; 2026 Tyrone, Ramsey, Gracee &amp; Dhenby. All rights reserved.</p>
