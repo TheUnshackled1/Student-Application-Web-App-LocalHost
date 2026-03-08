@@ -1794,6 +1794,73 @@ textarea.form-control {
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 6px;
 }
+.file-preview-thumb-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+.file-preview-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+  flex-shrink: 0;
+}
+.file-preview-thumb:hover {
+  transform: scale(1.08);
+  box-shadow: 0 2px 12px rgba(99,102,241,0.25);
+}
+.file-preview-pdf-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.file-preview-pdf-thumb i {
+  font-size: 24px;
+  color: #ef4444;
+}
+.file-preview-thumb-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.file-preview-thumb-name {
+  font-size: 12px;
+  color: #cbd5e1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+.file-preview-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #818cf8;
+  background: rgba(99,102,241,0.10);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 5px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+}
+.file-preview-view-btn:hover {
+  background: rgba(99,102,241,0.20);
+  color: #a5b4fc;
+}
 
 .input-with-camera {
   display: flex;

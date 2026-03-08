@@ -661,7 +661,29 @@
             if (data.status === 'ok') {
                 document.getElementById('photo_' + currentField).value = data.filename;
                 var preview = document.getElementById('preview_' + currentField);
-                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <i class="fa-solid fa-camera" style="color:#94a3b8;"></i> ' + data.filename;
+                var imgPath = data.path;
+                var fname = data.filename;
+                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <i class="fa-solid fa-camera" style="color:#94a3b8;"></i> ' + fname;
+                var wrap = document.createElement('div');
+                wrap.className = 'file-preview-thumb-wrap';
+                var thumbImg = document.createElement('img');
+                thumbImg.className = 'file-preview-thumb';
+                thumbImg.src = imgPath;
+                thumbImg.alt = 'Preview';
+                thumbImg.dataset.fname = fname;
+                thumbImg.onclick = function() { showDocPreview(this.src, this.dataset.fname, 'image'); };
+                var info = document.createElement('div');
+                info.className = 'file-preview-thumb-info';
+                info.innerHTML = '<span class="file-preview-thumb-name">' + fname + '</span>';
+                var viewBtn = document.createElement('button');
+                viewBtn.type = 'button';
+                viewBtn.className = 'file-preview-view-btn';
+                viewBtn.innerHTML = '<i class="fa-solid fa-eye"></i> View';
+                viewBtn.onclick = function() { thumbImg.click(); };
+                info.appendChild(viewBtn);
+                wrap.appendChild(thumbImg);
+                wrap.appendChild(info);
+                preview.appendChild(wrap);
                 preview.style.display = 'block';
 
                 var card = preview.closest('.applyform-doc-card');
@@ -773,9 +795,59 @@
                 return;
             }
 
-            // Show file name and hide camera button
-            if (preview) {
-                preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + this.files[0].name;
+            // Show file name, thumbnail, and hide camera button
+            if (preview && this.files.length > 0) {
+                var f = this.files[0];
+                var fExt = getFileExt(f.name);
+                var isImg = ['.jpg','.jpeg','.png'].indexOf(fExt) !== -1;
+                if (isImg) {
+                    var reader = new FileReader();
+                    var fname = f.name;
+                    reader.onload = function(ev) {
+                        var thumbImg = document.createElement('img');
+                        thumbImg.className = 'file-preview-thumb';
+                        thumbImg.src = ev.target.result;
+                        thumbImg.alt = 'Preview';
+                        thumbImg.dataset.fname = fname;
+                        thumbImg.onclick = function() { showDocPreview(this.src, this.dataset.fname, 'image'); };
+                        preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + fname;
+                        var wrap = document.createElement('div');
+                        wrap.className = 'file-preview-thumb-wrap';
+                        var info = document.createElement('div');
+                        info.className = 'file-preview-thumb-info';
+                        info.innerHTML = '<span class="file-preview-thumb-name">' + fname + '</span>';
+                        var viewBtn = document.createElement('button');
+                        viewBtn.type = 'button';
+                        viewBtn.className = 'file-preview-view-btn';
+                        viewBtn.innerHTML = '<i class="fa-solid fa-eye"></i> View';
+                        viewBtn.onclick = function() { thumbImg.click(); };
+                        info.appendChild(viewBtn);
+                        wrap.appendChild(thumbImg);
+                        wrap.appendChild(info);
+                        preview.appendChild(wrap);
+                    };
+                    reader.readAsDataURL(f);
+                } else {
+                    preview.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ' + f.name +
+                        '<div class="file-preview-thumb-wrap">' +
+                        '<div class="file-preview-pdf-thumb"><i class="fa-solid fa-file-pdf"></i></div>' +
+                        '<div class="file-preview-thumb-info">' +
+                        '<span class="file-preview-thumb-name">' + f.name + '</span>' +
+                        '</div></div>';
+                    var pdfInput = this;
+                    var pdfName = f.name;
+                    var pdfViewBtn = document.createElement('button');
+                    pdfViewBtn.type = 'button';
+                    pdfViewBtn.className = 'file-preview-view-btn';
+                    pdfViewBtn.innerHTML = '<i class="fa-solid fa-eye"></i> View';
+                    pdfViewBtn.onclick = function() {
+                        if (pdfInput.files && pdfInput.files[0]) {
+                            var url = URL.createObjectURL(pdfInput.files[0]);
+                            showDocPreview(url, pdfName, 'pdf');
+                        }
+                    };
+                    preview.querySelector('.file-preview-thumb-info').appendChild(pdfViewBtn);
+                }
                 preview.style.display = 'block';
                 hideCamera(card);
             }
@@ -1069,5 +1141,45 @@ document.getElementById('navToggle').addEventListener('click',function(){
 <footer class="site-footer">
     <p>&copy; 2026 Tyrone, Ramsey, Gracee &amp; Dhenby. All rights reserved.</p>
 </footer>
+
+<!-- ========== DOCUMENT PREVIEW OVERLAY ========== -->
+<div class="file-preview-overlay" id="docPreviewOverlay">
+    <div class="file-preview-modal">
+        <div class="file-preview-header">
+            <div class="file-preview-title-wrap">
+                <i class="fa-solid fa-eye"></i>
+                <span class="file-preview-title" id="docPreviewTitle">Preview</span>
+            </div>
+            <div class="file-preview-actions">
+                <button class="file-preview-btn file-preview-btn--close" onclick="closeDocPreview()" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="file-preview-body" id="docPreviewBody"></div>
+    </div>
+</div>
+<script>
+function showDocPreview(src, title, type) {
+    var overlay = document.getElementById('docPreviewOverlay');
+    var body = document.getElementById('docPreviewBody');
+    var titleEl = document.getElementById('docPreviewTitle');
+    titleEl.textContent = title || 'Preview';
+    if (type === 'pdf') {
+        body.innerHTML = '<iframe class="file-preview-iframe" src="' + src + '"></iframe>';
+    } else {
+        body.innerHTML = '<img class="file-preview-image" src="' + src + '" alt="' + (title || 'Preview') + '">';
+    }
+    overlay.classList.add('active');
+}
+function closeDocPreview() {
+    var overlay = document.getElementById('docPreviewOverlay');
+    overlay.classList.remove('active');
+    setTimeout(function() { document.getElementById('docPreviewBody').innerHTML = ''; }, 300);
+}
+document.getElementById('docPreviewOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeDocPreview();
+});
+</script>
 </body>
 </html>
