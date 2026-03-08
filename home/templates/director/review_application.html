@@ -123,6 +123,13 @@
             </form>
             {% endif %}
 
+            {% if app.status == 'interview_done' or app.status == 'office_assigned' %}
+            <button type="button" class="review-status-btn" style="background: linear-gradient(135deg, #22c55e, #16a34a); color:#fff; border-color:#16a34a;"
+                    onclick="document.getElementById('approveModal').classList.add('active'); document.body.style.overflow='hidden';">
+                <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start Date
+            </button>
+            {% endif %}
+
             <form method="post" action="{% url 'home:director_update_application_status' app.pk %}" style="display:inline;">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{% url 'home:director_review_application' app.pk %}">
@@ -364,6 +371,44 @@
     </div>
 
 </main>
+
+<!-- ━━━ APPROVE MODAL ━━━ -->
+<div class="file-preview-overlay" id="approveModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">
+    <div class="file-preview-modal" style="max-width: 480px;">
+        <div class="file-preview-header">
+            <div class="file-preview-title-wrap">
+                <i class="fa-solid fa-flag-checkered" style="color: #22c55e;"></i>
+                <span class="file-preview-title">Final Approval</span>
+            </div>
+            <div class="file-preview-actions">
+                <button type="button" class="file-preview-btn file-preview-btn--close" onclick="document.getElementById('approveModal').classList.remove('active');document.body.style.overflow='';">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="file-preview-body" style="flex-direction: column; align-items: stretch; background: #fff; padding: 24px;">
+            <form method="post" action="{% url 'home:director_update_application_status' app.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'home:director_review_application' app.pk %}">
+                <input type="hidden" name="status" value="approved">
+                <p style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
+                    Approve <strong>{{ app.first_name }} {{ app.last_name }}</strong> and set their start date.
+                </p>
+                <p style="font-size: 12px; color: #9ca3af; margin-bottom: 16px;">
+                    Preferred Office: <strong style="color:#d97706;">{% if app.preferred_office %}{{ app.preferred_office.name }}{% else %}Not specified{% endif %}</strong>
+                </p>
+                <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #374151;">
+                    Start Date
+                </label>
+                <input type="date" name="start_date" required
+                    style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 20px;">
+                <button type="submit" class="doc-action-btn doc-action-btn--view" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; background: linear-gradient(135deg, #22c55e, #16a34a);">
+                    <i class="fa-solid fa-circle-check"></i> Approve Application
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
 <!-- ━━━ RETURN DOCUMENT MODAL ━━━ -->
 <div class="file-preview-overlay" id="returnDocModal" onclick="if(event.target===this){this.classList.remove('active');document.body.style.overflow='';}">

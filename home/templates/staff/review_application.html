@@ -114,6 +114,12 @@
     {% if app.status != 'approved' and app.status != 'rejected' %}
     <div class="review-action-bar">
         <span class="review-action-label">Update Status:</span>
+        {% if app.status == 'interview_done' or app.status == 'office_assigned' %}
+        <button type="button" class="review-status-btn" style="background: linear-gradient(135deg, #22c55e, #16a34a); color:#fff; border-color:#16a34a;"
+                onclick="document.getElementById('approveModal').classList.add('active'); document.body.style.overflow='hidden';">
+            <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start Date
+        </button>
+        {% else %}
         <form method="post" action="{% url 'home:staff_update_application_status' app.pk %}" class="review-action-form">
             {% csrf_token %}
             <input type="hidden" name="next" value="{% url 'home:staff_review_application' app.pk %}">
@@ -124,11 +130,6 @@
                 <i class="fa-solid fa-circle-xmark"></i> Reject
             </button>
         </form>
-        {% if app.status == 'interview_done' or app.status == 'office_assigned' %}
-        <button type="button" class="review-status-btn" style="background: linear-gradient(135deg, #22c55e, #16a34a); color:#fff; border-color:#16a34a;"
-                onclick="document.getElementById('approveModal').classList.add('active'); document.body.style.overflow='hidden';">
-            <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start Date
-        </button>
         {% endif %}
     </div>
     {% endif %}
