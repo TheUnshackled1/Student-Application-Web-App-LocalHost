@@ -375,7 +375,6 @@ class ApplicationNote(models.Model):
         ('document_resubmit', 'Documents Resubmitted'),
         ('status_change', 'Status Change'),
     ]
-
     new_application = models.ForeignKey(
         NewApplication, null=True, blank=True, on_delete=models.CASCADE,
         related_name='notes_log',
