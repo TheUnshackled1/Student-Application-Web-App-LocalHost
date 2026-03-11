@@ -62,10 +62,12 @@
             <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--active"><i class="fa-solid fa-house"></i><span>HOME</span></a>
             <a href="{% url 'home:available_offices' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-building"></i><span>AVAILABLE OFFICES</span></a>
         </div>
+        {% if not user.is_staff and not user.is_superuser %}
         <a href="#" class="btn btn-nav btn-nav--apply" data-bs-toggle="modal" data-bs-target="#applyRenewModal">
             <i class="fa-solid fa-paper-plane"></i>
             <span>Apply / Renew as Student Assistant</span>
         </a>
+        {% endif %}
         {% if user.is_authenticated %}
         {% if user.is_superuser %}
         <a href="{% url 'home:director_dashboard' %}" class="btn btn-nav btn-nav--director">
@@ -295,7 +297,7 @@
                             </span>
                         </td>
                         <td class="app-log-name">{{ app.student_name }}</td>
-                        <td><code class="app-log-sid">{{ app.application_id|mask_sid:logged_in_student_id }}</code></td>
+                        <td><code class="app-log-sid">{% if user.is_staff or user.is_superuser %}{{ app.application_id }}{% else %}{{ app.application_id|mask_sid:logged_in_student_id }}{% endif %}</code></td>
                         <td>
                             <span class="app-log-status app-log-status--{{ app.raw_status }}">
                                 <i class="fa-solid fa-circle" style="font-size:6px;"></i>
@@ -477,7 +479,7 @@
                         <tr>
                             <td>{{ forloop.counter }}</td>
                             <td class="dash-st-name">{{ app.student_name }}</td>
-                            <td><code>{{ app.application_id|mask_sid:logged_in_student_id }}</code></td>
+                            <td><code>{% if user.is_staff or user.is_superuser %}{{ app.application_id }}{% else %}{{ app.application_id|mask_sid:logged_in_student_id }}{% endif %}</code></td>
                             <td>
                                 <span class="dash-st-type dash-st-type--{{ app.app_type_class }}">
                                     <i class="fa-solid {{ app.app_type_icon }}"></i> {{ app.app_type }}
@@ -527,7 +529,7 @@
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td class="dash-st-name">{{ sa.name }}</td>
-                        <td><code>{{ sa.student_id|mask_sid:logged_in_student_id }}</code></td>
+                        <td><code>{% if user.is_staff or user.is_superuser %}{{ sa.student_id }}{% else %}{{ sa.student_id|mask_sid:logged_in_student_id }}{% endif %}</code></td>
                         <td>{{ sa.course }}</td>
                         <td>{{ sa.office }}</td>
                         <td class="dash-st-date">{% if sa.start_date %}{{ sa.start_date|date:"M d, Y" }}{% else %}—{% endif %}</td>
