@@ -547,6 +547,9 @@
                                     <th class="text-end" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Hours</th>
                                     <th class="text-end" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Rate</th>
                                     <th class="text-end" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Payout</th>
+                                    <th class="text-center" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#22c55e;"><i class="fa-solid fa-check"></i></th>
+                                    <th class="text-center" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#f59e0b;"><i class="fa-solid fa-clock"></i></th>
+                                    <th class="text-center" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#ef4444;"><i class="fa-solid fa-xmark"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -558,6 +561,9 @@
                                 <td class="text-end">{{ mp.hours }}</td>
                                 <td class="text-end">₱{{ mp.rate }}</td>
                                 <td class="text-end fw-semibold">₱{{ mp.payout }}</td>
+                                <td class="text-center" style="color:#22c55e; font-weight:600;">{{ mp.present }}</td>
+                                <td class="text-center" style="color:#f59e0b; font-weight:600;">{{ mp.late }}</td>
+                                <td class="text-center" style="color:#ef4444; font-weight:600;">{{ mp.absent }}</td>
                             </tr>
                             {% endfor %}
                             </tbody>
@@ -569,6 +575,9 @@
                                     <td class="text-end" id="payoutTotalHrs-{{ forloop.counter }}">—</td>
                                     <td class="text-end">₱35.00</td>
                                     <td class="text-end" id="payoutTotalAmt-{{ forloop.counter }}">—</td>
+                                    <td class="text-center" id="payoutTotalPresent-{{ forloop.counter }}">—</td>
+                                    <td class="text-center" id="payoutTotalLate-{{ forloop.counter }}">—</td>
+                                    <td class="text-center" id="payoutTotalAbsent-{{ forloop.counter }}">—</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -734,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function(){
         var idx = el.id.split('-')[1];
         var table = el.closest('table');
         var rows = table.querySelectorAll('tbody tr');
-        var totalDays = 0, totalWd = 0, totalHrs = 0, totalAmt = 0;
+        var totalDays = 0, totalWd = 0, totalHrs = 0, totalAmt = 0, totalP = 0, totalL = 0, totalA = 0;
         rows.forEach(function(row){
             var cells = row.querySelectorAll('td');
             totalDays += parseInt(cells[1].textContent) || 0;
@@ -742,11 +751,17 @@ document.addEventListener('DOMContentLoaded', function(){
             totalHrs += parseFloat(cells[3].textContent) || 0;
             var amt = cells[5].textContent.replace('₱','').trim();
             totalAmt += parseFloat(amt) || 0;
+            totalP += parseInt(cells[6].textContent) || 0;
+            totalL += parseInt(cells[7].textContent) || 0;
+            totalA += parseInt(cells[8].textContent) || 0;
         });
         document.getElementById('payoutTotalDays-' + idx).textContent = totalDays;
         document.getElementById('payoutTotalWd-' + idx).textContent = totalWd;
         el.textContent = totalHrs.toFixed(2);
         document.getElementById('payoutTotalAmt-' + idx).textContent = '₱' + totalAmt.toFixed(2);
+        document.getElementById('payoutTotalPresent-' + idx).textContent = totalP;
+        document.getElementById('payoutTotalLate-' + idx).textContent = totalL;
+        document.getElementById('payoutTotalAbsent-' + idx).textContent = totalA;
     });
 });
 </script>

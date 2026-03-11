@@ -246,6 +246,44 @@
                 </div>
             </div>
 
+            <!-- Monthly Attendance Breakdown -->
+            {% if monthly_breakdown %}
+            <div class="staff-panel" style="margin-top:1.5rem;">
+                <div class="staff-panel-header">
+                    <div class="staff-panel-header-left">
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#6366f1,#4f46e5);"><i class="fa-solid fa-chart-column"></i></span>
+                        <h3 class="staff-panel-title">Monthly Breakdown</h3>
+                    </div>
+                </div>
+                <div class="staff-table-wrap">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th class="text-end">Hours</th>
+                                <th class="text-end">Payout</th>
+                                <th class="text-center" style="color:#22c55e;">Present</th>
+                                <th class="text-center" style="color:#f59e0b;">Late</th>
+                                <th class="text-center" style="color:#ef4444;">Absent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mb in monthly_breakdown %}
+                            <tr>
+                                <td>{{ mb.month }}</td>
+                                <td class="text-end" style="font-weight:600;">{{ mb.hours }}</td>
+                                <td class="text-end" style="font-weight:600;">₱{{ mb.payout }}</td>
+                                <td class="text-center" style="color:#22c55e; font-weight:600;">{{ mb.present }}</td>
+                                <td class="text-center" style="color:#f59e0b; font-weight:600;">{{ mb.late }}</td>
+                                <td class="text-center" style="color:#ef4444; font-weight:600;">{{ mb.absent }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Performance Evaluations (read-only for staff) -->
             {% if evaluations %}
             <div class="staff-panel" style="margin-top:1.5rem;">
