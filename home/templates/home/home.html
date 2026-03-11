@@ -760,8 +760,6 @@ if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
-var _pdfDoc = null, _pdfPage = 1, _pdfTotal = 1;
-
 function openFilePreview(url, name) {
     var overlay = document.getElementById('filePreviewOverlay');
     var body = document.getElementById('filePreviewBody');
@@ -782,15 +780,10 @@ function openFilePreview(url, name) {
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
     } else if (pdfExts.indexOf(ext) !== -1) {
-        body.innerHTML = '<canvas id="pdfCanvas" style="max-width:100%;border-radius:8px;"></canvas>' +
-            '<div id="pdfPageNav" style="display:none;justify-content:center;align-items:center;gap:8px;margin-top:10px;">' +
-            '<button class="file-preview-btn" onclick="pdfPrev()"><i class="fa-solid fa-chevron-left"></i></button>' +
-            '<span id="pdfPageInfo" style="color:#64748b;font-size:13px;">1 / 1</span>' +
-            '<button class="file-preview-btn" onclick="pdfNext()"><i class="fa-solid fa-chevron-right"></i></button>' +
-            '</div>';
+        body.innerHTML = '<div id="pdfScrollContainer" style="max-height:80vh;overflow-y:auto;padding:4px 0;"></div>';
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
-        _loadPdf(url);
+        _loadPdfAll(url);
     } else {
         body.innerHTML = '<div class="file-preview-fallback">' +
             '<i class="fa-solid fa-file-circle-question"></i>' +
@@ -802,15 +795,27 @@ function openFilePreview(url, name) {
     }
 }
 
-function _loadPdf(url) {
+function _loadPdfAll(url) {
     pdfjsLib.getDocument(url).promise.then(function(pdf) {
-        _pdfDoc = pdf;
-        _pdfTotal = pdf.numPages;
-        _pdfPage = 1;
-        if (_pdfTotal > 1) {
-            document.getElementById('pdfPageNav').style.display = 'flex';
+        var container = document.getElementById('pdfScrollContainer');
+        if (!container) return;
+        var total = pdf.numPages;
+        for (var i = 1; i <= total; i++) {
+            (function(pageNum) {
+                var canvas = document.createElement('canvas');
+                canvas.style.maxWidth = '100%';
+                canvas.style.display = 'block';
+                canvas.style.margin = '0 auto 12px auto';
+                canvas.style.borderRadius = '8px';
+                container.appendChild(canvas);
+                pdf.getPage(pageNum).then(function(page) {
+                    var viewport = page.getViewport({ scale: 1.8 });
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport });
+                });
+            })(i);
         }
-        _renderPdfPage(_pdfPage);
     }).catch(function() {
         document.getElementById('filePreviewBody').innerHTML =
             '<div class="file-preview-fallback">' +
@@ -820,23 +825,6 @@ function _loadPdf(url) {
             '</div>';
     });
 }
-
-function _renderPdfPage(num) {
-    _pdfDoc.getPage(num).then(function(page) {
-        var canvas = document.getElementById('pdfCanvas');
-        if (!canvas) return;
-        var ctx = canvas.getContext('2d');
-        var viewport = page.getViewport({ scale: 1.8 });
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        page.render({ canvasContext: ctx, viewport: viewport });
-        var info = document.getElementById('pdfPageInfo');
-        if (info) info.textContent = num + ' / ' + _pdfTotal;
-    });
-}
-
-function pdfPrev() { if (_pdfPage > 1) { _pdfPage--; _renderPdfPage(_pdfPage); } }
-function pdfNext() { if (_pdfPage < _pdfTotal) { _pdfPage++; _renderPdfPage(_pdfPage); } }
 
 function showPrivacyModal() {
     var modal = new bootstrap.Modal(document.getElementById('privacyModal'));
