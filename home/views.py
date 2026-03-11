@@ -2363,6 +2363,22 @@ def director_sa_detail(request, pk):
     evaluation_form = PerformanceEvaluationForm()
     status_form = ActiveSAStatusForm(instance=sa)
 
+    # ── Weekly summary ──
+    weekly_summary = _build_weekly_summary(attendance, sa.start_date)
+
+    # ── Semester report ──
+    semester_report = _build_semester_report(sa)
+
+    # ── Alerts ──
+    consec_count, consec_dates = _check_consecutive_absences(sa)
+    consecutive_absence_alert = None
+    if consec_count >= CONSECUTIVE_ABSENCE_THRESHOLD:
+        consecutive_absence_alert = {'count': consec_count, 'dates': consec_dates, 'threshold': CONSECUTIVE_ABSENCE_THRESHOLD}
+    late_count, late_month = _check_late_threshold(sa)
+    late_threshold_alert = None
+    if late_count >= LATE_MONTHLY_THRESHOLD:
+        late_threshold_alert = {'count': late_count, 'month': late_month, 'threshold': LATE_MONTHLY_THRESHOLD}
+
     context = {
         'sa': sa,
         'attendance': attendance[:30],
@@ -2378,6 +2394,10 @@ def director_sa_detail(request, pk):
         'evaluation_form': evaluation_form,
         'status_form': status_form,
         'director_name': request.user.get_full_name() or 'Director',
+        'weekly_summary': weekly_summary,
+        'semester_report': semester_report,
+        'consecutive_absence_alert': consecutive_absence_alert,
+        'late_threshold_alert': late_threshold_alert,
     }
     return render(request, 'director/sa_detail.html', context)
 
