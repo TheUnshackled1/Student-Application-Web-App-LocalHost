@@ -11,7 +11,7 @@ from .models import (
     StudentProfile, Document, ApplicationStep,
     UpcomingDate, Reminder, Announcement, NewApplication, RenewalApplication, Office,
     ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
-    ApplicationNote, NoDutyDay,
+    ApplicationNote, NoDutyDay, DutyReminder,
     calculate_end_date, recalculate_end_dates_for_office, auto_expire_student_assistants,
     generate_absent_records_for_yesterday,
 )
@@ -2965,12 +2965,22 @@ def student_dashboard(request):
 
             # Real-time absent record: shift ended with no clock-in → create absent record now
             if is_past:
-                rec, _ = AttendanceRecord.objects.get_or_create(
+                rec, created = AttendanceRecord.objects.get_or_create(
                     student_assistant=sa,
                     date=today,
                     shift=slot,
                     defaults={'status': 'absent'},
                 )
+                # Send absent notification email (once per shift)
+                if created:
+                    from .models import DutyReminder
+                    _, notif_new = DutyReminder.objects.get_or_create(
+                        student_assistant=sa, date=today,
+                        shift=slot, reminder_type='absent',
+                    )
+                    if notif_new:
+                        from .email_utils import send_absent_notification_email
+                        send_absent_notification_email(sa, today, slot)
 
             shifts_status.append({
                 'label': slot,

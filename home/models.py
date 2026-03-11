@@ -480,6 +480,28 @@ class ActiveStudentAssistant(models.Model):
         return self.new_application or self.renewal_application
 
 
+class DutyReminder(models.Model):
+    """Tracks sent duty notifications to prevent duplicates."""
+    REMINDER_TYPES = [
+        ('upcoming', 'Upcoming Shift'),
+        ('absent', 'Absent Notification'),
+    ]
+    student_assistant = models.ForeignKey(
+        'ActiveStudentAssistant', on_delete=models.CASCADE,
+        related_name='duty_reminders',
+    )
+    date = models.DateField()
+    shift = models.CharField(max_length=30)
+    reminder_type = models.CharField(max_length=10, choices=REMINDER_TYPES)
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['student_assistant', 'date', 'shift', 'reminder_type']
+
+    def __str__(self):
+        return f"{self.student_assistant.full_name} — {self.date} {self.shift} ({self.reminder_type})"
+
+
 class AttendanceRecord(models.Model):
     """Daily attendance log for an active student assistant."""
 
@@ -683,6 +705,7 @@ def generate_absent_records_for_yesterday():
     global_no_duty = NoDutyDay.objects.filter(date=yesterday, office__isnull=True).exists()
     if global_no_duty:
         return
+    from .email_utils import send_absent_notification_email
     for sa in ActiveStudentAssistant.objects.filter(status='active', duty_schedule__isnull=False):
         # Skip if SA's office had a no-duty day
         if sa.assigned_office_id in no_duty_dates:
@@ -694,9 +717,19 @@ def generate_absent_records_for_yesterday():
             continue
         slots = (sa.duty_schedule or {}).get(day_name, [])
         for slot in slots:
-            AttendanceRecord.objects.get_or_create(
+            record, created = AttendanceRecord.objects.get_or_create(
                 student_assistant=sa,
                 date=yesterday,
                 shift=slot,
                 defaults={'status': 'absent'},
             )
+            if created:
+                # Send absent notification (only once per shift)
+                _, notif_created = DutyReminder.objects.get_or_create(
+                    student_assistant=sa,
+                    date=yesterday,
+                    shift=slot,
+                    reminder_type='absent',
+                )
+                if notif_created:
+                    send_absent_notification_email(sa, yesterday, slot)

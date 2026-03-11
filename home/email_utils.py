@@ -155,3 +155,48 @@ def send_verification_email(user, request=None):
         f"— SWA Application System"
     )
     return _send(subject, message, user.email)
+
+
+# ================================================================
+#  DUTY NOTIFICATIONS
+# ================================================================
+
+def send_shift_reminder_email(sa, shift_label):
+    """Send a reminder email 5 minutes before a scheduled shift."""
+    if not sa.email:
+        logger.warning('No email for SA %s, skipping shift reminder.', sa.student_id)
+        return False
+
+    office_name = sa.assigned_office.name if sa.assigned_office else 'your assigned office'
+    subject = f'Duty Reminder — {shift_label}'
+    message = (
+        f"Dear {sa.full_name},\n\n"
+        f"This is a friendly reminder that your duty shift is about to start.\n\n"
+        f"  • Shift      : {shift_label}\n"
+        f"  • Office     : {office_name}\n"
+        f"  • Date       : Today\n\n"
+        f"Please make sure to clock in on time via the Student Dashboard.\n\n"
+        f"— SWA Application System"
+    )
+    return _send(subject, message, sa.email)
+
+
+def send_absent_notification_email(sa, absent_date, shift_label):
+    """Send a notification when a student is marked absent for a shift."""
+    if not sa.email:
+        logger.warning('No email for SA %s, skipping absent notification.', sa.student_id)
+        return False
+
+    office_name = sa.assigned_office.name if sa.assigned_office else 'your assigned office'
+    subject = f'Absent Notice — {absent_date.strftime("%B %d, %Y")}'
+    message = (
+        f"Dear {sa.full_name},\n\n"
+        f"You have been marked ABSENT for the following shift:\n\n"
+        f"  • Date       : {absent_date.strftime('%B %d, %Y')}\n"
+        f"  • Shift      : {shift_label}\n"
+        f"  • Office     : {office_name}\n\n"
+        f"If you believe this is an error, please contact your office head\n"
+        f"or the SWA staff to request an excuse.\n\n"
+        f"— SWA Application System"
+    )
+    return _send(subject, message, sa.email)
