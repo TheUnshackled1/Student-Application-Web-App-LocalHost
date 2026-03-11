@@ -155,6 +155,52 @@ class Command(BaseCommand):
                                     f'  Absent notice sent to {sa.full_name} for {shift_label}'
                                 )
 
+        # ── Consecutive absence & late threshold alerts (once per day) ──
+        from home.views import _check_consecutive_absences, _check_late_threshold
+        from home.views import CONSECUTIVE_ABSENCE_THRESHOLD, LATE_MONTHLY_THRESHOLD
+
+        consec_alerts = 0
+        late_alerts = 0
+
+        for sa in active_sas:
+            if sa.assigned_office_id in no_duty_office_ids:
+                continue
+            if sa.start_date and today < sa.start_date:
+                continue
+            if sa.end_date and today > sa.end_date:
+                continue
+
+            # Consecutive absences
+            consec_count, consec_dates = _check_consecutive_absences(sa)
+            if consec_count >= CONSECUTIVE_ABSENCE_THRESHOLD:
+                key = f'consec_{consec_count}'
+                _, created = DutyReminder.objects.get_or_create(
+                    student_assistant=sa,
+                    date=today,
+                    shift=key,
+                    reminder_type='absent',
+                )
+                if created:
+                    if send_consecutive_absence_alert(sa, consec_count, consec_dates):
+                        consec_alerts += 1
+                        self.stdout.write(f'  Consecutive absence alert sent to {sa.full_name} ({consec_count} days)')
+
+            # Late threshold
+            late_count, late_month = _check_late_threshold(sa)
+            if late_count >= LATE_MONTHLY_THRESHOLD:
+                key = f'late_{today.year}_{today.month}'
+                _, created = DutyReminder.objects.get_or_create(
+                    student_assistant=sa,
+                    date=today,
+                    shift=key,
+                    reminder_type='upcoming',
+                )
+                if created:
+                    if send_late_threshold_alert(sa, late_count, late_month):
+                        late_alerts += 1
+                        self.stdout.write(f'  Late threshold alert sent to {sa.full_name} ({late_count} in {late_month})')
+
         self.stdout.write(self.style.SUCCESS(
-            f'Done — {reminders_sent} reminder(s), {absent_sent} absent notification(s) sent.'
+            f'Done — {reminders_sent} reminder(s), {absent_sent} absent notice(s), '
+            f'{consec_alerts} consecutive-absence alert(s), {late_alerts} late-threshold alert(s) sent.'
         ))
