@@ -10,7 +10,10 @@ from datetime import timedelta
 from home.models import (
     ActiveStudentAssistant, AttendanceRecord, DutyReminder, NoDutyDay,
 )
-from home.email_utils import send_shift_reminder_email, send_absent_notification_email
+from home.email_utils import (
+    send_shift_reminder_email, send_absent_notification_email,
+    send_consecutive_absence_alert, send_late_threshold_alert,
+)
 import logging
 
 logger = logging.getLogger(__name__)
