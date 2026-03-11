@@ -45,3 +45,14 @@ DOC_FIELD_LABELS = {
 def doc_label(field_name):
     """Convert a document field name to a human-readable label."""
     return DOC_FIELD_LABELS.get(field_name, field_name.replace('_', ' ').title())
+
+
+@register.filter
+def mask_sid(student_id, own_id=''):
+    """Mask a student ID for privacy: 202***** unless it matches own_id."""
+    sid = str(student_id)
+    if own_id and sid == str(own_id):
+        return sid
+    if len(sid) > 3:
+        return sid[:3] + '*' * (len(sid) - 3)
+    return sid

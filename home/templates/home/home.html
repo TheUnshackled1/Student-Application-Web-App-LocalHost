@@ -274,7 +274,7 @@
                             </span>
                         </td>
                         <td class="app-log-name">{{ app.student_name }}</td>
-                        <td><code class="app-log-sid">{{ app.application_id }}</code></td>
+                        <td><code class="app-log-sid">{{ app.application_id|mask_sid:logged_in_student_id }}</code></td>
                         <td>
                             <span class="app-log-status app-log-status--{{ app.raw_status }}">
                                 <i class="fa-solid fa-circle" style="font-size:6px;"></i>
@@ -456,7 +456,7 @@
                         <tr>
                             <td>{{ forloop.counter }}</td>
                             <td class="dash-st-name">{{ app.student_name }}</td>
-                            <td><code>{{ app.application_id }}</code></td>
+                            <td><code>{{ app.application_id|mask_sid:logged_in_student_id }}</code></td>
                             <td>
                                 <span class="dash-st-type dash-st-type--{{ app.app_type_class }}">
                                     <i class="fa-solid {{ app.app_type_icon }}"></i> {{ app.app_type }}
@@ -506,7 +506,7 @@
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td class="dash-st-name">{{ sa.name }}</td>
-                        <td><code>{{ sa.student_id }}</code></td>
+                        <td><code>{{ sa.student_id|mask_sid:logged_in_student_id }}</code></td>
                         <td>{{ sa.course }}</td>
                         <td>{{ sa.office }}</td>
                         <td class="dash-st-date">{% if sa.start_date %}{{ sa.start_date|date:"M d, Y" }}{% else %}—{% endif %}</td>

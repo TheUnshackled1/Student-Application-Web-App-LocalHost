@@ -318,8 +318,8 @@ STATUS_DISPLAY_MAP = {
 
 def home(request):
     """Home/dashboard view for student applicants."""
-    # Clear any stale staff/director session — homepage is public
-    if request.user.is_authenticated:
+    # Clear stale staff/director sessions — homepage is public
+    if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
         auth_logout(request)
     today = _date.today()
 
@@ -627,6 +627,11 @@ def home(request):
         })
     approved_students.sort(key=lambda x: x['submitted_at'], reverse=True)
 
+    # Get logged-in student's ID for unmasking their own data
+    logged_in_student_id = ''
+    if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
+        logged_in_student_id = request.user.student_profile.student_id
+
     context = {
         'applications': applications,
         'all_applications': all_applications,
@@ -640,6 +645,7 @@ def home(request):
         'submission_success': submission_success,
         'day_choices': DAY_CHOICES,
         'time_slot_choices': TIME_SLOT_CHOICES,
+        'logged_in_student_id': logged_in_student_id,
     }
     return render(request, 'home/home.html', context)
 
@@ -713,12 +719,19 @@ def available_offices(request):
             'students': assigned_students,
         })
 
+    # All approved / active student assistants
+    all_student_assistants = ActiveStudentAssistant.objects.select_related(
+        'assigned_office'
+    ).filter(status='active').order_by('full_name')
+
     context = {
         'offices_json': json.dumps(offices_data),
         'total_offices': offices_qs.count(),
         'total_open': sum(1 for o in offices_data if o['status'] == 'open'),
         'total_limited': sum(1 for o in offices_data if o['status'] == 'limited'),
         'total_full': sum(1 for o in offices_data if o['status'] == 'full'),
+        'total_approved_sa': all_student_assistants.count(),
+        'all_student_assistants': all_student_assistants,
     }
 
     # If staff is logged in, include the office form for management
