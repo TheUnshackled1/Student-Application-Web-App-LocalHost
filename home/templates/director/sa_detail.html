@@ -327,6 +327,68 @@
                 </div>
             </div>
 
+            <!-- Weekly Attendance Summary -->
+            {% if weekly_summary %}
+            <div class="staff-panel" style="margin-top:1.5rem;">
+                <div class="staff-panel-header">
+                    <div class="staff-panel-header-left">
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#06b6d4,#0891b2);"><i class="fa-solid fa-calendar-week"></i></span>
+                        <h3 class="staff-panel-title">Weekly Summary</h3>
+                    </div>
+                </div>
+                <div class="staff-table-wrap">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Week</th>
+                                <th class="text-center" style="color:#22c55e;">Present</th>
+                                <th class="text-center" style="color:#f59e0b;">Late</th>
+                                <th class="text-center" style="color:#ef4444;">Absent</th>
+                                <th class="text-end">Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for wk in weekly_summary %}
+                            <tr>
+                                <td>{{ wk.label }}</td>
+                                <td class="text-center" style="color:#22c55e; font-weight:600;">{{ wk.present }}</td>
+                                <td class="text-center" style="color:#f59e0b; font-weight:600;">{{ wk.late }}</td>
+                                <td class="text-center" style="color:#ef4444; font-weight:600;">{{ wk.absent }}</td>
+                                <td class="text-end" style="font-weight:600;">{{ wk.hours }}h</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Semester Attendance Report -->
+            {% if semester_report %}
+            <div class="staff-panel" style="margin-top:1.5rem;">
+                <div class="staff-panel-header">
+                    <div class="staff-panel-header-left">
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);"><i class="fa-solid fa-chart-pie"></i></span>
+                        <h3 class="staff-panel-title">Semester Report</h3>
+                        <span class="ms-2 text-muted" style="font-size:.82rem;">{{ semester_report.semester }} {{ semester_report.academic_year }}</span>
+                    </div>
+                </div>
+                <div style="padding:1rem 1.5rem;">
+                    <div class="row g-2 mb-2">
+                        <div class="col-3"><div class="p-2 rounded-3 text-center" style="background:#f0fdf4; border:1px solid #bbf7d0;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Present</div><strong style="font-size:1.1rem; color:#16a34a;">{{ semester_report.present }}</strong></div></div>
+                        <div class="col-3"><div class="p-2 rounded-3 text-center" style="background:#fffbeb; border:1px solid #fde68a;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Late</div><strong style="font-size:1.1rem; color:#d97706;">{{ semester_report.late }}</strong></div></div>
+                        <div class="col-3"><div class="p-2 rounded-3 text-center" style="background:#fef2f2; border:1px solid #fecaca;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Absent</div><strong style="font-size:1.1rem; color:#dc2626;">{{ semester_report.absent }}</strong></div></div>
+                        <div class="col-3"><div class="p-2 rounded-3 text-center" style="background:#f8fafc; border:1px solid #e2e8f0;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Excused</div><strong style="font-size:1.1rem; color:#64748b;">{{ semester_report.excused }}</strong></div></div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-4"><div class="p-2 rounded-3 text-center" style="background:#eff6ff; border:1px solid #bfdbfe;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Total Records</div><strong style="font-size:1rem;">{{ semester_report.total }}</strong></div></div>
+                        <div class="col-4"><div class="p-2 rounded-3 text-center" style="background:#f0fdf4; border:1px solid #bbf7d0;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Attendance Rate</div><strong style="font-size:1rem; color:#16a34a;">{{ semester_report.attendance_rate }}%</strong></div></div>
+                        <div class="col-4"><div class="p-2 rounded-3 text-center" style="background:#faf5ff; border:1px solid #e9d5ff;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Hours</div><strong style="font-size:1rem; color:#7c3aed;">{{ semester_report.total_hours }}/{{ semester_report.required_hours }}</strong></div></div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Performance Evaluations -->
             <div class="staff-panel" style="margin-top:1.5rem;">
                 <div class="staff-panel-header">
