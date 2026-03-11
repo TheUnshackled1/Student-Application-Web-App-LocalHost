@@ -2103,6 +2103,37 @@ def staff_sa_detail(request, pk):
     evaluation_form = PerformanceEvaluationForm()
     status_form = ActiveSAStatusForm(instance=sa)
 
+    # ── Monthly attendance breakdown ──
+    monthly_breakdown = []
+    if sa.start_date:
+        from collections import defaultdict
+        hours_by_month = defaultdict(Decimal)
+        status_by_month = defaultdict(lambda: {'present': 0, 'late': 0, 'absent': 0})
+        for rec in attendance:
+            key = (rec.date.year, rec.date.month)
+            if rec.time_in and rec.time_out:
+                hours_by_month[key] += Decimal(str(rec.hours_worked))
+            if rec.status in ('present', 'late', 'absent'):
+                status_by_month[key][rec.status] += 1
+        HOURLY_RATE = Decimal('35.00')
+        for i in range(4):
+            m = sa.start_date.month + i
+            y = sa.start_date.year
+            if m > 12:
+                m -= 12
+                y += 1
+            month_label = _date(y, m, 1).strftime('%B %Y')
+            hours = hours_by_month.get((y, m), Decimal('0'))
+            counts = status_by_month.get((y, m), {'present': 0, 'late': 0, 'absent': 0})
+            monthly_breakdown.append({
+                'month': month_label,
+                'hours': float(hours),
+                'payout': float(round(hours * HOURLY_RATE, 2)),
+                'present': counts['present'],
+                'late': counts['late'],
+                'absent': counts['absent'],
+            })
+
     context = {
         'sa': sa,
         'attendance': attendance[:30],  # Last 30 records
@@ -2118,6 +2149,7 @@ def staff_sa_detail(request, pk):
         'evaluation_form': evaluation_form,
         'status_form': status_form,
         'staff_name': request.user.get_full_name() or request.user.username,
+        'monthly_breakdown': monthly_breakdown,
     }
     return render(request, 'staff/sa_detail.html', context)
 
@@ -2936,9 +2968,13 @@ def student_dashboard(request):
         if sa.start_date:
             all_records = sa.attendance_records.all()
             hours_by_month = defaultdict(Decimal)
+            status_by_month = defaultdict(lambda: {'present': 0, 'late': 0, 'absent': 0})
             for rec in all_records:
+                key = (rec.date.year, rec.date.month)
                 if rec.time_in and rec.time_out:
-                    hours_by_month[(rec.date.year, rec.date.month)] += Decimal(str(rec.hours_worked))
+                    hours_by_month[key] += Decimal(str(rec.hours_worked))
+                if rec.status in ('present', 'late', 'absent'):
+                    status_by_month[key][rec.status] += 1
 
             # Build 4 months starting from the SA's start_date month
             for i in range(4):
@@ -2955,6 +2991,7 @@ def student_dashboard(request):
                 )
                 hours = hours_by_month.get((y, m), Decimal('0'))
                 payout = round(hours * HOURLY_RATE, 2)
+                counts = status_by_month.get((y, m), {'present': 0, 'late': 0, 'absent': 0})
                 monthly_payout.append({
                     'month': month_label,
                     'days': days_in_month,
@@ -2962,6 +2999,9 @@ def student_dashboard(request):
                     'hours': float(hours),
                     'rate': float(HOURLY_RATE),
                     'payout': float(payout),
+                    'present': counts['present'],
+                    'late': counts['late'],
+                    'absent': counts['absent'],
                 })
 
         sa_data.append({
