@@ -408,6 +408,19 @@
 
                 <!-- Duty Schedule & Time Tracker -->
                 {% if item.sa.status == 'active' %}
+
+                {% if item.missed_shifts %}
+                <div class="alert mb-3 p-3 rounded-3 d-flex align-items-start gap-2" style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; font-size:.86rem;">
+                    <i class="fa-solid fa-triangle-exclamation" style="margin-top:2px; color:#ef4444;"></i>
+                    <div>
+                        <strong>Missed Shift{{ item.missed_shifts|length|pluralize }}</strong><br>
+                        {% for s in item.missed_shifts %}
+                        <span style="display:inline-block; margin-top:3px; padding:2px 10px; background:#fee2e2; border-radius:6px; font-size:.8rem; font-weight:600;">{{ s }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
                 <div class="mb-4 p-3 rounded-3" style="background:#f0fdf4; border:1px solid #bbf7d0;">
 
                     {% if not item.has_schedule %}

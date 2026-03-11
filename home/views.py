@@ -3004,6 +3004,9 @@ def student_dashboard(request):
                     'absent': counts['absent'],
                 })
 
+        # ── Missed shifts (past slots with no record) ──
+        missed_shifts = [s['label'] for s in shifts_status if s.get('past')]
+
         sa_data.append({
             'sa': sa,
             'attendance': attendance,
@@ -3014,6 +3017,7 @@ def student_dashboard(request):
             'has_schedule': bool(sa.duty_schedule),
             'today_day': day_name,
             'monthly_payout': monthly_payout,
+            'missed_shifts': missed_shifts,
         })
 
     # ── Approved Student Assistants (public list) ──
