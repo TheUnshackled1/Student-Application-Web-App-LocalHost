@@ -409,6 +409,30 @@
                 <!-- Duty Schedule & Time Tracker -->
                 {% if item.sa.status == 'active' %}
 
+                {% if item.consecutive_absence_alert %}
+                <div class="alert mb-3 p-3 rounded-3 d-flex align-items-start gap-2" style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; font-size:.86rem;">
+                    <i class="fa-solid fa-person-circle-exclamation" style="margin-top:2px; color:#dc2626; font-size:1.1rem;"></i>
+                    <div>
+                        <strong>Consecutive Absences Warning</strong><br>
+                        <span style="font-size:.82rem;">You have been absent for <strong>{{ item.consecutive_absence_alert.count }}</strong> consecutive duty day(s).
+                        {% for d in item.consecutive_absence_alert.dates %}
+                        <span style="display:inline-block; margin-top:3px; padding:2px 8px; background:#fee2e2; border-radius:6px; font-size:.78rem; font-weight:600;">{{ d|date:"M d" }}</span>
+                        {% endfor %}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if item.late_threshold_alert %}
+                <div class="alert mb-3 p-3 rounded-3 d-flex align-items-start gap-2" style="background:#fffbeb; border:1px solid #fde68a; color:#92400e; font-size:.86rem;">
+                    <i class="fa-solid fa-clock" style="margin-top:2px; color:#f59e0b; font-size:1.1rem;"></i>
+                    <div>
+                        <strong>Late Attendance Warning</strong><br>
+                        <span style="font-size:.82rem;">You have been late <strong>{{ item.late_threshold_alert.count }}</strong> time(s) in {{ item.late_threshold_alert.month }}. Please clock in on time.</span>
+                    </div>
+                </div>
+                {% endif %}
+
                 {% if item.missed_shifts %}
                 <div class="alert mb-3 p-3 rounded-3 d-flex align-items-start gap-2" style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; font-size:.86rem;">
                     <i class="fa-solid fa-triangle-exclamation" style="margin-top:2px; color:#ef4444;"></i>
@@ -594,6 +618,97 @@
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Weekly Attendance Summary -->
+                {% if item.weekly_summary %}
+                <div class="mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fa-solid fa-calendar-week text-info" style="font-size:1rem;"></i>
+                        <h6 class="fw-bold mb-0" style="font-size:.92rem;">Weekly Attendance Summary</h6>
+                    </div>
+                    <div class="table-responsive" style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+                        <table class="table table-sm table-hover mb-0" style="font-size:.84rem;">
+                            <thead style="background:#f1f5f9;">
+                                <tr>
+                                    <th style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Week</th>
+                                    <th class="text-center" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#22c55e;"><i class="fa-solid fa-check"></i></th>
+                                    <th class="text-center" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#f59e0b;"><i class="fa-solid fa-clock"></i></th>
+                                    <th class="text-center" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#ef4444;"><i class="fa-solid fa-xmark"></i></th>
+                                    <th class="text-end" style="padding:10px 12px; font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; color:#475569;">Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for wk in item.weekly_summary %}
+                            <tr>
+                                <td style="padding:8px 12px;">{{ wk.label }}</td>
+                                <td class="text-center" style="padding:8px 12px; color:#22c55e; font-weight:600;">{{ wk.present }}</td>
+                                <td class="text-center" style="padding:8px 12px; color:#f59e0b; font-weight:600;">{{ wk.late }}</td>
+                                <td class="text-center" style="padding:8px 12px; color:#ef4444; font-weight:600;">{{ wk.absent }}</td>
+                                <td class="text-end" style="padding:8px 12px; font-weight:600;">{{ wk.hours }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Semester Attendance Report -->
+                {% if item.semester_report %}
+                <div class="mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fa-solid fa-chart-pie text-purple" style="font-size:1rem; color:#8b5cf6;"></i>
+                        <h6 class="fw-bold mb-0" style="font-size:.92rem;">Semester Attendance Report</h6>
+                        <span class="text-muted" style="font-size:.78rem;">{{ item.semester_report.semester }} {{ item.semester_report.academic_year }}</span>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6 col-md-3">
+                            <div class="p-2 rounded-3 text-center" style="background:#f0fdf4; border:1px solid #bbf7d0;">
+                                <div class="text-muted" style="font-size:.7rem; text-transform:uppercase; font-weight:600;">Present</div>
+                                <strong style="font-size:1.1rem; color:#16a34a;">{{ item.semester_report.present }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-2 rounded-3 text-center" style="background:#fffbeb; border:1px solid #fde68a;">
+                                <div class="text-muted" style="font-size:.7rem; text-transform:uppercase; font-weight:600;">Late</div>
+                                <strong style="font-size:1.1rem; color:#d97706;">{{ item.semester_report.late }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-2 rounded-3 text-center" style="background:#fef2f2; border:1px solid #fecaca;">
+                                <div class="text-muted" style="font-size:.7rem; text-transform:uppercase; font-weight:600;">Absent</div>
+                                <strong style="font-size:1.1rem; color:#dc2626;">{{ item.semester_report.absent }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="p-2 rounded-3 text-center" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                                <div class="text-muted" style="font-size:.7rem; text-transform:uppercase; font-weight:600;">Excused</div>
+                                <strong style="font-size:1.1rem; color:#64748b;">{{ item.semester_report.excused }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <div class="p-2 rounded-3 text-center" style="background:#eff6ff; border:1px solid #bfdbfe;">
+                                <div class="text-muted" style="font-size:.7rem; text-transform:uppercase; font-weight:600;">Total Records</div>
+                                <strong style="font-size:1rem;">{{ item.semester_report.total }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-2 rounded-3 text-center" style="background:#f0fdf4; border:1px solid #bbf7d0;">
+                                <div class="text-muted" style="font-size:.7rem; text-transform:uppercase; font-weight:600;">Attendance Rate</div>
+                                <strong style="font-size:1rem; color:#16a34a;">{{ item.semester_report.attendance_rate }}%</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-2 rounded-3 text-center" style="background:#faf5ff; border:1px solid #e9d5ff;">
+                                <div class="text-muted" style="font-size:.7rem; text-transform:uppercase; font-weight:600;">Hours Rendered</div>
+                                <strong style="font-size:1rem; color:#7c3aed;">{{ item.semester_report.total_hours }}/{{ item.semester_report.required_hours }} hrs ({{ item.semester_report.hours_pct }}%)</strong>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
