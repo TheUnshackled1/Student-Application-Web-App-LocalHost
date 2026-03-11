@@ -583,7 +583,7 @@
                   <tr>
                     <td style="padding:10px 14px; color:#475569;">{{ forloop.counter }}</td>
                     <td style="padding:10px 14px; font-weight:600; color:#1e293b;">{{ sa.full_name }}</td>
-                    <td style="padding:10px 14px;"><span style="background:#f1f5f9; padding:3px 10px; border-radius:6px; font-weight:600; color:#334155; font-size:12px;">{{ sa.student_id|mask_sid }}</span></td>
+                    <td style="padding:10px 14px;"><span style="background:#f1f5f9; padding:3px 10px; border-radius:6px; font-weight:600; color:#334155; font-size:12px;">{% if user.is_staff or user.is_superuser %}{{ sa.student_id }}{% else %}{{ sa.student_id|mask_sid }}{% endif %}</span></td>
                     <td style="padding:10px 14px; color:#475569;">{{ sa.assigned_office.name|default:"Unassigned" }}</td>
                     <td style="padding:10px 14px; color:#475569;">{{ sa.get_semester_display }} {{ sa.academic_year }}</td>
                   </tr>
@@ -977,8 +977,10 @@
 
 <script>
 /* Mask student ID for privacy: e.g. 20230452 -> 202***** */
+var _isStaffOrDirector = {{ user.is_staff|yesno:"true,false" }} || {{ user.is_superuser|yesno:"true,false" }};
 function maskSid(sid) {
     sid = String(sid);
+    if (_isStaffOrDirector) return sid;
     if (sid.length > 3) return sid.substring(0, 3) + '*'.repeat(sid.length - 3);
     return sid;
 }
