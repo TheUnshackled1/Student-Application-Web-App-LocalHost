@@ -2147,6 +2147,22 @@ def staff_sa_detail(request, pk):
                 'absent': counts['absent'],
             })
 
+    # ── Weekly summary ──
+    weekly_summary = _build_weekly_summary(attendance, sa.start_date)
+
+    # ── Semester report ──
+    semester_report = _build_semester_report(sa)
+
+    # ── Alerts ──
+    consec_count, consec_dates = _check_consecutive_absences(sa)
+    consecutive_absence_alert = None
+    if consec_count >= CONSECUTIVE_ABSENCE_THRESHOLD:
+        consecutive_absence_alert = {'count': consec_count, 'dates': consec_dates, 'threshold': CONSECUTIVE_ABSENCE_THRESHOLD}
+    late_count, late_month = _check_late_threshold(sa)
+    late_threshold_alert = None
+    if late_count >= LATE_MONTHLY_THRESHOLD:
+        late_threshold_alert = {'count': late_count, 'month': late_month, 'threshold': LATE_MONTHLY_THRESHOLD}
+
     context = {
         'sa': sa,
         'attendance': attendance[:30],  # Last 30 records
@@ -2163,6 +2179,10 @@ def staff_sa_detail(request, pk):
         'status_form': status_form,
         'staff_name': request.user.get_full_name() or request.user.username,
         'monthly_breakdown': monthly_breakdown,
+        'weekly_summary': weekly_summary,
+        'semester_report': semester_report,
+        'consecutive_absence_alert': consecutive_absence_alert,
+        'late_threshold_alert': late_threshold_alert,
     }
     return render(request, 'staff/sa_detail.html', context)
 
@@ -3043,6 +3063,33 @@ def student_dashboard(request):
         # ── Missed shifts (past slots with no record) ──
         missed_shifts = [s['label'] for s in shifts_status if s.get('past')]
 
+        # ── Weekly summary ──
+        all_records_for_weekly = sa.attendance_records.all()
+        weekly_summary = _build_weekly_summary(all_records_for_weekly, sa.start_date)
+
+        # ── Semester report ──
+        semester_report = _build_semester_report(sa)
+
+        # ── Consecutive absence alert ──
+        consec_count, consec_dates = _check_consecutive_absences(sa)
+        consecutive_absence_alert = None
+        if consec_count >= CONSECUTIVE_ABSENCE_THRESHOLD:
+            consecutive_absence_alert = {
+                'count': consec_count,
+                'dates': consec_dates,
+                'threshold': CONSECUTIVE_ABSENCE_THRESHOLD,
+            }
+
+        # ── Late threshold alert ──
+        late_count, late_month = _check_late_threshold(sa)
+        late_threshold_alert = None
+        if late_count >= LATE_MONTHLY_THRESHOLD:
+            late_threshold_alert = {
+                'count': late_count,
+                'month': late_month,
+                'threshold': LATE_MONTHLY_THRESHOLD,
+            }
+
         sa_data.append({
             'sa': sa,
             'attendance': attendance,
@@ -3054,6 +3101,10 @@ def student_dashboard(request):
             'today_day': day_name,
             'monthly_payout': monthly_payout,
             'missed_shifts': missed_shifts,
+            'weekly_summary': weekly_summary,
+            'semester_report': semester_report,
+            'consecutive_absence_alert': consecutive_absence_alert,
+            'late_threshold_alert': late_threshold_alert,
         })
 
     # ── Approved Student Assistants (public list) ──
