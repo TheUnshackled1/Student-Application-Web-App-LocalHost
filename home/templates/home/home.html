@@ -62,32 +62,10 @@
             <a href="{% url 'home:home' %}" class="btn btn-nav btn-nav--active"><i class="fa-solid fa-house"></i><span>HOME</span></a>
             <a href="{% url 'home:available_offices' %}" class="btn btn-nav btn-nav--link"><i class="fa-solid fa-building"></i><span>AVAILABLE OFFICES</span></a>
         </div>
-        {% if not user.is_staff and not user.is_superuser %}
         <a href="#" class="btn btn-nav btn-nav--apply" data-bs-toggle="modal" data-bs-target="#applyRenewModal">
             <i class="fa-solid fa-paper-plane"></i>
             <span>Apply / Renew as Student Assistant</span>
         </a>
-        {% endif %}
-        {% if user.is_authenticated %}
-        {% if user.is_superuser %}
-        <a href="{% url 'home:director_dashboard' %}" class="btn btn-nav btn-nav--director">
-            <i class="fa-solid fa-building-columns"></i>
-            <span>Back to Dashboard</span>
-        </a>
-        {% elif user.is_staff %}
-        <a href="{% url 'home:staff_dashboard' %}" class="btn btn-nav btn-nav--staff">
-            <i class="fa-solid fa-building-columns"></i>
-            <span>Back to Dashboard</span>
-        </a>
-        {% endif %}
-        <form method="post" action="{% url 'logout' %}" style="margin:0;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-nav btn-nav--link" style="border:none; cursor:pointer;">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Logout</span>
-            </button>
-        </form>
-        {% else %}
         <a href="{% url 'home:student_login' %}" class="btn btn-nav btn-nav--student">
             <i class="fa-solid fa-user-graduate"></i>
             <span>Log in as Student</span>
@@ -100,7 +78,6 @@
             <i class="fa-solid fa-user-shield"></i>
             <span>Log in as Student Director</span>
         </a>
-        {% endif %}
     </div>
 </nav>
 

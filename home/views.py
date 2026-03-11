@@ -318,6 +318,9 @@ STATUS_DISPLAY_MAP = {
 
 def home(request):
     """Home/dashboard view for student applicants."""
+    # Clear any stale staff/director session — homepage is public
+    if request.user.is_authenticated:
+        auth_logout(request)
     today = _date.today()
 
     # ── Handle "Track Application" form submission ──
