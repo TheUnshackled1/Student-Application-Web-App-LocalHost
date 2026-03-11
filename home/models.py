@@ -666,3 +666,37 @@ def auto_expire_student_assistants():
         end_date__isnull=False,
         end_date__lt=today,
     ).update(status='expired')
+
+
+def generate_absent_records_for_yesterday():
+    """Create absent AttendanceRecords for any scheduled shifts that were missed yesterday."""
+    from django.db.models import Q
+    yesterday = _date.today() - timedelta(days=1)
+    # Skip weekends
+    if yesterday.weekday() >= 5:
+        return
+    day_name = yesterday.strftime('%A')
+    # Collect no-duty dates for yesterday
+    no_duty_dates = set(
+        NoDutyDay.objects.filter(date=yesterday).values_list('office_id', flat=True)
+    )
+    global_no_duty = NoDutyDay.objects.filter(date=yesterday, office__isnull=True).exists()
+    if global_no_duty:
+        return
+    for sa in ActiveStudentAssistant.objects.filter(status='active', duty_schedule__isnull=False):
+        # Skip if SA's office had a no-duty day
+        if sa.assigned_office_id in no_duty_dates:
+            continue
+        # Skip if SA hadn't started yet or already ended
+        if sa.start_date and yesterday < sa.start_date:
+            continue
+        if sa.end_date and yesterday > sa.end_date:
+            continue
+        slots = (sa.duty_schedule or {}).get(day_name, [])
+        for slot in slots:
+            AttendanceRecord.objects.get_or_create(
+                student_assistant=sa,
+                date=yesterday,
+                shift=slot,
+                defaults={'status': 'absent'},
+            )

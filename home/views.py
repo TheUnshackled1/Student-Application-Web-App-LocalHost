@@ -13,6 +13,7 @@ from .models import (
     ActiveStudentAssistant, AttendanceRecord, PerformanceEvaluation,
     ApplicationNote, NoDutyDay,
     calculate_end_date, recalculate_end_dates_for_office, auto_expire_student_assistants,
+    generate_absent_records_for_yesterday,
 )
 from .forms import (
     ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm,
@@ -2785,6 +2786,7 @@ def student_dashboard(request):
 
     # Run auto-expire check
     auto_expire_student_assistants()
+    generate_absent_records_for_yesterday()
 
     today = _date.today()
 
@@ -3188,11 +3190,12 @@ def student_clock_in(request, pk):
         messages.info(request, 'You have already reached the 4-hour daily limit.')
         return redirect('home:student_dashboard')
 
+    clock_status = 'late' if now > slot_start else 'present'
     record, created = AttendanceRecord.objects.get_or_create(
         student_assistant=sa,
         date=today,
         shift=shift_label,
-        defaults={'time_in': now, 'status': 'present', 'logged_by': request.user},
+        defaults={'time_in': now, 'status': clock_status, 'logged_by': request.user},
     )
     if created:
         messages.success(request, f'Clocked in at {now.strftime("%I:%M %p")} for {shift_label}.')
