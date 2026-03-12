@@ -25,7 +25,6 @@ def _parse_slot_times(slot_label):
 
 
 def _merge_consecutive_slots(raw_slots):
-    """Merge consecutive 30-min slots into continuous shift labels."""
     from datetime import datetime, timedelta as td
     if not raw_slots:
         return []
@@ -83,10 +82,8 @@ class Command(BaseCommand):
         absent_sent = 0
 
         for sa in active_sas:
-            # Skip if office has no-duty day
             if sa.assigned_office_id in no_duty_office_ids:
                 continue
-            # Skip if not within duty period
             if sa.start_date and today < sa.start_date:
                 continue
             if sa.end_date and today > sa.end_date:
@@ -99,8 +96,6 @@ class Command(BaseCommand):
                 slot_start, slot_end = _parse_slot_times(shift_label)
                 if not slot_start:
                     continue
-
-                # ── 5-minute reminder ──
                 from datetime import datetime, timedelta as td
                 shift_start_dt = datetime.combine(today, slot_start)
                 now_dt = datetime.combine(today, now_time)
@@ -120,9 +115,7 @@ class Command(BaseCommand):
                                 f'  Reminder sent to {sa.full_name} for {shift_label}'
                             )
 
-                # ── Real-time absent detection ──
                 if now_time > slot_end:
-                    # Check if there's an attendance record for this shift
                     has_record = AttendanceRecord.objects.filter(
                         student_assistant=sa, date=today, shift=shift_label,
                     ).exclude(status='absent').exists()
