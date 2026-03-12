@@ -3877,6 +3877,312 @@ def director_department_reports(request):
     }
     return render(request, 'director/department_reports.html', context)
 
+
+def _build_department_report_data():
+    """Shared helper – builds the same per-office report data used by the HTML page,
+    the PDF export, and the email view so all three stay in sync."""
+    from django.db.models import Avg, Count, FloatField, Sum
+    from django.db.models.functions import Coalesce
+
+    offices = Office.objects.filter(is_active=True).order_by('name')
+    report = []
+
+    for office in offices:
+        sas = ActiveStudentAssistant.objects.filter(assigned_office=office)
+        sa_count = sas.count()
+        active_count = sas.filter(status='active').count()
+
+        att_qs = AttendanceRecord.objects.filter(student_assistant__assigned_office=office)
+        att_total = att_qs.count()
+        att_present = att_qs.filter(status='present').count()
+        att_late = att_qs.filter(status='late').count()
+        att_absent = att_qs.filter(status='absent').count()
+        att_excused = att_qs.filter(status='excused').count()
+        attended = att_present + att_late + att_excused
+        attendance_rate = round(attended / att_total * 100, 1) if att_total else 0
+
+        hours_agg = sas.aggregate(
+            avg_hours=Coalesce(Avg('total_hours'), 0.0, output_field=FloatField()),
+            total_hours=Coalesce(Sum('total_hours'), 0.0, output_field=FloatField()),
+            avg_required=Coalesce(Avg('required_hours'), 0.0, output_field=FloatField()),
+        )
+        avg_hours = round(float(hours_agg['avg_hours']), 1)
+        total_hours = round(float(hours_agg['total_hours']), 1)
+        avg_required = round(float(hours_agg['avg_required']), 1)
+        avg_completion = round(avg_hours / avg_required * 100, 1) if avg_required else 0
+
+        eval_qs = PerformanceEvaluation.objects.filter(student_assistant__assigned_office=office)
+        eval_agg = eval_qs.aggregate(
+            count=Count('id'),
+            avg_quality=Avg('work_quality'),
+            avg_punctuality=Avg('punctuality'),
+            avg_initiative=Avg('initiative'),
+            avg_cooperation=Avg('cooperation'),
+            avg_communication=Avg('communication'),
+            avg_overall=Avg('overall_rating'),
+        )
+
+        def _r(v):
+            return round(float(v), 2) if v else 0
+
+        report.append({
+            'office_name': office.name,
+            'building': office.building,
+            'head': office.head or '—',
+            'sa_count': sa_count,
+            'active_count': active_count,
+            'att_total': att_total, 'att_present': att_present, 'att_late': att_late,
+            'att_absent': att_absent, 'att_excused': att_excused, 'attendance_rate': attendance_rate,
+            'avg_hours': avg_hours, 'total_hours': total_hours,
+            'avg_required': avg_required, 'avg_completion': avg_completion,
+            'eval_count': eval_agg['count'] or 0,
+            'avg_quality': _r(eval_agg['avg_quality']),
+            'avg_punctuality': _r(eval_agg['avg_punctuality']),
+            'avg_initiative': _r(eval_agg['avg_initiative']),
+            'avg_cooperation': _r(eval_agg['avg_cooperation']),
+            'avg_communication': _r(eval_agg['avg_communication']),
+            'avg_overall': _r(eval_agg['avg_overall']),
+        })
+
+    all_att = AttendanceRecord.objects.all()
+    g_att_total = all_att.count()
+    g_attended = all_att.filter(status__in=['present', 'late', 'excused']).count()
+
+    all_sas = ActiveStudentAssistant.objects.all()
+    g_hours = all_sas.aggregate(
+        avg_hours=Coalesce(Avg('total_hours'), 0.0, output_field=FloatField()),
+        total_hours=Coalesce(Sum('total_hours'), 0.0, output_field=FloatField()),
+    )
+    all_evals = PerformanceEvaluation.objects.all()
+    g_eval = all_evals.aggregate(avg_overall=Avg('overall_rating'), count=Count('id'))
+
+    global_stats = {
+        'total_sas': all_sas.count(),
+        'active_sas': all_sas.filter(status='active').count(),
+        'attendance_rate': round(g_attended / g_att_total * 100, 1) if g_att_total else 0,
+        'avg_hours': round(float(g_hours['avg_hours']), 1),
+        'total_hours': round(float(g_hours['total_hours']), 1),
+        'avg_overall': round(float(g_eval['avg_overall']), 2) if g_eval['avg_overall'] else 0,
+        'eval_count': g_eval['count'] or 0,
+    }
+    return report, global_stats
+
+
+def _render_department_report_pdf(report, global_stats):
+    """Generate a department-reports PDF (landscape letter) and return the bytes."""
+    from io import BytesIO
+    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
+    buf = BytesIO()
+    page = landscape(letter)
+    doc = SimpleDocTemplate(buf, pagesize=page,
+                            leftMargin=0.5 * inch, rightMargin=0.5 * inch,
+                            topMargin=0.5 * inch, bottomMargin=0.5 * inch)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    # ── Title ──
+    title_style = ParagraphStyle('Title', parent=styles['Title'],
+                                  fontSize=16, textColor=colors.HexColor('#14532d'),
+                                  spaceAfter=4)
+    elements.append(Paragraph('CARLOS HILADO MEMORIAL STATE UNIVERSITY', title_style))
+
+    sub_style = ParagraphStyle('Sub', parent=styles['Normal'],
+                                fontSize=10, textColor=colors.HexColor('#166534'),
+                                alignment=1, spaceAfter=2)
+    elements.append(Paragraph('Talisay City, Negros Occidental', sub_style))
+
+    heading_style = ParagraphStyle('H2', parent=styles['Heading2'],
+                                    fontSize=13, textColor=colors.HexColor('#14532d'),
+                                    alignment=1, spaceAfter=12)
+    elements.append(Paragraph('Department-Level Reports', heading_style))
+
+    date_style = ParagraphStyle('Date', parent=styles['Normal'],
+                                 fontSize=9, textColor=colors.HexColor('#6b7280'),
+                                 alignment=1, spaceAfter=8)
+    elements.append(Paragraph(f'Generated: {_date.today().strftime("%B %d, %Y")}', date_style))
+
+    # ── Global summary ──
+    gs = global_stats
+    summary_data = [[
+        'Total SAs', 'Active', 'Attendance Rate', 'Avg Hours/SA', 'Avg Rating', 'Evaluations',
+    ], [
+        str(gs['total_sas']), str(gs['active_sas']),
+        f"{gs['attendance_rate']}%", str(gs['avg_hours']),
+        f"{gs['avg_overall']}/5", str(gs['eval_count']),
+    ]]
+    summary_table = Table(summary_data, hAlign='CENTER')
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#166534')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    elements.append(summary_table)
+    elements.append(Spacer(1, 14))
+
+    # ── Per-office table ──
+    cell_style = ParagraphStyle('Cell', parent=styles['Normal'], fontSize=8, leading=10)
+    bold_cell = ParagraphStyle('BoldCell', parent=cell_style, fontName='Helvetica-Bold')
+
+    header = [
+        Paragraph('<b>Office</b>', bold_cell),
+        Paragraph('<b>SAs<br/>(Active/Total)</b>', bold_cell),
+        Paragraph('<b>Attendance<br/>Rate</b>', bold_cell),
+        Paragraph('<b>Present</b>', bold_cell),
+        Paragraph('<b>Late</b>', bold_cell),
+        Paragraph('<b>Absent</b>', bold_cell),
+        Paragraph('<b>Avg Hrs</b>', bold_cell),
+        Paragraph('<b>Completion</b>', bold_cell),
+        Paragraph('<b>Total Hrs</b>', bold_cell),
+        Paragraph('<b>Avg Rating</b>', bold_cell),
+        Paragraph('<b>Evals</b>', bold_cell),
+    ]
+    data = [header]
+
+    for r in report:
+        data.append([
+            Paragraph(r['office_name'], cell_style),
+            Paragraph(f"{r['active_count']}/{r['sa_count']}", cell_style),
+            Paragraph(f"{r['attendance_rate']}%", cell_style),
+            Paragraph(str(r['att_present']), cell_style),
+            Paragraph(str(r['att_late']), cell_style),
+            Paragraph(str(r['att_absent']), cell_style),
+            Paragraph(f"{r['avg_hours']}", cell_style),
+            Paragraph(f"{r['avg_completion']}%", cell_style),
+            Paragraph(f"{r['total_hours']}", cell_style),
+            Paragraph(f"{r['avg_overall']}/5", cell_style),
+            Paragraph(str(r['eval_count']), cell_style),
+        ])
+
+    col_widths = [140, 55, 60, 48, 40, 44, 52, 62, 56, 60, 42]
+    t = Table(data, colWidths=col_widths, hAlign='CENTER', repeatRows=1)
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#166534')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8fafc')]),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    elements.append(t)
+    elements.append(Spacer(1, 12))
+
+    # ── Per-office evaluation detail table ──
+    eval_header = [
+        Paragraph('<b>Office</b>', bold_cell),
+        Paragraph('<b>Quality</b>', bold_cell),
+        Paragraph('<b>Punctuality</b>', bold_cell),
+        Paragraph('<b>Initiative</b>', bold_cell),
+        Paragraph('<b>Cooperation</b>', bold_cell),
+        Paragraph('<b>Communication</b>', bold_cell),
+        Paragraph('<b>Overall</b>', bold_cell),
+    ]
+    eval_data = [eval_header]
+    has_evals = False
+    for r in report:
+        if r['eval_count'] > 0:
+            has_evals = True
+            eval_data.append([
+                Paragraph(r['office_name'], cell_style),
+                Paragraph(f"{r['avg_quality']}/5", cell_style),
+                Paragraph(f"{r['avg_punctuality']}/5", cell_style),
+                Paragraph(f"{r['avg_initiative']}/5", cell_style),
+                Paragraph(f"{r['avg_cooperation']}/5", cell_style),
+                Paragraph(f"{r['avg_communication']}/5", cell_style),
+                Paragraph(f"{r['avg_overall']}/5", cell_style),
+            ])
+
+    if has_evals:
+        eval_heading = ParagraphStyle('EH', parent=styles['Heading3'],
+                                       fontSize=11, textColor=colors.HexColor('#92400e'),
+                                       spaceAfter=6)
+        elements.append(Paragraph('Performance Evaluation Averages by Office', eval_heading))
+        et = Table(eval_data, hAlign='CENTER', repeatRows=1)
+        et.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#92400e')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#fffbeb')]),
+            ('TOPPADDING', (0, 0), (-1, -1), 5),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        elements.append(et)
+
+    doc.build(elements)
+    return buf.getvalue()
+
+
+@login_required
+def director_department_reports_pdf(request):
+    """Download department reports as a PDF."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+
+    from django.http import HttpResponse
+    report, global_stats = _build_department_report_data()
+    pdf_bytes = _render_department_report_pdf(report, global_stats)
+
+    response = HttpResponse(pdf_bytes, content_type='application/pdf')
+    date_str = _date.today().strftime('%Y%m%d')
+    response['Content-Disposition'] = f'attachment; filename="Department_Reports_{date_str}.pdf"'
+    return response
+
+
+@login_required
+def director_department_reports_email(request):
+    """Email the department reports PDF to the director's configured email."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+
+    from django.core.mail import EmailMessage
+
+    report, global_stats = _build_department_report_data()
+    pdf_bytes = _render_department_report_pdf(report, global_stats)
+
+    date_str = _date.today().strftime('%B %d, %Y')
+    filename = f"Department_Reports_{_date.today().strftime('%Y%m%d')}.pdf"
+
+    recipient = request.user.email or settings.EMAIL_HOST_USER
+    email = EmailMessage(
+        subject=f'Department-Level Reports — {date_str}',
+        body=(
+            f'Good day,\n\n'
+            f'Please find attached the Department-Level Reports generated on {date_str}.\n\n'
+            f'Summary:\n'
+            f'  • Total SAs: {global_stats["total_sas"]}\n'
+            f'  • Active SAs: {global_stats["active_sas"]}\n'
+            f'  • Attendance Rate: {global_stats["attendance_rate"]}%\n'
+            f'  • Avg Hours/SA: {global_stats["avg_hours"]}\n'
+            f'  • Avg Performance Rating: {global_stats["avg_overall"]}/5\n'
+            f'  • Total Evaluations: {global_stats["eval_count"]}\n\n'
+            f'This is an automated report from the CHMSU SA Application System.'
+        ),
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[recipient],
+    )
+    email.attach(filename, pdf_bytes, 'application/pdf')
+    email.send()
+
+    messages.success(request, f'Report emailed successfully to {recipient}.')
+    return redirect('home:director_department_reports')
+
 def _compute_renewal_recommendation(attendance_rate, total_hours, required_hours, latest_eval):
     """
     Compute a system-driven renewal recommendation based on:
