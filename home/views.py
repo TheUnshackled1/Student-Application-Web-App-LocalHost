@@ -3197,11 +3197,7 @@ def student_dashboard(request):
     return render(request, 'student/dashboard.html', context)
 
 
-# ================================================================
-#  ATTENDANCE HELPERS — Weekly, Semester, Alerts
-# ================================================================
 
-# Thresholds
 CONSECUTIVE_ABSENCE_THRESHOLD = 3   # consecutive duty-days absent
 LATE_MONTHLY_THRESHOLD = 5          # late records per month
 
