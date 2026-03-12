@@ -656,7 +656,8 @@ class PerformanceEvaluationForm(forms.ModelForm):
         model = PerformanceEvaluation
         fields = [
             'evaluation_period', 'work_quality', 'punctuality',
-            'initiative', 'cooperation', 'communication', 'remarks',
+            'initiative', 'cooperation', 'communication',
+            'recommendation_status', 'remarks',
         ]
         widgets = {
             'evaluation_period': forms.Select(attrs={'class': 'form-select'}),
@@ -675,6 +676,7 @@ class PerformanceEvaluationForm(forms.ModelForm):
             'communication': forms.NumberInput(attrs={
                 'class': 'form-control', 'min': '1', 'max': '5',
             }),
+            'recommendation_status': forms.Select(attrs={'class': 'form-select'}),
             'remarks': forms.Textarea(attrs={
                 'class': 'form-control', 'rows': 3,
                 'placeholder': 'Additional comments or recommendations...',

@@ -797,6 +797,17 @@
                             <span>Cooperation: <strong class="text-dark">{{ ev.cooperation }}</strong></span>
                             <span>Communication: <strong class="text-dark">{{ ev.communication }}</strong></span>
                         </div>
+                        {% if ev.recommendation_status %}
+                        <div class="mt-2">
+                            {% if ev.recommendation_status == 'rehire' %}
+                            <span class="badge" style="background:#dcfce7; color:#166534; font-size:.75rem; padding:4px 10px; border-radius:6px;"><i class="fa-solid fa-circle-check"></i> Rehire</span>
+                            {% elif ev.recommendation_status == 'not_rehire' %}
+                            <span class="badge" style="background:#fef2f2; color:#991b1b; font-size:.75rem; padding:4px 10px; border-radius:6px;"><i class="fa-solid fa-circle-xmark"></i> Not Rehire</span>
+                            {% elif ev.recommendation_status == 'conditional' %}
+                            <span class="badge" style="background:#fffbeb; color:#92400e; font-size:.75rem; padding:4px 10px; border-radius:6px;"><i class="fa-solid fa-circle-exclamation"></i> Conditional</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                         {% if ev.remarks %}<div class="mt-2 text-muted" style="font-size:.82rem;"><i class="fa-solid fa-quote-left me-1" style="font-size:.65rem;"></i><em>{{ ev.remarks }}</em></div>{% endif %}
                     </div>
                     {% endfor %}

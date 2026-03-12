@@ -565,6 +565,13 @@ class PerformanceEvaluation(models.Model):
         ('final', 'Final / End-of-Term'),
     ]
 
+    RECOMMENDATION_CHOICES = [
+        ('', '— Not Set —'),
+        ('rehire', 'Recommend for Rehire'),
+        ('not_rehire', 'Do Not Rehire'),
+        ('conditional', 'Conditional Rehire'),
+    ]
+
     student_assistant = models.ForeignKey(
         ActiveStudentAssistant, on_delete=models.CASCADE,
         related_name='evaluations',
@@ -579,6 +586,11 @@ class PerformanceEvaluation(models.Model):
     communication = models.PositiveSmallIntegerField(help_text='1 = Poor, 5 = Excellent')
 
     overall_rating = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
+    recommendation_status = models.CharField(
+        max_length=15, choices=RECOMMENDATION_CHOICES,
+        blank=True, default='',
+        help_text='Rehire recommendation for contract renewal',
+    )
     remarks = models.TextField(blank=True, default='')
 
     evaluated_by = models.ForeignKey(

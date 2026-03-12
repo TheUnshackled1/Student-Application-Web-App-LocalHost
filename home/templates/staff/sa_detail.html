@@ -387,6 +387,7 @@
                                 <th>Cooperation</th>
                                 <th>Communication</th>
                                 <th>Overall</th>
+                                <th>Recommendation</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
@@ -400,11 +401,95 @@
                                 <td>{{ ev.cooperation }}/5</td>
                                 <td>{{ ev.communication }}/5</td>
                                 <td style="font-weight:700;color:#10b981;">{{ ev.overall_rating }}/5</td>
+                                <td>
+                                    {% if ev.recommendation_status == 'rehire' %}
+                                    <span class="badge" style="background:#dcfce7; color:#166534; font-size:.75rem; padding:4px 10px; border-radius:6px;"><i class="fa-solid fa-circle-check"></i> Rehire</span>
+                                    {% elif ev.recommendation_status == 'not_rehire' %}
+                                    <span class="badge" style="background:#fef2f2; color:#991b1b; font-size:.75rem; padding:4px 10px; border-radius:6px;"><i class="fa-solid fa-circle-xmark"></i> Not Rehire</span>
+                                    {% elif ev.recommendation_status == 'conditional' %}
+                                    <span class="badge" style="background:#fffbeb; color:#92400e; font-size:.75rem; padding:4px 10px; border-radius:6px;"><i class="fa-solid fa-circle-exclamation"></i> Conditional</span>
+                                    {% else %}
+                                    <span style="opacity:0.4; font-size:.8rem;">—</span>
+                                    {% endif %}
+                                </td>
                                 <td>{{ ev.evaluated_at|date:"M d, Y" }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- System Renewal Recommendation -->
+            {% if semester_report and semester_report.system_recommendation %}
+            <div class="staff-panel" style="margin-top:1.5rem;">
+                <div class="staff-panel-header">
+                    <div class="staff-panel-header-left">
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);"><i class="fa-solid fa-robot"></i></span>
+                        <h3 class="staff-panel-title">System Renewal Recommendation</h3>
+                    </div>
+                </div>
+                <div style="padding:1rem 1.5rem;">
+                    {% with rec=semester_report.system_recommendation %}
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="p-3 rounded-3 text-center flex-fill" style="background:{% if rec.level == 'excellent' %}#f0fdf4; border:1px solid #bbf7d0{% elif rec.level == 'good' %}#f0fdf4; border:1px solid #bbf7d0{% elif rec.level == 'conditional' %}#fffbeb; border:1px solid #fde68a{% else %}#fef2f2; border:1px solid #fecaca{% endif %};">
+                            <div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">System Recommendation</div>
+                            <strong style="font-size:1rem; color:{% if rec.level == 'excellent' or rec.level == 'good' %}#16a34a{% elif rec.level == 'conditional' %}#d97706{% else %}#dc2626{% endif %};">{{ rec.recommendation }}</strong>
+                        </div>
+                        <div class="p-3 rounded-3 text-center" style="min-width:100px; background:#f8fafc; border:1px solid #e2e8f0;">
+                            <div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Score</div>
+                            <strong style="font-size:1.1rem;">{{ rec.weighted_score }}%</strong>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-4">
+                            <div class="p-2 rounded-3 text-center" style="background:#f0fdf4; border:1px solid #bbf7d0;">
+                                <div style="font-size:.65rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Attendance</div>
+                                <strong style="font-size:.95rem; color:#16a34a;">{{ rec.attendance_score }}%</strong>
+                                <div style="font-size:.65rem; color:#9ca3af;">Weight: 40%</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded-3 text-center" style="background:#faf5ff; border:1px solid #e9d5ff;">
+                                <div style="font-size:.65rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Hours</div>
+                                <strong style="font-size:.95rem; color:#7c3aed;">{{ rec.hours_score }}%</strong>
+                                <div style="font-size:.65rem; color:#9ca3af;">Weight: 30%</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded-3 text-center" style="background:#fdf4ff; border:1px solid #f5d0fe;">
+                                <div style="font-size:.65rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Performance</div>
+                                <strong style="font-size:.95rem; color:#c026d3;">{% if rec.performance_score is not None %}{{ rec.performance_score }}%{% else %}N/A{% endif %}</strong>
+                                <div style="font-size:.65rem; color:#9ca3af;">Weight: 30%</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if rec.director_recommendation %}
+                    <div class="mt-2 p-2 rounded-3" style="background:#f0fdf4; border:1px solid #bbf7d0; font-size:.85rem;">
+                        <i class="fa-solid fa-user-shield me-1" style="color:#16a34a;"></i>
+                        <strong>Director's Recommendation:</strong> {{ rec.director_recommendation }}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Completion Certificate -->
+            {% if sa.status == 'completed' or sa.status == 'expired' %}
+            <div class="staff-panel" style="margin-top:1.5rem;">
+                <div class="staff-panel-header">
+                    <div class="staff-panel-header-left">
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#16a34a,#15803d);"><i class="fa-solid fa-certificate"></i></span>
+                        <h3 class="staff-panel-title">Completion Certificate</h3>
+                    </div>
+                </div>
+                <div style="padding:1rem 1.5rem; text-align:center;">
+                    <p style="font-size:.85rem; color:#6b7280; margin-bottom:1rem;">Generate and download a PDF completion certificate for this SA.</p>
+                    <a href="{% url 'home:sa_completion_certificate' sa.pk %}" class="btn" style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;border-radius:10px;padding:10px 24px;font-weight:600;">
+                        <i class="fa-solid fa-file-pdf"></i> Download Certificate
+                    </a>
                 </div>
             </div>
             {% endif %}

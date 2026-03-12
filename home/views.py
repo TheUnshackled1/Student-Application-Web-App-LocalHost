@@ -3253,6 +3253,15 @@ def _build_semester_report(sa):
     total_hours = float(sa.total_hours)
     required_hours = sa.required_hours
     hours_pct = round(total_hours / required_hours * 100, 1) if required_hours else 0
+
+    # ── System-driven renewal recommendation ──
+    final_eval = sa.evaluations.filter(evaluation_period='final').first()
+    midterm_eval = sa.evaluations.filter(evaluation_period='midterm').first()
+    latest_eval = final_eval or midterm_eval
+    system_recommendation = _compute_renewal_recommendation(
+        attendance_rate, total_hours, required_hours, latest_eval
+    )
+
     return {
         'semester': sa.get_semester_display(),
         'academic_year': sa.academic_year,
@@ -3265,6 +3274,7 @@ def _build_semester_report(sa):
         'total_hours': total_hours,
         'required_hours': required_hours,
         'hours_pct': hours_pct,
+        'system_recommendation': system_recommendation,
     }
 
 
@@ -3740,7 +3750,7 @@ def director_export_evaluations_csv(request):
     header = [
         'Student ID', 'Full Name', 'Office', 'Period',
         'Work Quality', 'Punctuality', 'Initiative', 'Cooperation',
-        'Communication', 'Overall Rating', 'Remarks', 'Evaluated By', 'Date',
+        'Communication', 'Overall Rating', 'Recommendation', 'Remarks', 'Evaluated By', 'Date',
     ]
     rows = []
     for ev in PerformanceEvaluation.objects.select_related('student_assistant', 'student_assistant__assigned_office', 'evaluated_by').order_by('-evaluated_at'):
@@ -3750,6 +3760,240 @@ def director_export_evaluations_csv(request):
             ev.get_evaluation_period_display(),
             ev.work_quality, ev.punctuality, ev.initiative,
             ev.cooperation, ev.communication, ev.overall_rating,
+            ev.get_recommendation_status_display() if ev.recommendation_status else '',
             ev.remarks, ev.evaluated_by or '', ev.evaluated_at.strftime('%Y-%m-%d %H:%M'),
         ])
     return _make_csv_response('evaluations_export.csv', header, rows)
+
+
+# ================================================================
+#  SYSTEM RENEWAL RECOMMENDATION
+# ================================================================
+
+def _compute_renewal_recommendation(attendance_rate, total_hours, required_hours, latest_eval):
+    """
+    Compute a system-driven renewal recommendation based on:
+    - Attendance rate (weight 40%)
+    - Hours completion (weight 30%)
+    - Performance rating (weight 30%)
+    Returns dict with recommendation, score, and breakdown.
+    """
+    # Attendance score (0-100)
+    att_score = min(attendance_rate, 100)
+
+    # Hours completion score (0-100)
+    hours_pct = (total_hours / required_hours * 100) if required_hours else 0
+    hours_score = min(hours_pct, 100)
+
+    # Performance score (0-100)
+    if latest_eval and latest_eval.overall_rating:
+        perf_score = float(latest_eval.overall_rating) / 5.0 * 100
+    else:
+        perf_score = None  # No evaluation yet
+
+    # Director's explicit recommendation (if set)
+    director_recommendation = None
+    if latest_eval and latest_eval.recommendation_status:
+        director_recommendation = latest_eval.get_recommendation_status_display()
+
+    # Weighted overall (if we have eval data)
+    if perf_score is not None:
+        weighted = (att_score * 0.4) + (hours_score * 0.3) + (perf_score * 0.3)
+    else:
+        # Without eval, use 60/40 attendance/hours split
+        weighted = (att_score * 0.6) + (hours_score * 0.4)
+
+    weighted = round(weighted, 1)
+
+    # Determine recommendation
+    if weighted >= 80:
+        recommendation = 'Highly Recommended for Rehire'
+        level = 'excellent'
+    elif weighted >= 60:
+        recommendation = 'Recommended for Rehire'
+        level = 'good'
+    elif weighted >= 40:
+        recommendation = 'Conditional Rehire'
+        level = 'conditional'
+    else:
+        recommendation = 'Not Recommended for Rehire'
+        level = 'poor'
+
+    return {
+        'recommendation': recommendation,
+        'level': level,
+        'weighted_score': weighted,
+        'attendance_score': round(att_score, 1),
+        'hours_score': round(hours_score, 1),
+        'performance_score': round(perf_score, 1) if perf_score is not None else None,
+        'director_recommendation': director_recommendation,
+    }
+
+
+# ================================================================
+#  COMPLETION CERTIFICATE (PDF)
+# ================================================================
+
+def sa_completion_certificate(request, pk):
+    """Generate and download a completion certificate PDF for an SA."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('home:home')
+
+    sa = get_object_or_404(
+        ActiveStudentAssistant.objects.select_related('assigned_office'), pk=pk
+    )
+
+    from django.http import HttpResponse
+    from io import BytesIO
+
+    # Build PDF using reportlab if available, otherwise HTML-to-PDF fallback
+    try:
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.units import inch
+        from reportlab.lib import colors
+        from reportlab.pdfgen import canvas as pdf_canvas
+
+        buf = BytesIO()
+        c = pdf_canvas.Canvas(buf, pagesize=letter)
+        width, height = letter
+
+        # Border
+        c.setStrokeColor(colors.HexColor('#166534'))
+        c.setLineWidth(3)
+        c.rect(40, 40, width - 80, height - 80)
+        c.setLineWidth(1)
+        c.rect(45, 45, width - 90, height - 90)
+
+        # Header
+        y = height - 100
+        c.setFont('Helvetica-Bold', 22)
+        c.setFillColor(colors.HexColor('#14532d'))
+        c.drawCentredString(width / 2, y, 'CARLOS HILADO MEMORIAL STATE UNIVERSITY')
+        y -= 22
+        c.setFont('Helvetica', 12)
+        c.setFillColor(colors.HexColor('#166534'))
+        c.drawCentredString(width / 2, y, 'Talisay City, Negros Occidental')
+        y -= 40
+        c.setFont('Helvetica-Bold', 18)
+        c.setFillColor(colors.HexColor('#14532d'))
+        c.drawCentredString(width / 2, y, 'CERTIFICATE OF COMPLETION')
+        y -= 15
+        c.setStrokeColor(colors.HexColor('#22c55e'))
+        c.setLineWidth(2)
+        c.line(width / 2 - 120, y, width / 2 + 120, y)
+        y -= 30
+
+        # Body
+        c.setFont('Helvetica', 12)
+        c.setFillColor(colors.black)
+        c.drawCentredString(width / 2, y, 'This is to certify that')
+        y -= 35
+        c.setFont('Helvetica-Bold', 20)
+        c.setFillColor(colors.HexColor('#14532d'))
+        c.drawCentredString(width / 2, y, sa.full_name.upper())
+        y -= 15
+        c.setStrokeColor(colors.HexColor('#14532d'))
+        c.setLineWidth(0.5)
+        c.line(width / 2 - 150, y, width / 2 + 150, y)
+        y -= 25
+        c.setFont('Helvetica', 11)
+        c.setFillColor(colors.black)
+        c.drawCentredString(width / 2, y, f'Student ID: {sa.student_id}    |    Course: {sa.course}')
+        y -= 30
+        c.setFont('Helvetica', 12)
+
+        # Body text
+        office_name = sa.assigned_office.name if sa.assigned_office else 'N/A'
+        semester_label = sa.get_semester_display()
+        academic_year = sa.academic_year or 'N/A'
+        start = sa.start_date.strftime('%B %d, %Y') if sa.start_date else 'N/A'
+        end = sa.end_date.strftime('%B %d, %Y') if sa.end_date else 'N/A'
+        total_hours = float(sa.total_hours)
+
+        lines = [
+            f'has successfully completed the Student Assistant Program',
+            f'at {office_name}',
+            f'for {semester_label}, A.Y. {academic_year}',
+            f'from {start} to {end}',
+            f'with a total of {total_hours:.1f} hours rendered.',
+        ]
+        for line in lines:
+            c.drawCentredString(width / 2, y, line)
+            y -= 20
+
+        # Attendance summary
+        semester_report = _build_semester_report(sa)
+        if semester_report:
+            y -= 15
+            c.setFont('Helvetica', 10)
+            c.setFillColor(colors.HexColor('#374151'))
+            c.drawCentredString(width / 2, y, f'Attendance Rate: {semester_report["attendance_rate"]}%    |    '
+                                f'Present: {semester_report["present"]}    |    Late: {semester_report["late"]}    |    '
+                                f'Absent: {semester_report["absent"]}')
+
+        # Performance
+        final_eval = sa.evaluations.filter(evaluation_period='final').first()
+        if final_eval:
+            y -= 25
+            c.setFont('Helvetica', 10)
+            c.setFillColor(colors.HexColor('#374151'))
+            c.drawCentredString(width / 2, y, f'Performance Rating: {final_eval.overall_rating}/5.00')
+            if final_eval.recommendation_status:
+                y -= 16
+                c.drawCentredString(width / 2, y, f'Recommendation: {final_eval.get_recommendation_status_display()}')
+
+        # Signature lines
+        y -= 60
+        c.setStrokeColor(colors.black)
+        c.setLineWidth(0.5)
+        # Left
+        c.line(80, y, 260, y)
+        c.setFont('Helvetica', 10)
+        c.drawCentredString(170, y - 14, 'Student Director')
+        # Right
+        c.line(width - 260, y, width - 80, y)
+        c.drawCentredString(width - 170, y - 14, 'Office Head / Supervisor')
+
+        # Date
+        y -= 45
+        c.setFont('Helvetica', 10)
+        c.setFillColor(colors.HexColor('#6b7280'))
+        today_str = _date.today().strftime('%B %d, %Y')
+        c.drawCentredString(width / 2, y, f'Issued on: {today_str}')
+
+        c.showPage()
+        c.save()
+        buf.seek(0)
+
+        response = HttpResponse(buf.getvalue(), content_type='application/pdf')
+        safe_name = sa.full_name.replace(' ', '_')
+        response['Content-Disposition'] = f'attachment; filename="Completion_Certificate_{safe_name}.pdf"'
+        return response
+
+    except ImportError:
+        # reportlab not installed — return a simple HTML certificate
+        from django.template.loader import render_to_string
+        html = f"""<!DOCTYPE html><html><head><title>Completion Certificate</title>
+        <style>
+        body{{font-family:serif;text-align:center;padding:60px 40px;}}
+        h1{{color:#14532d;margin-bottom:5px;}}
+        h2{{color:#166534;font-size:1.5rem;margin-top:30px;}}
+        .name{{font-size:1.8rem;font-weight:bold;color:#14532d;border-bottom:2px solid #14532d;display:inline-block;padding:0 30px 5px;margin:20px 0;}}
+        p{{font-size:1rem;margin:6px 0;}}
+        .footer{{margin-top:60px;display:flex;justify-content:space-around;}}
+        .sig{{border-top:1px solid #000;width:200px;padding-top:8px;text-align:center;}}
+        </style></head><body>
+        <h1>CARLOS HILADO MEMORIAL STATE UNIVERSITY</h1>
+        <p style="color:#166534;">Talisay City, Negros Occidental</p>
+        <h2>CERTIFICATE OF COMPLETION</h2>
+        <p>This is to certify that</p>
+        <div class="name">{sa.full_name.upper()}</div>
+        <p>Student ID: {sa.student_id} | Course: {sa.course}</p>
+        <p>has successfully completed the Student Assistant Program</p>
+        <p>at {sa.assigned_office.name if sa.assigned_office else 'N/A'}</p>
+        <p>for {sa.get_semester_display()}, A.Y. {sa.academic_year or 'N/A'}</p>
+        <p>with a total of {float(sa.total_hours):.1f} hours rendered.</p>
+        <p style="margin-top:40px;color:#6b7280;">Issued on: {_date.today().strftime('%B %d, %Y')}</p>
+        <div class="footer"><div class="sig">Student Director</div><div class="sig">Office Head</div></div>
+        </body></html>"""
+        return HttpResponse(html)
