@@ -137,6 +137,15 @@ body {
   letter-spacing: 0.5px;
 }
 
+.logo-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid #22c55e;
+}
+
 .nav-btn-group {
   gap: 8px !important;
 }
