@@ -15,7 +15,6 @@ def _get_status_display(application, status_key):
 
 
 def send_application_confirmation(application, app_type='new'):
-    """Send confirmation email after successful application submission."""
     if not application.email:
         logger.warning('No email for %s, skipping confirmation.', application.student_id)
         return False
