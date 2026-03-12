@@ -3763,8 +3763,119 @@ def director_export_evaluations_csv(request):
 
 
 # ================================================================
-#  SYSTEM RENEWAL RECOMMENDATION
+#  DEPARTMENT-LEVEL REPORTS  (Module 7.1)
 # ================================================================
+
+@login_required
+def director_department_reports(request):
+    """Per-office aggregation: attendance averages, productivity averages, eval summary."""
+    if not request.user.is_superuser:
+        return redirect('home:home')
+
+    from django.db.models import Avg, Count, Q, Sum, F
+    from django.db.models.functions import Coalesce
+
+    offices = Office.objects.filter(is_active=True).order_by('name')
+    report = []
+
+    for office in offices:
+        sas = ActiveStudentAssistant.objects.filter(assigned_office=office)
+        sa_count = sas.count()
+        active_count = sas.filter(status='active').count()
+
+        # ── Attendance averages ──
+        att_qs = AttendanceRecord.objects.filter(student_assistant__assigned_office=office)
+        att_total = att_qs.count()
+        att_present = att_qs.filter(status='present').count()
+        att_late = att_qs.filter(status='late').count()
+        att_absent = att_qs.filter(status='absent').count()
+        att_excused = att_qs.filter(status='excused').count()
+        attended = att_present + att_late + att_excused
+        attendance_rate = round(attended / att_total * 100, 1) if att_total else 0
+
+        # ── Productivity / hours averages ──
+        hours_agg = sas.aggregate(
+            avg_hours=Coalesce(Avg('total_hours'), 0.0),
+            total_hours=Coalesce(Sum('total_hours'), 0.0),
+            avg_required=Coalesce(Avg('required_hours'), 0.0),
+        )
+        avg_hours = round(float(hours_agg['avg_hours']), 1)
+        total_hours = round(float(hours_agg['total_hours']), 1)
+        avg_required = round(float(hours_agg['avg_required']), 1)
+        avg_completion = round(avg_hours / avg_required * 100, 1) if avg_required else 0
+
+        # ── Performance evaluation summary ──
+        eval_qs = PerformanceEvaluation.objects.filter(student_assistant__assigned_office=office)
+        eval_agg = eval_qs.aggregate(
+            count=Count('id'),
+            avg_quality=Avg('work_quality'),
+            avg_punctuality=Avg('punctuality'),
+            avg_initiative=Avg('initiative'),
+            avg_cooperation=Avg('cooperation'),
+            avg_communication=Avg('communication'),
+            avg_overall=Avg('overall_rating'),
+        )
+        eval_count = eval_agg['count'] or 0
+
+        def _r(v):
+            return round(float(v), 2) if v else 0
+
+        report.append({
+            'office': office,
+            'sa_count': sa_count,
+            'active_count': active_count,
+            # attendance
+            'att_total': att_total,
+            'att_present': att_present,
+            'att_late': att_late,
+            'att_absent': att_absent,
+            'att_excused': att_excused,
+            'attendance_rate': attendance_rate,
+            # productivity
+            'avg_hours': avg_hours,
+            'total_hours': total_hours,
+            'avg_required': avg_required,
+            'avg_completion': avg_completion,
+            # evaluations
+            'eval_count': eval_count,
+            'avg_quality': _r(eval_agg['avg_quality']),
+            'avg_punctuality': _r(eval_agg['avg_punctuality']),
+            'avg_initiative': _r(eval_agg['avg_initiative']),
+            'avg_cooperation': _r(eval_agg['avg_cooperation']),
+            'avg_communication': _r(eval_agg['avg_communication']),
+            'avg_overall': _r(eval_agg['avg_overall']),
+        })
+
+    # ── Global totals ──
+    all_att = AttendanceRecord.objects.all()
+    g_att_total = all_att.count()
+    g_attended = all_att.filter(status__in=['present', 'late', 'excused']).count()
+    g_attendance_rate = round(g_attended / g_att_total * 100, 1) if g_att_total else 0
+
+    all_sas = ActiveStudentAssistant.objects.all()
+    g_hours = all_sas.aggregate(
+        avg_hours=Coalesce(Avg('total_hours'), 0.0),
+        total_hours=Coalesce(Sum('total_hours'), 0.0),
+    )
+
+    all_evals = PerformanceEvaluation.objects.all()
+    g_eval = all_evals.aggregate(avg_overall=Avg('overall_rating'), count=Count('id'))
+
+    context = {
+        'report': report,
+        'offices': offices,
+        'global_stats': {
+            'total_sas': all_sas.count(),
+            'active_sas': all_sas.filter(status='active').count(),
+            'attendance_rate': g_attendance_rate,
+            'avg_hours': round(float(g_hours['avg_hours']), 1),
+            'total_hours': round(float(g_hours['total_hours']), 1),
+            'avg_overall': round(float(g_eval['avg_overall']), 2) if g_eval['avg_overall'] else 0,
+            'eval_count': g_eval['count'] or 0,
+        },
+        'director_name': request.user.get_full_name() or 'Director',
+    }
+    return render(request, 'director/department_reports.html', context)
 
 def _compute_renewal_recommendation(attendance_rate, total_hours, required_hours, latest_eval):
     """
