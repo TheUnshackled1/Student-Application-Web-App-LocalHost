@@ -19,7 +19,7 @@ class CustomIndexDashboard(Dashboard):
             order=0,
         ))
 
-        # ── Recent Applications ──
+
         self.children.append(modules.RecentActions(
             'Recent Actions',
             limit=10,
