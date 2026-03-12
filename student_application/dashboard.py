@@ -6,7 +6,6 @@ class CustomIndexDashboard(Dashboard):
     columns = 3
 
     def init_with_context(self, context):
-        # ── Application Statistics ──
         self.children.append(modules.LinkList(
             'Quick Links',
             children=[
