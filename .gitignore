@@ -1,1 +1,4 @@
 env/
+backups/
+db.sqlite3
+*.enc

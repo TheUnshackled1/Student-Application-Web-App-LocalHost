@@ -130,6 +130,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ── Encrypted Data Storage (Fernet symmetric encryption for backups) ──
+DATA_ENCRYPTION_KEY = "WAQ0AyjYw1kuHp2Xhr6-VKtyUO1NZPyPOLF0CJuiKLY="
+
 # Authentication
 LOGIN_URL = "/"
 LOGIN_REDIRECT_URL = "/"
