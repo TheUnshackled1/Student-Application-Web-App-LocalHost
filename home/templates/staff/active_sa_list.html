@@ -151,7 +151,7 @@
                             <div style="display:flex;flex-direction:column;gap:2px;">
                                 <span style="font-weight:600;">{{ sa.total_hours }}/{{ sa.required_hours }}h</span>
                                 <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:100px;overflow:hidden;">
-                                    <div style="background:{% if sa.hours_percentage >= 100 %}#10b981{% elif sa.hours_percentage >= 50 %}#3b82f6{% else %}#f59e0b{% endif %};height:100%;width:{{ sa.hours_percentage }}%;border-radius:4px;transition:width .3s;"></div>
+                                    <div style="background:{% if sa.hours_percentage >= 100 %}#10b981{% elif sa.hours_percentage >= 50 %}#22c55e{% else %}#f59e0b{% endif %};height:100%;width:{{ sa.hours_percentage }}%;border-radius:4px;transition:width .3s;"></div>
                                 </div>
                             </div>
                         </td>
@@ -161,7 +161,7 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <a href="{% url 'home:staff_sa_detail' sa.pk %}" class="btn btn-sm" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:0.82rem;">
+                            <a href="{% url 'home:staff_sa_detail' sa.pk %}" class="btn btn-sm" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:0.82rem;">
                                 <i class="fa-solid fa-eye"></i> View
                             </a>
                         </td>

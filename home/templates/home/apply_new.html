@@ -152,7 +152,7 @@
                             <label class="form-label">Gender <span class="text-danger">*</span></label>
                             <select class="form-select gender-select" name="gender" required onchange="updateGenderColor(this)">
                                 <option value="" {% if not form.gender.value %}selected{% endif %} disabled>Select gender</option>
-                                <option value="male" data-color="#3b82f6" {% if form.gender.value == 'male' %}selected{% endif %}>Male</option>
+                                <option value="male" data-color="#22c55e" {% if form.gender.value == 'male' %}selected{% endif %}>Male</option>
                                 <option value="female" data-color="#ec4899" {% if form.gender.value == 'female' %}selected{% endif %}>Female</option>
                             </select>
                         </div>
@@ -214,7 +214,7 @@
                                 <option value="CAS" data-color="#22c55e" {% if form.course.value == 'CAS' %}selected{% endif %}>CAS — College of Arts and Sciences</option>
                                 <option value="CBMA" data-color="#eab308" {% if form.course.value == 'CBMA' %}selected{% endif %}>CBMA — College of Business Management and Accountancy</option>
                                 <option value="CCS" data-color="#94a3b8" {% if form.course.value == 'CCS' %}selected{% endif %}>CCS — College of Computer Studies</option>
-                                <option value="COEd" data-color="#3b82f6" {% if form.course.value == 'COEd' %}selected{% endif %}>COEd — College of Education</option>
+                                <option value="COEd" data-color="#22c55e" {% if form.course.value == 'COEd' %}selected{% endif %}>COEd — College of Education</option>
                                 <option value="CIT" data-color="#ef4444" {% if form.course.value == 'CIT' %}selected{% endif %}>CIT — College of Industrial Technology</option>
                                 <option value="COE" data-color="#f97316" {% if form.course.value == 'COE' %}selected{% endif %}>COE — College of Engineering</option>
                             </select>
@@ -526,7 +526,7 @@
 <script>
     function updateSelectColor(sel) {
         var opt = sel.options[sel.selectedIndex];
-        var color = opt && opt.dataset.color ? opt.dataset.color : '#2563eb';
+        var color = opt && opt.dataset.color ? opt.dataset.color : '#16a34a';
         sel.style.color = color;
         sel.style.borderColor = color;
         sel.style.boxShadow = '0 0 0 3px ' + color + '33';

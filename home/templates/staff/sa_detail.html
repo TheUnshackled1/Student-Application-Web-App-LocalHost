@@ -67,7 +67,7 @@
 
     <!-- Stats Row -->
     <div class="staff-stats-row">
-        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #3b82f6, #2563eb);">
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #22c55e, #16a34a);">
             <div class="staff-stat-icon"><i class="fa-solid fa-clock"></i></div>
             <div class="staff-stat-info">
                 <span class="staff-stat-val">{{ sa.total_hours }}/{{ sa.required_hours }}</span>
@@ -101,7 +101,7 @@
     <div class="staff-panel" style="margin-bottom:1.5rem;">
         <div class="staff-panel-header">
             <div class="staff-panel-header-left">
-                <span class="staff-panel-icon" style="background:linear-gradient(135deg,#3b82f6,#2563eb);"><i class="fa-solid fa-chart-bar"></i></span>
+                <span class="staff-panel-icon" style="background:linear-gradient(135deg,#22c55e,#16a34a);"><i class="fa-solid fa-chart-bar"></i></span>
                 <h3 class="staff-panel-title">Hours Progress</h3>
             </div>
         </div>
@@ -111,7 +111,7 @@
                 <span style="opacity:0.7;">{{ sa.required_hours }} hours required</span>
             </div>
             <div style="background:rgba(255,255,255,0.08);border-radius:8px;height:14px;overflow:hidden;">
-                <div style="background:linear-gradient(90deg,{% if sa.hours_percentage >= 100 %}#10b981,#059669{% elif sa.hours_percentage >= 50 %}#3b82f6,#2563eb{% else %}#f59e0b,#d97706{% endif %});height:100%;width:{{ sa.hours_percentage }}%;border-radius:8px;transition:width .4s ease;"></div>
+                <div style="background:linear-gradient(90deg,{% if sa.hours_percentage >= 100 %}#10b981,#059669{% elif sa.hours_percentage >= 50 %}#22c55e,#16a34a{% else %}#f59e0b,#d97706{% endif %});height:100%;width:{{ sa.hours_percentage }}%;border-radius:8px;transition:width .4s ease;"></div>
             </div>
         </div>
     </div>
@@ -272,7 +272,7 @@
             <div class="staff-panel" style="margin-top:1.5rem;">
                 <div class="staff-panel-header">
                     <div class="staff-panel-header-left">
-                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#6366f1,#4f46e5);"><i class="fa-solid fa-chart-column"></i></span>
+                        <span class="staff-panel-icon" style="background:linear-gradient(135deg,#16a34a,#15803d);"><i class="fa-solid fa-chart-column"></i></span>
                         <h3 class="staff-panel-title">Monthly Breakdown</h3>
                     </div>
                 </div>
@@ -359,7 +359,7 @@
                         <div class="col-3"><div class="p-2 rounded-3 text-center" style="background:#f8fafc; border:1px solid #e2e8f0;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Excused</div><strong style="font-size:1.1rem; color:#64748b;">{{ semester_report.excused }}</strong></div></div>
                     </div>
                     <div class="row g-2">
-                        <div class="col-4"><div class="p-2 rounded-3 text-center" style="background:#eff6ff; border:1px solid #bfdbfe;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Total Records</div><strong style="font-size:1rem;">{{ semester_report.total }}</strong></div></div>
+                        <div class="col-4"><div class="p-2 rounded-3 text-center" style="background:#f0fdf4; border:1px solid #bbf7d0;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Total Records</div><strong style="font-size:1rem;">{{ semester_report.total }}</strong></div></div>
                         <div class="col-4"><div class="p-2 rounded-3 text-center" style="background:#f0fdf4; border:1px solid #bbf7d0;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Attendance Rate</div><strong style="font-size:1rem; color:#16a34a;">{{ semester_report.attendance_rate }}%</strong></div></div>
                         <div class="col-4"><div class="p-2 rounded-3 text-center" style="background:#faf5ff; border:1px solid #e9d5ff;"><div style="font-size:.7rem; text-transform:uppercase; font-weight:600; color:#6b7280;">Hours</div><strong style="font-size:1rem; color:#7c3aed;">{{ semester_report.total_hours }}/{{ semester_report.required_hours }}</strong></div></div>
                     </div>

@@ -35,7 +35,7 @@
         color: #334155;
     }
     .office-mgmt-toolbar .mgmt-label i {
-        color: #2563eb;
+        color: #16a34a;
         margin-right: 6px;
     }
     .btn-add-office {
@@ -43,7 +43,7 @@
         align-items: center;
         gap: 6px;
         padding: 8px 18px;
-        background: linear-gradient(135deg, #2563eb, #1e40af);
+        background: linear-gradient(135deg, #16a34a, #15803d);
         color: #fff;
         border: none;
         border-radius: 10px;
@@ -55,7 +55,7 @@
         text-decoration: none;
     }
     .btn-add-office:hover {
-        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        background: linear-gradient(135deg, #15803d, #1e3a8a);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(37,99,235,0.3);
         color: #fff;
@@ -81,12 +81,12 @@
         background: #f8fafc;
     }
     .oact-btn--edit {
-        color: #2563eb;
+        color: #16a34a;
     }
     .oact-btn--edit:hover {
-        background: #2563eb;
+        background: #16a34a;
         color: #fff;
-        border-color: #2563eb;
+        border-color: #16a34a;
     }
     .oact-btn--delete {
         color: #dc2626;
@@ -113,7 +113,7 @@
         background: #ffffff;
     }
     .office-modal .modal-header {
-        background: linear-gradient(135deg, #2563eb, #1e40af);
+        background: linear-gradient(135deg, #16a34a, #15803d);
         color: #fff;
         border: none;
         padding: 20px 24px;
@@ -143,7 +143,7 @@
     }
     .office-modal .form-control:focus,
     .office-modal .form-select:focus {
-        border-color: #2563eb;
+        border-color: #16a34a;
         box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
         background: #ffffff;
         color: #1e293b;
@@ -200,7 +200,7 @@
     }
     .coords-display code {
         background: #f1f5f9;
-        color: #2563eb;
+        color: #16a34a;
         padding: 2px 6px;
         border-radius: 4px;
         font-size: 11px;
@@ -279,7 +279,7 @@
         width: 100%;
     }
     .icon-picker-selected:hover {
-        border-color: #2563eb;
+        border-color: #16a34a;
         background: #f1f5f9;
     }
     .icon-picker-selected i.preview-icon {
@@ -291,7 +291,7 @@
         justify-content: center;
         background: rgba(37,99,235,0.1);
         border-radius: 8px;
-        color: #2563eb;
+        color: #16a34a;
     }
     .icon-picker-selected .preview-label {
         flex: 1;
@@ -340,11 +340,11 @@
     }
     .icon-picker-item.active {
         background: rgba(37,99,235,0.12);
-        border-color: #2563eb;
+        border-color: #16a34a;
     }
     .icon-picker-item i {
         font-size: 18px;
-        color: #2563eb;
+        color: #16a34a;
     }
     .icon-picker-item span {
         font-size: 9px;
@@ -463,7 +463,7 @@
             {% elif 'error' in message.tags %}
             background: linear-gradient(135deg, #dc2626, #b91c1c); border:1px solid rgba(252,165,165,0.25);
             {% else %}
-            background: linear-gradient(135deg, #2563eb, #1d4ed8); border:1px solid rgba(147,197,253,0.25);
+            background: linear-gradient(135deg, #16a34a, #1d4ed8); border:1px solid rgba(147,197,253,0.25);
             {% endif %}
         ">
             <i class="fa-solid {% if 'success' in message.tags %}fa-circle-check{% elif 'error' in message.tags %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}" style="font-size:18px;"></i>
@@ -517,7 +517,7 @@
 
     {% if is_director %}
     <!-- Director: Draggable markers hint -->
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 18px;margin-bottom:12px;border-radius:12px;background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.25);font-size:12px;color:#c4b5fd;">
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 18px;margin-bottom:12px;border-radius:12px;background:rgba(22,163,74,0.10);border:1px solid rgba(22,163,74,0.25);font-size:12px;color:#c4b5fd;">
         <i class="fa-solid fa-hand-pointer" style="font-size:15px;color:#a78bfa;"></i>
         <span><strong>Director Mode:</strong> You can drag any marker (green, yellow, red, or purple) to reposition it. Office locations save automatically.</span>
     </div>
@@ -525,7 +525,7 @@
 
     <!-- Office Stats Summary -->
     <div class="staff-stats-row" style="margin-bottom: 16px;">
-        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #6366f1, #4f46e5);">
+        <div class="staff-stat-card" style="--stat-gradient: linear-gradient(135deg, #16a34a, #15803d);">
             <div class="staff-stat-icon"><i class="fa-solid fa-building"></i></div>
             <div class="staff-stat-info">
                 <span class="staff-stat-val">{{ total_offices }}</span>
@@ -633,7 +633,7 @@
                             <span>Full &mdash; No Slots</span>
                         </div>
                         <div class="legend-item">
-                            <span class="legend-dot" style="background: #6366f1;"></span>
+                            <span class="legend-dot" style="background: #16a34a;"></span>
                             <span>Campus Building</span>
                         </div>
                     </div>
@@ -930,7 +930,7 @@
             </div>
             <div class="d-flex justify-content-end gap-2 mt-3">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius:10px; font-family:'Inter',sans-serif; background: rgba(255,255,255,0.08); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.12);">Cancel</button>
-                <button type="submit" class="btn-add-office" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                <button type="submit" class="btn-add-office" style="background: linear-gradient(135deg, #16a34a, #1d4ed8);">
                     <i class="fa-solid fa-check"></i> Save Changes
                 </button>
             </div>
@@ -1118,9 +1118,9 @@ function showMapToast(message, type) {
     var existing = document.getElementById('mapToast');
     if (existing) existing.remove();
     var colors = {
-        success: { bg: 'linear-gradient(135deg,#2563eb,#1e40af)', icon: 'fa-circle-check' },
+        success: { bg: 'linear-gradient(135deg,#16a34a,#15803d)', icon: 'fa-circle-check' },
         error:   { bg: 'linear-gradient(135deg,#ef4444,#dc2626)', icon: 'fa-circle-xmark' },
-        info:    { bg: 'linear-gradient(135deg,#6366f1,#4f46e5)', icon: 'fa-circle-info' }
+        info:    { bg: 'linear-gradient(135deg,#16a34a,#15803d)', icon: 'fa-circle-info' }
     };
     var c = colors[type] || colors.success;
     var toast = document.createElement('div');
@@ -1224,11 +1224,11 @@ offices.forEach(function(office) {
 
 // ========== ADD BUILDING MARKERS (static) ==========
 buildings.forEach(function(bldg) {
-    var icon = createIcon('#6366f1', bldg.icon);
+    var icon = createIcon('#16a34a', bldg.icon);
     var popupHtml =
         '<div class="map-popup">' +
             '<h4>' + bldg.name + '</h4>' +
-            '<span class="popup-status" style="background:#6366f1;">Campus Building</span>' +
+            '<span class="popup-status" style="background:#16a34a;">Campus Building</span>' +
         '</div>';
     var bMarker = L.marker([bldg.lat, bldg.lng], { icon: icon, draggable: IS_DIRECTOR }).addTo(map);
     bMarker.bindPopup(popupHtml, { maxWidth: 280 });

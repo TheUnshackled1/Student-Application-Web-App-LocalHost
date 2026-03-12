@@ -76,7 +76,7 @@
     <!-- ── Quick Actions ── -->
     <div class="container mt-4">
         <div class="d-flex flex-wrap gap-2 mb-4">
-            <a href="{% url 'home:apply_new' %}" class="btn btn-sm text-white" style="background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:8px; font-weight:600; letter-spacing:.3px;">
+            <a href="{% url 'home:apply_new' %}" class="btn btn-sm text-white" style="background:linear-gradient(135deg,#16a34a,#15803d); border-radius:8px; font-weight:600; letter-spacing:.3px;">
                 <i class="fa-solid fa-file-circle-plus me-1"></i> New Application
             </a>
             <a href="{% url 'home:apply_renew' %}" class="btn btn-sm text-white" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed); border-radius:8px; font-weight:600; letter-spacing:.3px;">
@@ -104,12 +104,12 @@
                         </div>
                         <div style="display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto;">
                             {% for reminder in reminders %}
-                            <div style="display:flex; gap:10px; padding:10px 12px; border-radius:10px; border-left:3px solid {% if reminder.priority == 'urgent' %}#ef4444{% elif reminder.priority == 'warning' %}#fbbf24{% else %}#3b82f6{% endif %}; background:{% if reminder.priority == 'urgent' %}#fef2f2{% elif reminder.priority == 'warning' %}#fffbeb{% else %}#eff6ff{% endif %};">
+                            <div style="display:flex; gap:10px; padding:10px 12px; border-radius:10px; border-left:3px solid {% if reminder.priority == 'urgent' %}#ef4444{% elif reminder.priority == 'warning' %}#fbbf24{% else %}#22c55e{% endif %}; background:{% if reminder.priority == 'urgent' %}#fef2f2{% elif reminder.priority == 'warning' %}#fffbeb{% else %}#f0fdf4{% endif %};">
                                 <div style="flex-shrink:0; margin-top:2px;">
-                                    <i class="fa-solid {% if reminder.priority == 'urgent' %}fa-triangle-exclamation{% elif reminder.priority == 'warning' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}" style="font-size:14px; color:{% if reminder.priority == 'urgent' %}#ef4444{% elif reminder.priority == 'warning' %}#f59e0b{% else %}#3b82f6{% endif %};"></i>
+                                    <i class="fa-solid {% if reminder.priority == 'urgent' %}fa-triangle-exclamation{% elif reminder.priority == 'warning' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}" style="font-size:14px; color:{% if reminder.priority == 'urgent' %}#ef4444{% elif reminder.priority == 'warning' %}#f59e0b{% else %}#22c55e{% endif %};"></i>
                                 </div>
                                 <div style="flex:1; min-width:0;">
-                                    <span style="display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; padding:1px 8px; border-radius:4px; margin-bottom:4px; color:{% if reminder.priority == 'urgent' %}#991b1b{% elif reminder.priority == 'warning' %}#92400e{% else %}#1e40af{% endif %}; background:{% if reminder.priority == 'urgent' %}#fecaca{% elif reminder.priority == 'warning' %}#fde68a{% else %}#bfdbfe{% endif %};">{{ reminder.priority|upper }}</span>
+                                    <span style="display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; padding:1px 8px; border-radius:4px; margin-bottom:4px; color:{% if reminder.priority == 'urgent' %}#991b1b{% elif reminder.priority == 'warning' %}#92400e{% else %}#15803d{% endif %}; background:{% if reminder.priority == 'urgent' %}#fecaca{% elif reminder.priority == 'warning' %}#fde68a{% else %}#bbf7d0{% endif %};">{{ reminder.priority|upper }}</span>
                                     <p style="font-size:13px; color:#374151; margin:4px 0 0; line-height:1.45;">{{ reminder.message }}</p>
                                     {% if reminder.created_at %}
                                     <span style="font-size:11px; color:#9ca3af; margin-top:4px; display:block;"><i class="fa-regular fa-clock" style="margin-right:2px;"></i>{{ reminder.created_at }}</span>
@@ -171,7 +171,7 @@
     {% if applications %}
     <div class="container mb-4">
         <div class="d-flex align-items-center gap-2 mb-3">
-            <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; font-size:.95rem;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#16a34a,#15803d); color:#fff; font-size:.95rem;">
                 <i class="fa-solid fa-file-lines"></i>
             </span>
             <h4 class="fw-bold mb-0" style="letter-spacing:-.3px;">My Applications</h4>
@@ -185,7 +185,7 @@
                 <!-- Header row -->
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                     <div>
-                        <span class="badge {% if app_card.app_type_key == 'new' %}text-white{% else %}text-white{% endif %} mb-2" style="font-size:.72rem; font-weight:600; letter-spacing:.5px; padding:5px 10px; border-radius:6px; background:{% if app_card.app_type_key == 'new' %}#4f46e5{% else %}#0891b2{% endif %};">{{ app_card.app_type|upper }}</span>
+                        <span class="badge {% if app_card.app_type_key == 'new' %}text-white{% else %}text-white{% endif %} mb-2" style="font-size:.72rem; font-weight:600; letter-spacing:.5px; padding:5px 10px; border-radius:6px; background:{% if app_card.app_type_key == 'new' %}#15803d{% else %}#0891b2{% endif %};">{{ app_card.app_type|upper }}</span>
                         <h5 class="mb-1 fw-bold" style="letter-spacing:-.2px;">{{ app_card.student_name }}</h5>
                         <small class="text-muted" style="font-size:.82rem;">Submitted {{ app_card.submitted_at|date:"M d, Y" }}</small>
                     </div>
@@ -217,13 +217,13 @@
                             <div class="d-flex flex-column align-items-center" style="min-width:40px;">
                                 <div style="width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; transition:all .2s;
                                     {% if step.status == 'done' %}background:#22c55e; color:#fff;
-                                    {% elif step.status == 'current' %}background:#6366f1; color:#fff; box-shadow:0 0 0 3px rgba(99,102,241,.3);
+                                    {% elif step.status == 'current' %}background:#16a34a; color:#fff; box-shadow:0 0 0 3px rgba(22,163,74,.3);
                                     {% else %}background:#e2e8f0; color:#94a3b8;{% endif %}">
                                     {% if step.status == 'done' %}<i class="fa-solid fa-check" style="font-size:.7rem;"></i>{% else %}{{ step.step_number }}{% endif %}
                                 </div>
                                 <span style="font-size:.65rem; font-weight:600; margin-top:4px; text-align:center; line-height:1.15; width:72px;
                                     {% if step.status == 'done' %}color:#16a34a;
-                                    {% elif step.status == 'current' %}color:#6366f1;
+                                    {% elif step.status == 'current' %}color:#16a34a;
                                     {% else %}color:#94a3b8;{% endif %}">{{ step.title }}</span>
                             </div>
                             {% if not forloop.last %}
@@ -692,7 +692,7 @@
                     </div>
                     <div class="row g-2">
                         <div class="col-md-4">
-                            <div class="p-2 rounded-3 text-center" style="background:#eff6ff; border:1px solid #bfdbfe;">
+                            <div class="p-2 rounded-3 text-center" style="background:#f0fdf4; border:1px solid #bbf7d0;">
                                 <div class="text-muted" style="font-size:.7rem; text-transform:uppercase; font-weight:600;">Total Records</div>
                                 <strong style="font-size:1rem;">{{ item.semester_report.total }}</strong>
                             </div>
@@ -790,7 +790,7 @@
                     <div class="p-3 mb-2 rounded-3" style="font-size:.84rem; background:#f8fafc; border:1px solid #e2e8f0;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <strong>{{ ev.get_evaluation_period_display }}</strong>
-                            <span class="badge" style="background:linear-gradient(135deg,#6366f1,#4f46e5); font-size:.8rem; padding:5px 12px; border-radius:6px;">{{ ev.overall_rating }}/5.00</span>
+                            <span class="badge" style="background:linear-gradient(135deg,#16a34a,#15803d); font-size:.8rem; padding:5px 12px; border-radius:6px;">{{ ev.overall_rating }}/5.00</span>
                         </div>
                         <div class="d-flex flex-wrap gap-3 text-muted" style="font-size:.8rem;">
                             <span>Quality: <strong class="text-dark">{{ ev.work_quality }}</strong></span>
@@ -812,7 +812,7 @@
     <!-- ===== APPROVED STUDENT ASSISTANTS ===== -->
     <div class="container mb-4">
         <div class="d-flex align-items-center gap-2 mb-3">
-            <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#14b8a6,#0d9488); color:#fff; font-size:.95rem;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; font-size:.95rem;">
                 <i class="fa-solid fa-user-check"></i>
             </span>
             <div>
@@ -821,7 +821,7 @@
             </div>
         </div>
         <div class="card" style="border:none; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06); overflow:hidden;">
-            <div style="height:4px; background:linear-gradient(90deg,#14b8a6,#0d9488);"></div>
+            <div style="height:4px; background:linear-gradient(90deg,#22c55e,#16a34a);"></div>
             <div class="table-responsive">
                 <table class="table table-hover mb-0" style="font-size:.84rem;">
                     <thead style="background:#f1f5f9;">
