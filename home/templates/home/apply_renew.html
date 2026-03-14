@@ -401,38 +401,11 @@
                         </div>
                         <div class="file-preview" id="preview_official_time"></div>
                         <input type="hidden" name="official_time_photo" id="photo_official_time">
-
-                        <!-- Availability Schedule (revealed after uploading Official Time) -->
-                        <div id="availabilitySection" style="margin-top: 1rem; display: none;">
-                            <hr style="border-color: #e2e8f0; margin: 0.75rem 0;">
-                            <h5 style="font-size: 0.95rem; font-weight: 700; color: #059669; margin-bottom: 4px;">
-                                <i class="fa-solid fa-calendar-check"></i> Availability Schedule
-                            </h5>
-                            <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 0.75rem;">Select all time slots when you are available for duty. Staff will compare this with your uploaded Schedule of Classes.</p>
-                            <div style="overflow-x:auto;">
-                            <table class="table table-bordered table-sm text-center" id="availabilityGrid" style="font-size: 0.82rem;">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th style="min-width:80px;">Time</th>
-                                        {% for d_val, d_label in day_choices %}<th>{{ d_label|slice:":3" }}</th>{% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for ts_val, ts_label in time_slot_choices %}
-                                    <tr>
-                                        <td class="fw-semibold" style="white-space:nowrap;">{{ ts_label }}</td>
-                                        {% for d_val, d_label in day_choices %}
-                                        <td>
-                                            <input type="checkbox" class="form-check-input avail-cb" data-day="{{ d_val }}" data-time="{{ ts_val }}" style="cursor:pointer;">
-                                        </td>
-                                        {% endfor %}
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                            </div>
-                            <input type="hidden" name="availability_schedule" id="id_availability_schedule" value="{{ form.availability_schedule.value|default:'' }}">
-                        </div>
+                        <button type="button" id="openScheduleBtn" onclick="document.getElementById('scheduleModal').style.display='flex'" style="margin-top:10px; width:100%; padding:9px 14px; font-size:0.82rem; font-weight:600; border:none; border-radius:8px; cursor:pointer; background:linear-gradient(135deg,#059669,#10b981); color:#fff; display:flex; align-items:center; justify-content:center; gap:6px; transition:box-shadow 0.2s;">
+                            <i class="fa-solid fa-calendar-check"></i> Set Availability Schedule
+                        </button>
+                        <div id="scheduleStatus" style="margin-top:6px; font-size:0.78rem; color:#64748b; text-align:center;"></div>
+                        <input type="hidden" name="availability_schedule" id="id_availability_schedule" value="{{ form.availability_schedule.value|default:'' }}">
                     </div>
 
                     <!-- Doc 5 -->
@@ -1067,6 +1040,12 @@
                         if (cb) cb.checked = true;
                     });
                 });
+                var count = document.querySelectorAll('.avail-cb:checked').length;
+                if (count > 0) {
+                    var el = document.getElementById('scheduleStatus');
+                    el.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#059669;"></i> ' + count + ' time slot' + (count > 1 ? 's' : '') + ' selected';
+                    el.style.color = '#059669';
+                }
             } catch(e) {}
         }
 
@@ -1095,32 +1074,6 @@
             }
             hidden.value = JSON.stringify(schedule);
         });
-    })();
-
-    // ── Show Availability Schedule when Official Time is uploaded ──
-    (function() {
-        var section = document.getElementById('availabilitySection');
-        if (!section) return;
-        var fileInput = document.querySelector('input[name="official_time"]');
-        var photoInput = document.getElementById('photo_official_time');
-
-        function showSchedule() {
-            if ((fileInput && fileInput.files && fileInput.files.length > 0) ||
-                (photoInput && photoInput.value)) {
-                section.style.display = '';
-            }
-        }
-
-        if (fileInput) fileInput.addEventListener('change', showSchedule);
-        if (photoInput) {
-            new MutationObserver(showSchedule).observe(photoInput, {attributes: true, attributeFilter: ['value']});
-            setInterval(function() { if (photoInput.value) showSchedule(); }, 500);
-        }
-        // If form was re-rendered with validation errors and schedule already has data, show it
-        var hidden = document.getElementById('id_availability_schedule');
-        if (hidden && hidden.value && hidden.value !== '{}' && hidden.value !== '') {
-            section.style.display = '';
-        }
     })();
 </script>
 <script>
@@ -1177,6 +1130,66 @@ function closeDocPreview() {
 document.getElementById('docPreviewOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeDocPreview();
 });
+</script>
+
+<!-- ========== AVAILABILITY SCHEDULE MODAL ========== -->
+<div id="scheduleModal" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; padding:20px;" onclick="if(event.target===this)this.style.display='none'">
+    <div style="background:#fff; border-radius:14px; max-width:700px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); padding:24px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#059669,#10b981); color:#fff; font-size:16px;">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+                <div>
+                    <h4 style="margin:0; font-size:1rem; font-weight:700; color:#0f172a;">Availability Schedule</h4>
+                    <p style="margin:0; font-size:0.78rem; color:#64748b;">Select all time slots when you are available for duty.</p>
+                </div>
+            </div>
+            <button type="button" onclick="document.getElementById('scheduleModal').style.display='none'" style="background:none; border:none; font-size:1.3rem; color:#94a3b8; cursor:pointer; padding:4px 8px;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div style="overflow-x:auto;">
+        <table class="table table-bordered table-sm text-center" id="availabilityGrid" style="font-size:0.82rem; margin-bottom:0;">
+            <thead class="table-dark">
+                <tr>
+                    <th style="min-width:80px;">Time</th>
+                    {% for d_val, d_label in day_choices %}<th>{{ d_label|slice:":3" }}</th>{% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for ts_val, ts_label in time_slot_choices %}
+                <tr>
+                    <td class="fw-semibold" style="white-space:nowrap;">{{ ts_label }}</td>
+                    {% for d_val, d_label in day_choices %}
+                    <td>
+                        <input type="checkbox" class="form-check-input avail-cb" data-day="{{ d_val }}" data-time="{{ ts_val }}" style="cursor:pointer;">
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <div style="text-align:right; margin-top:16px;">
+            <button type="button" onclick="closeScheduleModal()" style="padding:10px 28px; font-size:0.85rem; font-weight:600; border:none; border-radius:8px; cursor:pointer; background:linear-gradient(135deg,#059669,#10b981); color:#fff;">
+                <i class="fa-solid fa-check"></i> Done
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+function closeScheduleModal() {
+    document.getElementById('scheduleModal').style.display = 'none';
+    var count = document.querySelectorAll('.avail-cb:checked').length;
+    var el = document.getElementById('scheduleStatus');
+    if (count > 0) {
+        el.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#059669;"></i> ' + count + ' time slot' + (count > 1 ? 's' : '') + ' selected';
+        el.style.color = '#059669';
+    } else {
+        el.innerHTML = '';
+    }
+}
 </script>
 </body>
 </html>
