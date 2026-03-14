@@ -401,6 +401,38 @@
                         </div>
                         <div class="file-preview" id="preview_official_time"></div>
                         <input type="hidden" name="official_time_photo" id="photo_official_time">
+
+                        <!-- Availability Schedule (revealed after uploading Official Time) -->
+                        <div id="availabilitySection" style="margin-top: 1rem; display: none;">
+                            <hr style="border-color: #e2e8f0; margin: 0.75rem 0;">
+                            <h5 style="font-size: 0.95rem; font-weight: 700; color: #059669; margin-bottom: 4px;">
+                                <i class="fa-solid fa-calendar-check"></i> Availability Schedule
+                            </h5>
+                            <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 0.75rem;">Select all time slots when you are available for duty. Staff will compare this with your uploaded Schedule of Classes.</p>
+                            <div style="overflow-x:auto;">
+                            <table class="table table-bordered table-sm text-center" id="availabilityGrid" style="font-size: 0.82rem;">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="min-width:80px;">Time</th>
+                                        {% for d_val, d_label in day_choices %}<th>{{ d_label|slice:":3" }}</th>{% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ts_val, ts_label in time_slot_choices %}
+                                    <tr>
+                                        <td class="fw-semibold" style="white-space:nowrap;">{{ ts_label }}</td>
+                                        {% for d_val, d_label in day_choices %}
+                                        <td>
+                                            <input type="checkbox" class="form-check-input avail-cb" data-day="{{ d_val }}" data-time="{{ ts_val }}" style="cursor:pointer;">
+                                        </td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+                            <input type="hidden" name="availability_schedule" id="id_availability_schedule" value="{{ form.availability_schedule.value|default:'' }}">
+                        </div>
                     </div>
 
                     <!-- Doc 5 -->
@@ -440,40 +472,6 @@
                     </div>
 
                 </div>
-
-            <!-- ━━━ AVAILABILITY SCHEDULE (inside documents section) ━━━ -->
-            <div id="availabilitySection" style="margin-top: 1.5rem; display: none;">
-                <div class="applyform-section-header">
-                    <span class="applyform-section-badge" style="background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 3px 10px rgba(5,150,105,0.25);"><i class="fa-solid fa-calendar-check"></i></span>
-                    <div>
-                        <h4 class="applyform-section-title">Availability Schedule</h4>
-                        <p class="applyform-section-sub">Select all time slots when you are available for duty. Staff will compare this with your uploaded Schedule of Classes.</p>
-                    </div>
-                </div>
-                <div style="overflow-x:auto;">
-                <table class="table table-bordered table-sm text-center" id="availabilityGrid" style="font-size: 0.82rem;">
-                    <thead class="table-dark">
-                        <tr>
-                            <th style="min-width:80px;">Time</th>
-                            {% for d_val, d_label in day_choices %}<th>{{ d_label|slice:":3" }}</th>{% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ts_val, ts_label in time_slot_choices %}
-                        <tr>
-                            <td class="fw-semibold" style="white-space:nowrap;">{{ ts_label }}</td>
-                            {% for d_val, d_label in day_choices %}
-                            <td>
-                                <input type="checkbox" class="form-check-input avail-cb" data-day="{{ d_val }}" data-time="{{ ts_val }}" style="cursor:pointer;">
-                            </td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                </div>
-                <input type="hidden" name="availability_schedule" id="id_availability_schedule" value="{{ form.availability_schedule.value|default:'' }}">
-            </div>
 
             </div><!-- /section-4 -->
 
