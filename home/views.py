@@ -752,7 +752,7 @@ def apply_new(request):
         _inject_camera_photos(request, [
             'application_form', 'id_picture', 'barangay_clearance',
             'parents_itr', 'enrolment_form', 'schedule_classes',
-            'proof_insurance', 'grades_last_sem', 'official_time',
+            'proof_insurance', 'grades_last_sem',
         ])
         form = NewApplicationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -807,7 +807,7 @@ def apply_renew(request):
         # Inject camera-captured photos into request.FILES before form binding
         _inject_camera_photos(request, [
             'id_picture', 'enrolment_form', 'schedule_classes',
-            'grades_last_sem', 'official_time', 'recommendation_letter',
+            'grades_last_sem', 'recommendation_letter',
             'evaluation_form',
         ])
         form = RenewalApplicationForm(request.POST, request.FILES)

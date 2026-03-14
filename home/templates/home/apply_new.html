@@ -411,22 +411,10 @@
                     <div class="file-preview" id="preview_grades_last_sem"></div>
                     <input type="hidden" name="grades_last_sem_photo" id="photo_grades_last_sem">
                 </div>
-                <div class="applyform-doc-card">
+                <div class="applyform-doc-card" style="grid-column: 1 / -1;">
                     <div class="applyform-doc-num">9</div>
                     <label class="applyform-doc-label">Filled Out Official Time <span class="text-danger">*</span></label>
-                    <div class="input-with-camera">
-                        <div class="custom-file-upload">
-                            <input type="file" name="official_time" accept=".pdf,.jpg,.png,.jpeg" required>
-                            <span class="custom-file-btn"><i class="fa-solid fa-upload"></i> Choose File</span>
-                            <span class="custom-file-text" data-default="No file chosen">No file chosen</span>
-                        </div>
-                        <button type="button" class="btn-camera-sm" onclick="openCameraModal('official_time')">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
-                    </div>
-                    <div class="file-preview" id="preview_official_time"></div>
-                    <input type="hidden" name="official_time_photo" id="photo_official_time">
-                    <button type="button" id="openScheduleBtn" onclick="document.getElementById('scheduleModal').style.display='flex'" style="margin-top:10px; width:100%; padding:9px 14px; font-size:0.82rem; font-weight:600; border:none; border-radius:8px; cursor:pointer; background:linear-gradient(135deg,#059669,#10b981); color:#fff; display:flex; align-items:center; justify-content:center; gap:6px; transition:box-shadow 0.2s;">
+                    <button type="button" id="openScheduleBtn" onclick="document.getElementById('scheduleModal').style.display='flex'" style="width:100%; padding:9px 14px; font-size:0.82rem; font-weight:600; border:none; border-radius:8px; cursor:pointer; background:linear-gradient(135deg,#059669,#10b981); color:#fff; display:flex; align-items:center; justify-content:center; gap:6px; transition:box-shadow 0.2s;">
                         <i class="fa-solid fa-calendar-check"></i> Set Availability Schedule
                     </button>
                     <div id="scheduleStatus" style="margin-top:6px; font-size:0.78rem; color:#64748b; text-align:center;"></div>
