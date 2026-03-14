@@ -1411,6 +1411,9 @@ body {
 .applyform-input-icon > .form-control {
   padding-left: 40px;
 }
+.applyform-input-icon > .form-select {
+  padding-left: 40px;
+}
 
 /* ── Address Detect ── */
 .applyform-address-wrap {
