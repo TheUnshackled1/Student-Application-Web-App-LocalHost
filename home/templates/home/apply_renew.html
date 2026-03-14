@@ -1318,6 +1318,31 @@ document.getElementById('docPreviewOverlay').addEventListener('click', function(
 <style>
 @keyframes schedAlertIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
 </style>
+<!-- Renewal Block Modal (student ID not found) -->
+<div id="renewalBlockModal" style="display:none; position:fixed; inset:0; z-index:25000; background:rgba(0,0,0,0.55); justify-content:center; align-items:center; padding:20px;">
+    <div style="background:#fff; border-radius:16px; max-width:440px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; animation:schedAlertIn 0.25s ease;">
+        <div style="padding:24px 24px 0; text-align:center;">
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:50%; background:#fee2e2; margin-bottom:12px;">
+                <i class="fa-solid fa-ban" style="font-size:28px; color:#ef4444;"></i>
+            </div>
+            <h5 style="margin:0 0 8px; font-size:1.1rem; font-weight:700; color:#0f172a;">Renewal Not Allowed</h5>
+            <p style="margin:0; font-size:0.88rem; color:#475569; line-height:1.6;">
+                Your Student ID was <strong>not found</strong> in our records. This means you were not a Student Assistant last semester.
+            </p>
+            <p style="margin:10px 0 0; font-size:0.88rem; color:#475569; line-height:1.6;">
+                Renewal is only for <strong>returning</strong> student assistants. Please apply as a <strong>new applicant</strong> instead.
+            </p>
+        </div>
+        <div style="padding:20px 24px; display:flex; gap:10px; justify-content:center;">
+            <button type="button" onclick="document.getElementById('renewalBlockModal').style.display='none'" style="padding:10px 24px; font-size:0.85rem; font-weight:600; border:1px solid #d1d5db; border-radius:8px; cursor:pointer; color:#374151; background:#fff; transition:background 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'">
+                Go Back
+            </button>
+            <a href="{% url 'home:apply_new' %}" style="padding:10px 24px; font-size:0.85rem; font-weight:600; border:none; border-radius:8px; cursor:pointer; color:#fff; background:linear-gradient(135deg,#2563eb,#3b82f6); text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                <i class="fa-solid fa-arrow-right"></i> Apply as New
+            </a>
+        </div>
+    </div>
+</div>
 <script>
 function showScheduleAlert(type, title, msg) {
     var icon = document.getElementById('scheduleAlertIcon');
