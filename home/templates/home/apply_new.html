@@ -1450,6 +1450,13 @@ document.getElementById('docPreviewOverlay').addEventListener('click', function(
             </tbody>
         </table>
         </div>
+        <div id="weeklyHoursSummary" style="margin-top:14px; padding:12px 16px; background:rgba(5,150,105,0.06); border:1px solid rgba(5,150,105,0.15); border-radius:10px; display:none;">
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                <span style="font-size:0.82rem; color:#475569; font-weight:500;"><i class="fa-solid fa-clock" style="color:#059669;"></i> Weekly Total</span>
+                <span id="weeklyHoursValue" style="font-size:1.05rem; font-weight:700; color:#059669;">0 hours</span>
+            </div>
+            <div id="dailyBreakdown" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;"></div>
+        </div>
         <div style="text-align:right; margin-top:16px;">
             <button type="button" onclick="closeScheduleModal()" style="padding:10px 28px; font-size:0.85rem; font-weight:600; border:none; border-radius:8px; cursor:pointer; background:linear-gradient(135deg,#059669,#10b981); color:#fff;">
                 <i class="fa-solid fa-check"></i> Done
@@ -1494,17 +1501,50 @@ function showScheduleAlert(type, title, msg) {
 
 // Real-time validation on each checkbox change
 var _minHourTimers = {};
+var _dayOrder = ['Mon','Tue','Wed','Thu','Fri'];
+
+function updateWeeklyHours() {
+    var daySlots = {};
+    _dayOrder.forEach(function(d) { daySlots[d] = 0; });
+    document.querySelectorAll('.avail-cb:checked').forEach(function(cb) {
+        var day = cb.getAttribute('data-day');
+        daySlots[day] = (daySlots[day] || 0) + 1;
+    });
+    var totalSlots = 0;
+    _dayOrder.forEach(function(d) { totalSlots += daySlots[d]; });
+    var totalHours = totalSlots * 0.5;
+    var summary = document.getElementById('weeklyHoursSummary');
+    var valueEl = document.getElementById('weeklyHoursValue');
+    var breakdown = document.getElementById('dailyBreakdown');
+
+    if (totalSlots === 0) {
+        summary.style.display = 'none';
+        return;
+    }
+    summary.style.display = 'block';
+    var hStr = totalHours === 1 ? '1 hour' : totalHours + ' hours';
+    valueEl.textContent = hStr + '/week';
+
+    var pills = '';
+    _dayOrder.forEach(function(d) {
+        if (daySlots[d] > 0) {
+            var dh = (daySlots[d] * 0.5);
+            var dhStr = dh === 1 ? '1hr' : dh + 'hrs';
+            pills += '<span style="padding:3px 10px; font-size:0.72rem; font-weight:600; border-radius:20px; background:rgba(5,150,105,0.1); color:#059669; border:1px solid rgba(5,150,105,0.2);">' + d + ' ' + dhStr + '</span>';
+        }
+    });
+    breakdown.innerHTML = pills;
+}
+
 document.querySelectorAll('.avail-cb').forEach(function(cb) {
     cb.addEventListener('change', function() {
         var day = this.getAttribute('data-day');
         var count = document.querySelectorAll('.avail-cb[data-day="' + day + '"]:checked').length;
-        // Clear any pending timer for this day
         if (_minHourTimers[day]) { clearTimeout(_minHourTimers[day]); _minHourTimers[day] = null; }
         if (this.checked && count > 8) {
             this.checked = false;
             showScheduleAlert('warning', 'Maximum 4 hours per day!', day + ' already has 4 hours selected. Please deselect another slot first.');
         } else if (this.checked && count === 1) {
-            // Wait 3 seconds, then check if still only 1 slot
             _minHourTimers[day] = setTimeout(function() {
                 var current = document.querySelectorAll('.avail-cb[data-day="' + day + '"]:checked').length;
                 if (current === 1) {
@@ -1512,6 +1552,7 @@ document.querySelectorAll('.avail-cb').forEach(function(cb) {
                 }
             }, 3000);
         }
+        updateWeeklyHours();
     });
 });
 
@@ -1534,9 +1575,11 @@ function closeScheduleModal() {
     }
     document.getElementById('scheduleModal').style.display = 'none';
     var count = document.querySelectorAll('.avail-cb:checked').length;
+    var totalHours = count * 0.5;
     var el = document.getElementById('scheduleStatus');
     if (count > 0) {
-        el.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#059669;"></i> ' + count + ' time slot' + (count > 1 ? 's' : '') + ' selected';
+        var hStr = totalHours === 1 ? '1 hour' : totalHours + ' hours';
+        el.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#059669;"></i> ' + count + ' slot' + (count > 1 ? 's' : '') + ' selected — <strong>' + hStr + '/week</strong>';
         el.style.color = '#059669';
     } else {
         el.innerHTML = '';
