@@ -1205,15 +1205,24 @@ function showScheduleAlert(type, title, msg) {
 }
 
 // Real-time validation on each checkbox change
+var _minHourTimers = {};
 document.querySelectorAll('.avail-cb').forEach(function(cb) {
     cb.addEventListener('change', function() {
         var day = this.getAttribute('data-day');
         var count = document.querySelectorAll('.avail-cb[data-day="' + day + '"]:checked').length;
+        // Clear any pending timer for this day
+        if (_minHourTimers[day]) { clearTimeout(_minHourTimers[day]); _minHourTimers[day] = null; }
         if (this.checked && count > 8) {
             this.checked = false;
             showScheduleAlert('warning', 'Maximum 4 hours per day!', day + ' already has 4 hours selected. Please deselect another slot first.');
         } else if (this.checked && count === 1) {
-            showScheduleAlert('warning', 'Minimum 1 hour per day!', day + ' has only 30 minutes. Please select at least 2 consecutive slots (1 hour) to meet the minimum.');
+            // Wait 3 seconds, then check if still only 1 slot
+            _minHourTimers[day] = setTimeout(function() {
+                var current = document.querySelectorAll('.avail-cb[data-day="' + day + '"]:checked').length;
+                if (current === 1) {
+                    showScheduleAlert('warning', 'Minimum 1 hour per day!', day + ' has only 30 minutes. Please select at least 2 consecutive slots (1 hour) to meet the minimum.');
+                }
+            }, 3000);
         }
     });
 });
