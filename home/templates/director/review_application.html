@@ -121,12 +121,10 @@
             </form>
             {% endif %}
 
-            {% if app.status == 'interview_done' or app.status == 'office_assigned' %}
             <button type="button" class="review-status-btn" style="background: linear-gradient(135deg, #22c55e, #16a34a); color:#fff; border-color:#16a34a;"
                     onclick="document.getElementById('approveModal').classList.add('active'); document.body.style.overflow='hidden';">
                 <i class="fa-solid fa-circle-check"></i> Approve &amp; Set Start Date
             </button>
-            {% endif %}
 
             <form method="post" action="{% url 'home:director_update_application_status' app.pk %}" style="display:inline;">
                 {% csrf_token %}
