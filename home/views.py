@@ -4179,31 +4179,25 @@ def director_department_reports_email(request):
 def _compute_renewal_recommendation(attendance_rate, total_hours, required_hours, latest_eval):
     att_score = min(attendance_rate, 100)
 
-    # Hours completion score (0-100)
     hours_pct = (total_hours / required_hours * 100) if required_hours else 0
     hours_score = min(hours_pct, 100)
 
-    # Performance score (0-100)
+
     if latest_eval and latest_eval.overall_rating:
         perf_score = float(latest_eval.overall_rating) / 5.0 * 100
     else:
-        perf_score = None  # No evaluation yet
-
-    # Director's explicit recommendation (if set)
+        perf_score = None  
     director_recommendation = None
     if latest_eval and latest_eval.recommendation_status:
         director_recommendation = latest_eval.get_recommendation_status_display()
 
-    # Weighted overall (if we have eval data)
     if perf_score is not None:
         weighted = (att_score * 0.4) + (hours_score * 0.3) + (perf_score * 0.3)
     else:
-        # Without eval, use 60/40 attendance/hours split
         weighted = (att_score * 0.6) + (hours_score * 0.4)
 
     weighted = round(weighted, 1)
 
-    # Determine recommendation
     if weighted >= 80:
         recommendation = 'Highly Recommended for Rehire'
         level = 'excellent'
@@ -4228,12 +4222,7 @@ def _compute_renewal_recommendation(attendance_rate, total_hours, required_hours
     }
 
 
-# ================================================================
-#  COMPLETION CERTIFICATE (PDF)
-# ================================================================
-
 def sa_completion_certificate(request, pk):
-    """Generate and download a completion certificate PDF for an SA."""
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('home:home')
 
