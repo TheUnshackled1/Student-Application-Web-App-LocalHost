@@ -428,11 +428,9 @@
                     <input type="hidden" name="official_time_photo" id="photo_official_time">
                 </div>
             </div>
-            </div>
-            <div class="applyform-submit-area">
 
-            <!-- ━━━ AVAILABILITY SCHEDULE ━━━ -->
-            <div class="applyform-section" id="section-availability" style="margin-bottom: 1.5rem;">
+            <!-- ━━━ AVAILABILITY SCHEDULE (inside documents section) ━━━ -->
+            <div style="margin-top: 1.5rem;">
                 <div class="applyform-section-header">
                     <span class="applyform-section-badge" style="background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 3px 10px rgba(5,150,105,0.25);"><i class="fa-solid fa-calendar-check"></i></span>
                     <div>
@@ -464,6 +462,9 @@
                 </div>
                 <input type="hidden" name="availability_schedule" id="id_availability_schedule" value="{{ form.availability_schedule.value|default:'' }}">
             </div>
+
+            </div>
+            <div class="applyform-submit-area">
 
                 <div class="applyform-submit-info">
                     <i class="fa-solid fa-shield-check"></i>
