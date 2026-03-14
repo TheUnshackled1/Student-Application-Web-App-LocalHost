@@ -265,7 +265,9 @@
                     </div>
                     <div class="review-doc-info" style="flex:1;">
                         <span class="review-doc-name">{{ doc.name }}</span>
-                        {% if doc.uploaded %}
+                        {% if doc.is_schedule and doc.uploaded %}
+                            <span style="font-size:11px; color:#059669; font-weight:500;"><i class="fa-solid fa-calendar-check"></i> See Availability Schedule below ↓</span>
+                        {% elif doc.uploaded %}
                             <button type="button" class="review-doc-link" onclick="openFilePreview('{{ doc.file.url }}', '{{ doc.name }}')">
                                 <i class="fa-solid fa-eye"></i> View File
                             </button>

@@ -233,15 +233,26 @@ def _build_documents_from_app(app):
     ]
     documents = []
     for field_name, label in doc_fields:
+        # Official Time is the availability schedule, not a file upload
+        if field_name == 'official_time':
+            sched = app.availability_schedule
+            has_schedule = bool(sched and isinstance(sched, dict) and len(sched) > 0)
+            if has_schedule:
+                status = 'done' if app.status in ('approved', 'office_assigned') else 'uploaded'
+                lbl = 'Done' if status == 'done' else 'Uploaded'
+                documents.append({'name': label, 'field': field_name, 'uploaded': True, 'status': status, 'label': lbl, 'url': '', 'is_schedule': True})
+            else:
+                documents.append({'name': label, 'field': field_name, 'uploaded': False, 'status': 'missing', 'label': 'Missing', 'url': ''})
+            continue
         file_field = getattr(app, field_name)
         if file_field:
             url = file_field.url
             if app.status in ('approved', 'office_assigned'):
-                documents.append({'name': label, 'status': 'done', 'label': 'Done', 'url': url})
+                documents.append({'name': label, 'field': field_name, 'uploaded': True, 'status': 'done', 'label': 'Done', 'url': url})
             else:
-                documents.append({'name': label, 'status': 'uploaded', 'label': 'Uploaded', 'url': url})
+                documents.append({'name': label, 'field': field_name, 'uploaded': True, 'status': 'uploaded', 'label': 'Uploaded', 'url': url})
         else:
-            documents.append({'name': label, 'status': 'missing', 'label': 'Missing', 'url': ''})
+            documents.append({'name': label, 'field': field_name, 'uploaded': False, 'status': 'missing', 'label': 'Missing', 'url': ''})
     return documents
 
 
@@ -258,15 +269,26 @@ def _build_documents_from_renewal(app):
     ]
     documents = []
     for field_name, label in doc_fields:
+        # Official Time is the availability schedule, not a file upload
+        if field_name == 'official_time':
+            sched = app.availability_schedule
+            has_schedule = bool(sched and isinstance(sched, dict) and len(sched) > 0)
+            if has_schedule:
+                status = 'done' if app.status in ('approved', 'office_assigned') else 'uploaded'
+                lbl = 'Done' if status == 'done' else 'Uploaded'
+                documents.append({'name': label, 'field': field_name, 'uploaded': True, 'status': status, 'label': lbl, 'url': '', 'is_schedule': True})
+            else:
+                documents.append({'name': label, 'field': field_name, 'uploaded': False, 'status': 'missing', 'label': 'Missing', 'url': ''})
+            continue
         file_field = getattr(app, field_name)
         if file_field:
             url = file_field.url
             if app.status in ('approved', 'office_assigned'):
-                documents.append({'name': label, 'status': 'done', 'label': 'Done', 'url': url})
+                documents.append({'name': label, 'field': field_name, 'uploaded': True, 'status': 'done', 'label': 'Done', 'url': url})
             else:
-                documents.append({'name': label, 'status': 'uploaded', 'label': 'Uploaded', 'url': url})
+                documents.append({'name': label, 'field': field_name, 'uploaded': True, 'status': 'uploaded', 'label': 'Uploaded', 'url': url})
         else:
-            documents.append({'name': label, 'status': 'missing', 'label': 'Missing', 'url': ''})
+            documents.append({'name': label, 'field': field_name, 'uploaded': False, 'status': 'missing', 'label': 'Missing', 'url': ''})
     return documents
 
 
@@ -808,7 +830,7 @@ def apply_renew(request):
         _inject_camera_photos(request, [
             'id_picture', 'enrolment_form', 'schedule_classes',
             'grades_last_sem', 'recommendation_letter',
-            'evaluation_form', 'official_time',
+            'evaluation_form',
         ])
         form = RenewalApplicationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -1369,6 +1391,21 @@ def staff_review_application(request, pk):
     ]
     documents = []
     for field_name, label in doc_fields:
+        # Official Time = availability schedule, not a file upload
+        if field_name == 'official_time':
+            sched = app.availability_schedule
+            has_schedule = bool(sched and isinstance(sched, dict) and len(sched) > 0)
+            doc_entry = {
+                'name': label,
+                'field': field_name,
+                'file': None,
+                'uploaded': has_schedule,
+                'validation': None,
+                'returned_reason': (app.returned_documents or {}).get(field_name, ''),
+                'is_schedule': True,
+            }
+            documents.append(doc_entry)
+            continue
         file_field = getattr(app, field_name)
         doc_entry = {
             'name': label,
@@ -1378,7 +1415,6 @@ def staff_review_application(request, pk):
             'validation': None,
             'returned_reason': (app.returned_documents or {}).get(field_name, ''),
         }
-        # Run inline OpenCV validation on uploaded image files
         if file_field:
             doc_entry['validation'] = _validate_uploaded_file(file_field, field_name)
         documents.append(doc_entry)
@@ -1780,6 +1816,20 @@ def director_review_application(request, pk):
     ]
     documents = []
     for field_name, label in doc_fields:
+        if field_name == 'official_time':
+            sched = app.availability_schedule
+            has_schedule = bool(sched and isinstance(sched, dict) and len(sched) > 0)
+            doc_entry = {
+                'name': label,
+                'field': field_name,
+                'file': None,
+                'uploaded': has_schedule,
+                'validation': None,
+                'returned_reason': (app.returned_documents or {}).get(field_name, ''),
+                'is_schedule': True,
+            }
+            documents.append(doc_entry)
+            continue
         file_field = getattr(app, field_name)
         doc_entry = {
             'name': label,

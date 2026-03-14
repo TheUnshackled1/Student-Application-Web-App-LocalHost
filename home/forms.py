@@ -197,7 +197,7 @@ class NewApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
             'availability_schedule',
             'application_form', 'id_picture', 'barangay_clearance',
             'parents_itr', 'enrolment_form', 'schedule_classes',
-            'proof_insurance', 'grades_last_sem', 'official_time',
+            'proof_insurance', 'grades_last_sem',
         ]
         widgets = {
             'first_name': forms.TextInput(attrs={
@@ -348,9 +348,6 @@ class NewApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
     def clean_grades_last_sem(self):
         return self._validate_doc('grades_last_sem')
 
-    def clean_official_time(self):
-        return self._validate_doc('official_time')
-
     def clean_availability_schedule(self):
         data = self.cleaned_data.get('availability_schedule')
         if isinstance(data, str):
@@ -378,7 +375,7 @@ class RenewalApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
             'previous_office', 'preferred_office', 'hours_rendered', 'supervisor_name',
             'availability_schedule',
             'id_picture', 'enrolment_form', 'schedule_classes', 'grades_last_sem',
-            'official_time', 'recommendation_letter', 'evaluation_form',
+            'recommendation_letter', 'evaluation_form',
         ]
         widgets = {
             'student_id': forms.TextInput(attrs={
@@ -437,7 +434,7 @@ class RenewalApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
         required_fields = [
             'preferred_office', 'availability_schedule',
             'id_picture', 'enrolment_form', 'schedule_classes',
-            'grades_last_sem', 'official_time', 'recommendation_letter',
+            'grades_last_sem', 'recommendation_letter',
             'evaluation_form',
         ]
         for fname in required_fields:
@@ -495,9 +492,6 @@ class RenewalApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
 
     def clean_grades_last_sem(self):
         return self._validate_doc('grades_last_sem')
-
-    def clean_official_time(self):
-        return self._validate_doc('official_time')
 
     def clean_recommendation_letter(self):
         return self._validate_doc('recommendation_letter')
