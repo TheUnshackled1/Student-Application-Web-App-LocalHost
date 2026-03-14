@@ -263,7 +263,7 @@ class NewApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
             'preferred_office', 'availability_schedule',
             'application_form', 'id_picture', 'barangay_clearance',
             'parents_itr', 'enrolment_form', 'schedule_classes',
-            'proof_insurance', 'grades_last_sem', 'official_time',
+            'proof_insurance', 'grades_last_sem',
         ]
         for fname in required_fields:
             if fname in self.fields:
