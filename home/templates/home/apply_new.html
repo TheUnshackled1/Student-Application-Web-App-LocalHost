@@ -172,6 +172,14 @@
     .flatpickr-input[readonly] {
         cursor: pointer;
     }
+    /* Flatpickr alt input text visibility */
+    .flatpickr-input.form-control[readonly] {
+        color: #1e293b !important;
+        font-weight: 500;
+    }
+    #dobAgeDisplay strong {
+        color: #1e293b !important;
+    }
     </style>
 </head>
 <body>
@@ -1260,7 +1268,7 @@
 
                 var ageDisplay = document.getElementById('dobAgeDisplay');
                 if (age >= 18) {
-                    ageDisplay.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <strong style="color:#e2e8f0;">' + ageStr + '</strong>';
+                    ageDisplay.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <strong style="color:#166534;">' + ageStr + '</strong>';
                 } else {
                     ageDisplay.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#fca5a5;"></i> <strong style="color:#fca5a5;">' + ageStr + ' — Must be 18+</strong>';
                 }
