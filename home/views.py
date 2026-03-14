@@ -3740,7 +3740,6 @@ def staff_export_attendance_csv(request):
 
 @login_required
 def director_export_evaluations_csv(request):
-    """Export performance evaluations as CSV (director only)."""
     if not request.user.is_superuser:
         return redirect('home:home')
     header = [
@@ -3783,7 +3782,6 @@ def director_department_reports(request):
         sa_count = sas.count()
         active_count = sas.filter(status='active').count()
 
-        # ── Attendance averages ──
         att_qs = AttendanceRecord.objects.filter(student_assistant__assigned_office=office)
         att_total = att_qs.count()
         att_present = att_qs.filter(status='present').count()
@@ -3793,7 +3791,7 @@ def director_department_reports(request):
         attended = att_present + att_late + att_excused
         attendance_rate = round(attended / att_total * 100, 1) if att_total else 0
 
-        # ── Productivity / hours averages ──
+
         hours_agg = sas.aggregate(
             avg_hours=Coalesce(Avg('total_hours'), 0.0, output_field=FloatField()),
             total_hours=Coalesce(Sum('total_hours'), 0.0, output_field=FloatField()),
@@ -3804,7 +3802,7 @@ def director_department_reports(request):
         avg_required = round(float(hours_agg['avg_required']), 1)
         avg_completion = round(avg_hours / avg_required * 100, 1) if avg_required else 0
 
-        # ── Performance evaluation summary ──
+
         eval_qs = PerformanceEvaluation.objects.filter(student_assistant__assigned_office=office)
         eval_agg = eval_qs.aggregate(
             count=Count('id'),
