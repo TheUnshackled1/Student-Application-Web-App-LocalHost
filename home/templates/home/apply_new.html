@@ -198,14 +198,14 @@
 
                 <div class="applyform-field-group">
                     <div class="row g-3">
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="form-label">Student ID <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
                                 <i class="fa-solid fa-id-badge"></i>
                                 <input type="text" class="form-control" name="student_id" id="id_student_id_new" maxlength="8" minlength="8" inputmode="numeric" pattern="\d{8}" placeholder="12345678" title="Must be exactly 8 digits" value="{{ form.student_id.value|default:'' }}" required>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-9">
                             <label class="form-label">Course / Program <span class="text-danger">*</span></label>
                             <select class="form-select course-select" name="course" id="id_course_new" required onchange="updateCourseColor(this)">
                                 <option value="" {% if not form.course.value %}selected{% endif %} disabled>Select college / program</option>
@@ -217,6 +217,8 @@
                                 <option value="COE" data-color="#f97316" {% if form.course.value == 'COE' %}selected{% endif %}>COE — College of Engineering</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="row g-3 mt-1">
                         <div class="col-md-3">
                             <label class="form-label">Year Level <span class="text-danger">*</span></label>
                             <select class="form-select year-select" name="year_level" id="id_year_level" required onchange="updateSelectColor(this)">
@@ -235,8 +237,6 @@
                                 <option value="2nd" data-color="#f472b6" {% if form.semester.value == '2nd' %}selected{% endif %}>2nd Semester</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="row g-3 mt-1">
                         <div class="col-md-6">
                             <label class="form-label">Preferred Office for Duty <span class="text-danger">*</span></label>
                             <div class="applyform-input-icon">
