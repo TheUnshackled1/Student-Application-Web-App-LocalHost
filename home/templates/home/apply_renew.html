@@ -1169,6 +1169,12 @@
         }
 
         form.addEventListener('submit', function(e) {
+            // Block submission if student ID not verified
+            if (!window._studentIdVerified) {
+                e.preventDefault();
+                document.getElementById('renewalBlockModal').style.display = 'flex';
+                return;
+            }
             var schedule = {};
             document.querySelectorAll('.avail-cb:checked').forEach(function(cb) {
                 var day = cb.getAttribute('data-day');
