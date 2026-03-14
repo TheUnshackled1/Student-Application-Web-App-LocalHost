@@ -877,79 +877,106 @@
         updateSteps();
     })();
 
-    // ── Address Auto-Detect via Geolocation + Reverse Geocoding ──
-    function detectAddress() {
-        var btn = document.getElementById('btnDetectAddress');
-        var status = document.getElementById('addressStatus');
-        var addrField = document.getElementById('id_address');
-
-        if (!navigator.geolocation) {
-            status.textContent = 'Geolocation is not supported by your browser.';
-            status.style.color = '#ef4444';
-            return;
+    // ── Negros Occidental City / Barangay Address Selector ──
+    window.negrosData = {
+        "Bacolod City":["Alijis","Alangilan","Banago","Bata","Cabug","Estefania","Felisa","Granada","Handumanan","Hilaoan","Mandalagan","Mansilingan","Montevista","Pahanocoy","Punta Taytay","Singcang-Airport","Sum-ag","Taculing","Tangub","Villamonte","Barangay 1","Barangay 2","Barangay 3","Barangay 4","Barangay 5","Barangay 6","Barangay 7","Barangay 8","Barangay 9","Barangay 10","Barangay 11","Barangay 12","Barangay 13","Barangay 14","Barangay 15","Barangay 16","Barangay 17","Barangay 18","Barangay 19","Barangay 20","Barangay 21","Barangay 22","Barangay 23","Barangay 24","Barangay 25","Barangay 26","Barangay 27","Barangay 28","Barangay 29","Barangay 30","Barangay 31","Barangay 32","Barangay 33","Barangay 34","Barangay 35","Barangay 36","Barangay 37","Barangay 38","Barangay 39","Barangay 40","Barangay 41"],
+        "Talisay City":["Barangay I","Barangay II","Barangay III","Barangay IV","Barangay V","Barangay VI","Barangay VII","Binonga","Buenavista","Cabatangan","Camatog","Concepcion","Dos Hermanas","Efigenio Lizares","Lag-asan","Matab-ang","San Fernando","Zone 1","Zone 2","Zone 3","Zone 4","Zone 5","Zone 6","Zone 7","Zone 8","Zone 9","Zone 10","Zone 11","Zone 12"],
+        "Silay City":["Barangay I","Barangay II","Barangay III","Barangay IV","Barangay V","Barangay VI","Balaring","Guinhalaran","Hawaiian","Lantad","Mambulac","Patag","Rizal"],
+        "Bago City":["Barangay I","Barangay II","Abuanan","Alianza","Atipuluan","Bacong-Montilla","Bagroy","Calumangan","Caridad","Don Jorge Araneta","Dulao","Ilijan","Lag-asan","Ma-ao","Mailum","Malingin","Napoles","Pacol","Sagasa","Sampinit","Tabunan","Taloc"],
+        "Cadiz City":["Barangay 1","Barangay 2","Barangay 3","Barangay 4","Barangay 5","Barangay 6","Andres Bonifacio","Banquerohan","Cadiz Viejo","Caduha-an","Celestino Villacin","Daga","Jerusalem","Luna","Mabini","Magsaysay","Sicaba","Tinampa-an","V. Gustilo"],
+        "Escalante City":["Alimango","Balintawak","Binaguiohan","Buenavista","Cervantes","Dian-ay","Hacienda Fe","Japitan","Jonobjonob","Langub","Libertad","Mabini","Magsaysay","Malasibog","Old Poblacion","Paitan","Pinapugasan","Rizal","Tamlang","Udtongan","Washington"],
+        "Himamaylan City":["Barangay I","Barangay II","Barangay III","Barangay IV","Buenavista","Carabalan","Caradio-an","Dalicanan","Libacao","Mahalang","Mambagaton","Minapasog","San Antonio","Sipaway","Su-ay","Talaban","To-oy"],
+        "Kabankalan City":["Barangay 1","Barangay 2","Barangay 3","Barangay 4","Barangay 5","Barangay 6","Barangay 7","Barangay 8","Barangay 9","Binicuil","Camansi","Camingawan","Camugao","Daan Banua","Hilamonan","Ilog","Linao","Locotan","Magballo","Orong","Salong","Tabugon","Tagoc","Tagukon","Tampalon","Tan-awan"],
+        "La Carlota City":["Barangay I","Barangay II","Barangay III","Cubay","Haguimit","Nagasi","Palanguia","Rizal","San Agustin","Yualing"],
+        "Sagay City":["Barangay I","Barangay II","Barangay III","Barangay IV","Barangay V","Barangay VI","Bulanon","Campo Himoga-an","Colonia Divina","Fabrica","General Luna","Malubon","Old Sagay","Paraiso","Plaridel","Puey","Rafaela Barrera","Rizal","Taba-ao","Vito"],
+        "San Carlos City":["Barangay I","Barangay II","Barangay III","Barangay IV","Barangay V","Barangay VI","Buluangan","Codcod","Ermita","Guadalupe","Nataban","Palampas","Prosperidad","Punao","Quezon","Rizal","San Juan"],
+        "Sipalay City":["Barangay 1","Barangay 2","Barangay 3","Barangay 4","Barangay 5","Cayhagan","Gilmalonan","Hinoba-an Norte","Mambaroto","Manlucahoc","Maricalum","Nabulao","San Jose","Talacagay"],
+        "Victorias City":["Barangay I","Barangay II","Barangay III","Barangay IV","Barangay V","Barangay VI","Barangay VII","Barangay VIII","Barangay IX","Barangay X","Barangay XI","Barangay XII","Barangay XIII","Barangay XIV","Barangay XV","Barangay XVI","Dacongcogon","Madao","Magsaysay","New Poblacion"],
+        "Binalbagan":["Barangay I","Barangay II","Amontay","Bi-ao","Canmoros","Enclaro","Marina","Paglaum","Payao","Progreso","San Jose","San Juan","San Pedro","San Teodoro","San Vicente","Santo Rosario","Santol"],
+        "Calatrava":["Barangay I","Barangay II","Barangay III","Agpangi","Ani-e","Bagacay","Bago","Bantayanon","Bato","Calampisawan","Cambayobo","Castellano","Hilub-ang","Lipat-on","Marcelo","Nagasi","Sag-ang","San Isidro","Tiling","Tigbao"],
+        "Candoni":["Barangay I","Barangay II","Agboy","Banga","Haguimit","Gatuslao","Kabungahan","Payawan","Sa-ang","Tabugon"],
+        "Cauayan":["Barangay I","Barangay II","Inayawan","Isio","Lumbia","Mambugsay","Man-uling","Molobolo","Sag-ang","Talacdan","Tiling","To-oy"],
+        "Don Salvador Benedicto":["Barangay I","Barangay II","Bago","Kumaliskis","Igmaya-an","Mailum","Pacol","Rizal","San Jose"],
+        "Enrique B. Magalona":["Barangay I","Barangay II","Barangay III","Barangay IV","Alacaygan","Atipulu-an","Bato","Consing","Cudiangas","Damgo","Lag-asan","Ma-ao","Medina","Menchaca","Pontevedra","San Isidro","Tanza","Tuburan"],
+        "Hinigaran":["Barangay I","Barangay II","Barangay III","Bato","Calapi","Carawisan","Gilmalonan","Hinoba-an","Initao","Mambiranan","Miranda","Molobolo","Paticui","Plaridel","Tagda","Tuguis"],
+        "Hinoba-an":["Barangay I","Barangay II","Alim","Asia","Bacuyangan","Batuan","Buca-an","Damutan","Libas","Punta","San Rafael","Talacagay","Villareal"],
+        "Ilog":["Barangay I","Barangay II","Balicotoc","Bocana","Calubang","Canlamay","Guintubhan","Dancalan","Galicia","Malabago","Manalad","Maraburab","Tabu"],
+        "Isabela":["Barangay I","Barangay II","Barangay III","Barangay IV","Barangay V","Barangay VI","Basak","Bulanon","Cabcab","Camugao","Panaquiao","Sikatuna","Tinongan"],
+        "La Castellana":["Barangay I","Barangay II","Barangay III","Biak-na-Bato","Cabacungan","Camandag","Lalagsan","Manghanoy","Robles","Sag-ang","Talacagay"],
+        "Manapla":["Barangay I","Barangay II","Barangay III","Barangay IV","Chambery","Gatuslao","Punta Mesa","Punta Salong","Purisima","San Pablo","Tortosa"],
+        "Moises Padilla":["Barangay I","Barangay II","Barangay III","Barangay IV","Barangay V","Barangay VI","Barangay VII","Barangay VIII","Camangahan","Crossing Magallon","Guinpana-an","Inolingan","Macagahay","Montilla","Oringao","Pala-pala","San Jose"],
+        "Murcia":["Barangay I","Barangay II","Aleosan","Alijis","Amayco","Blumentritt","Calirao","Cansilayan","Damsite","Don Jorge Araneta","Iglau-an","Minoyan","Pandanon","Salvacion","San Miguel","Talotog"],
+        "Pontevedra":["Barangay I","Barangay II","Barangay III","Barangay IV","Antipolo","Canroma","Don Benito Lopez","General Malvar","Habana","Pandan","Rizal","San Isidro","Simbahan","Subida","Tacayan","Trapiche"],
+        "Pulupandan":["Barangay I","Barangay II","Barangay III","Barangay IV","Barangay V","Barangay VI","Barangay VII","Canjusa","Culo","Ubay","Utod","Pag-asa"],
+        "San Enrique":["Barangay I","Barangay II","Barangay III","Barangay IV","Bagonawa","Batuan","Manalad","Mapili","Palayog","Tabao Proper"],
+        "Toboso":["Barangay I","Barangay II","Barangay III","Barangay IV","Buenavista","Cantomco","Hilub-ang","Mambulac","Salamanca","Tabun-ac"],
+        "Valladolid":["Barangay I","Barangay II","Barangay III","Barangay IV","Barangay V","Bagumbayan","Batong","Buenavista","Guintorilan","Lacaron","Mabini","Rizal","Tabao Proper"]
+    };
+    window.populateBarangays = function(city) {
+        var brgySelect = document.getElementById('id_barangay');
+        brgySelect.innerHTML = '<option value="" selected disabled>Select barangay</option>';
+        if (window.negrosData[city]) {
+            window.negrosData[city].forEach(function(b) {
+                var opt = document.createElement('option');
+                opt.value = b; opt.textContent = b;
+                brgySelect.appendChild(opt);
+            });
+            brgySelect.disabled = false;
+        } else {
+            brgySelect.disabled = true;
         }
-
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Detecting...';
-        status.textContent = 'Getting your location...';
-        status.style.color = '#94a3b8';
-
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                var lat = position.coords.latitude;
-                var lon = position.coords.longitude;
-                status.textContent = 'Location found. Fetching address...';
-
-                // Reverse geocode using OpenStreetMap Nominatim (free)
-                fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon + '&addressdetails=1', {
-                    headers: { 'Accept-Language': 'en' }
-                })
-                .then(function(resp) { return resp.json(); })
-                .then(function(data) {
-                    if (data && data.address) {
-                        var a = data.address;
-                        var province = a.state || a.county || a.state_district || '';
-                        // Validate location is within Negros Occidental
-                        if (province.toLowerCase().indexOf('negros occidental') === -1) {
-                            status.textContent = 'Location detected is outside Negros Occidental. Please enter your address manually.';
-                            status.style.color = '#f59e0b';
-                            btn.disabled = false;
-                            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Detect';
-                            return;
-                        }
-                        // Extract Barangay, City/Municipality
-                        var brgy = a.suburb || a.village || a.neighbourhood || a.quarter || '';
-                        var city = a.city || a.town || a.municipality || '';
-                        var parts = [];
-                        if (brgy) parts.push('Brgy. ' + brgy);
-                        if (city) parts.push(city);
-                        parts.push('Negros Occidental');
-                        addrField.value = parts.join(', ');
-                        status.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Address detected — Negros Occidental';
-                        status.style.color = '#22c55e';
-                    } else {
-                        status.textContent = 'Could not determine address. Please enter manually.';
-                        status.style.color = '#f59e0b';
+        updateAddress();
+    };
+    window.updateAddress = function() {
+        var city = document.getElementById('id_city').value;
+        var brgy = document.getElementById('id_barangay').value;
+        var hidden = document.getElementById('id_address');
+        var preview = document.getElementById('addressPreviewText');
+        if (city && brgy) {
+            var addr = 'Brgy. ' + brgy + ', ' + city + ', Negros Occidental';
+            hidden.value = addr;
+            preview.textContent = addr;
+            preview.style.color = '#166534';
+            preview.style.fontWeight = '600';
+        } else if (city) {
+            hidden.value = '';
+            preview.textContent = city + ', Negros Occidental — select barangay';
+            preview.style.color = '#64748b';
+            preview.style.fontWeight = '400';
+        } else {
+            hidden.value = '';
+            preview.textContent = 'Select city and barangay above';
+            preview.style.color = '#64748b';
+            preview.style.fontWeight = '400';
+        }
+    };
+    // Populate city dropdown and restore saved address
+    (function() {
+        var citySelect = document.getElementById('id_city');
+        var brgySelect = document.getElementById('id_barangay');
+        var cities = Object.keys(window.negrosData).sort();
+        cities.forEach(function(c) {
+            var opt = document.createElement('option');
+            opt.value = c; opt.textContent = c;
+            citySelect.appendChild(opt);
+        });
+        var saved = document.getElementById('id_address').value;
+        if (saved) {
+            var parts = saved.split(', ');
+            if (parts.length >= 2) {
+                var savedCity = parts[parts.length - 2];
+                var savedBrgy = parts.slice(0, parts.length - 2).join(', ').replace(/^Brgy\.\s*/, '');
+                if (window.negrosData[savedCity]) {
+                    citySelect.value = savedCity;
+                    populateBarangays(savedCity);
+                    if (savedBrgy) {
+                        brgySelect.value = savedBrgy;
                     }
-                })
-                .catch(function() {
-                    status.textContent = 'Reverse geocoding failed. Please enter manually.';
-                    status.style.color = '#ef4444';
-                })
-                .finally(function() {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Detect';
-                });
-            },
-            function(err) {
-                status.textContent = 'Location access denied: ' + err.message;
-                status.style.color = '#ef4444';
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Detect';
-            },
-            { enableHighAccuracy: true, timeout: 10000 }
-        );
-    }
+                    updateAddress();
+                }
+            }
+        }
+    })();
 
     (function() {
         var sidInput = document.getElementById('id_student_id_new');
