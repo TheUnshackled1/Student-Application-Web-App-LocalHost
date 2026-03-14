@@ -1432,7 +1432,7 @@ def staff_update_application_status(request, pk):
 
         # Handle schedule mismatch
         if new_status == 'schedule_mismatch':
-            mismatch_note = request.POST.get('schedule_mismatch_note', '')
+            mismatch_note = request.POST.get('schedule_mismatch_note', '').strip().title()
             app.schedule_mismatch_note = mismatch_note
             app.schedule_verified = False
             send_schedule_mismatch_email(app, mismatch_note)
@@ -1444,7 +1444,7 @@ def staff_update_application_status(request, pk):
 
         # Handle document request
         if new_status == 'documents_requested':
-            docs_note = request.POST.get('requested_documents_note', '')
+            docs_note = request.POST.get('requested_documents_note', '').strip().title()
             app.requested_documents_note = docs_note
             send_document_request_email(app, docs_note)
             ApplicationNote.objects.create(
@@ -1480,7 +1480,7 @@ def staff_return_document(request, pk):
         return redirect('home:home')
     app = get_object_or_404(NewApplication, pk=pk)
     field_name = request.POST.get('field_name', '').strip()
-    reason = request.POST.get('reason', '').strip()
+    reason = request.POST.get('reason', '').strip().title()
     doc_label = request.POST.get('doc_label', field_name)
 
     # Validate field_name against known document fields
@@ -1849,7 +1849,7 @@ def director_update_application_status(request, pk):
 
         # Handle schedule mismatch
         if new_status == 'schedule_mismatch':
-            mismatch_note = request.POST.get('schedule_mismatch_note', '')
+            mismatch_note = request.POST.get('schedule_mismatch_note', '').strip().title()
             app.schedule_mismatch_note = mismatch_note
             app.schedule_verified = False
             send_schedule_mismatch_email(app, mismatch_note)
@@ -1861,7 +1861,7 @@ def director_update_application_status(request, pk):
 
         # Handle document request
         if new_status == 'documents_requested':
-            docs_note = request.POST.get('requested_documents_note', '')
+            docs_note = request.POST.get('requested_documents_note', '').strip().title()
             app.requested_documents_note = docs_note
             send_document_request_email(app, docs_note)
             ApplicationNote.objects.create(
@@ -1897,7 +1897,7 @@ def director_return_document(request, pk):
         return redirect('home:home')
     app = get_object_or_404(NewApplication, pk=pk)
     field_name = request.POST.get('field_name', '').strip()
-    reason = request.POST.get('reason', '').strip()
+    reason = request.POST.get('reason', '').strip().title()
     doc_label = request.POST.get('doc_label', field_name)
 
     valid_fields = [
@@ -2659,7 +2659,7 @@ def staff_add_note(request, pk):
     if not request.user.is_staff:
         return redirect('home:home')
     app = get_object_or_404(NewApplication, pk=pk)
-    content = request.POST.get('note_content', '').strip()
+    content = request.POST.get('note_content', '').strip().title()
     if content:
         ApplicationNote.objects.create(
             new_application=app,
@@ -2691,7 +2691,7 @@ def staff_verify_schedule(request, pk):
         messages.success(request, 'Schedule verified successfully.')
 
     elif action == 'mismatch':
-        mismatch_note = request.POST.get('mismatch_note', '').strip()
+        mismatch_note = request.POST.get('mismatch_note', '').strip().title()
         old_status = app.status
         app.status = 'schedule_mismatch'
         app.schedule_verified = False
@@ -2716,7 +2716,7 @@ def director_add_note(request, pk):
     if not request.user.is_superuser:
         return redirect('home:home')
     app = get_object_or_404(NewApplication, pk=pk)
-    content = request.POST.get('note_content', '').strip()
+    content = request.POST.get('note_content', '').strip().title()
     if content:
         ApplicationNote.objects.create(
             new_application=app,

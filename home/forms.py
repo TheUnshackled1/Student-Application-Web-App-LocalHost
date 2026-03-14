@@ -9,6 +9,47 @@ from .models import (
 import json
 
 
+# ── Auto-capitalize mixin ──
+
+# Fields that should NOT be title-cased
+_SKIP_CAPITALIZE = {
+    'email', 'password', 'password1', 'password2', 'username',
+    'student_id', 'contact_number', 'availability_schedule',
+    'csrfmiddlewaretoken',
+}
+
+
+def _title_case(value):
+    """Capitalize the first letter of each word (e.g. 'tyrone' → 'Tyrone')."""
+    if not isinstance(value, str):
+        return value
+    return value.strip().title()
+
+
+class AutoCapitalizeMixin:
+    """Mixin that auto-capitalizes text fields in clean()."""
+
+    def clean(self):
+        cleaned = super().clean()
+        for field_name, value in cleaned.items():
+            if field_name in _SKIP_CAPITALIZE:
+                continue
+            field_obj = self.fields.get(field_name)
+            if field_obj is None:
+                continue
+            if isinstance(field_obj, (forms.CharField,)) and isinstance(value, str):
+                widget = field_obj.widget
+                # Skip hidden inputs (e.g. JSON schedule) and passwords
+                if isinstance(widget, (forms.HiddenInput, forms.PasswordInput)):
+                    continue
+                # Skip numeric-pattern fields
+                attrs = getattr(widget, 'attrs', {})
+                if attrs.get('inputmode') == 'numeric':
+                    continue
+                cleaned[field_name] = _title_case(value)
+        return cleaned
+
+
 # ── Availability schedule choices ──
 
 DAY_CHOICES = [
@@ -83,7 +124,7 @@ def validate_image_type(value):
             )
 
 
-class ReminderForm(forms.ModelForm):
+class ReminderForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = Reminder
         fields = ['message', 'priority', 'expires_at', 'is_active']
@@ -102,7 +143,7 @@ class ReminderForm(forms.ModelForm):
         }
 
 
-class UpcomingDateForm(forms.ModelForm):
+class UpcomingDateForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = UpcomingDate
         fields = ['title', 'date', 'expires_at', 'is_active']
@@ -123,7 +164,7 @@ class UpcomingDateForm(forms.ModelForm):
         }
 
 
-class AnnouncementForm(forms.ModelForm):
+class AnnouncementForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = Announcement
         fields = ['title', 'summary', 'image', 'expires_at', 'is_active']
@@ -146,7 +187,7 @@ class AnnouncementForm(forms.ModelForm):
         }
 
 
-class NewApplicationForm(forms.ModelForm):
+class NewApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = NewApplication
         fields = [
@@ -328,7 +369,7 @@ class NewApplicationForm(forms.ModelForm):
         return data
 
 
-class RenewalApplicationForm(forms.ModelForm):
+class RenewalApplicationForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = RenewalApplication
         fields = [
@@ -565,7 +606,7 @@ ICON_CHOICES = [
 ]
 
 
-class OfficeForm(forms.ModelForm):
+class OfficeForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = Office
         fields = [
@@ -629,7 +670,7 @@ class OfficeForm(forms.ModelForm):
 #  ACTIVE SA MANAGEMENT FORMS
 # ================================================================
 
-class AttendanceForm(forms.ModelForm):
+class AttendanceForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = AttendanceRecord
         fields = ['date', 'time_in', 'time_out', 'status', 'remarks']
@@ -651,7 +692,7 @@ class AttendanceForm(forms.ModelForm):
         }
 
 
-class PerformanceEvaluationForm(forms.ModelForm):
+class PerformanceEvaluationForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = PerformanceEvaluation
         fields = [
@@ -692,7 +733,7 @@ class PerformanceEvaluationForm(forms.ModelForm):
         return cleaned
 
 
-class ActiveSAStatusForm(forms.ModelForm):
+class ActiveSAStatusForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = ActiveStudentAssistant
         fields = ['status', 'end_date', 'required_hours']
@@ -711,7 +752,7 @@ class ActiveSAStatusForm(forms.ModelForm):
 #  STUDENT REGISTRATION & LOGIN FORMS
 # ================================================================
 
-class StudentRegistrationForm(forms.Form):
+class StudentRegistrationForm(AutoCapitalizeMixin, forms.Form):
     """Registration form for students."""
     student_id = forms.CharField(
         max_length=8, min_length=8,
@@ -768,7 +809,7 @@ class StudentLoginForm(forms.Form):
 #  NO-DUTY DAY FORM
 # ================================================================
 
-class NoDutyDayForm(forms.ModelForm):
+class NoDutyDayForm(AutoCapitalizeMixin, forms.ModelForm):
     class Meta:
         model = NoDutyDay
         fields = ['date', 'reason', 'office']
