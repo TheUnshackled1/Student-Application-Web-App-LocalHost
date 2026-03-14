@@ -7317,4 +7317,19 @@ textarea.form-control { color: #334155; }
   box-shadow: 0 4px 14px rgba(21,128,61,0.30);
 }
 
+/* ── Auto-capitalize text inputs ── */
+input[type="text"],
+input[type="search"],
+input:not([type]),
+textarea,
+select {
+  text-transform: capitalize;
+}
+input[type="email"] {
+  text-transform: none;
+}
+input[type="password"] {
+  text-transform: none;
+}
+
 /* ── END LIGHT FORMAL THEME ── */
