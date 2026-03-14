@@ -182,11 +182,33 @@
                                 <input type="text" class="form-control" name="contact_number" id="id_contact_number" maxlength="11" inputmode="numeric" pattern="\d{11}" placeholder="09XXXXXXXXX" title="Must be exactly 11 digits" value="{{ form.contact_number.value|default:'' }}" required>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Home Address <span class="text-danger">*</span></label>
-                            <div class="applyform-input-icon">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <input type="text" class="form-control" name="address" id="id_address" placeholder="Street, Brgy, City" value="{{ form.address.value|default:'' }}" required>
+                    </div>
+                </div>
+                <div class="applyform-field-group">
+                    <span class="applyform-field-group-label"><i class="fa-solid fa-location-dot"></i> Home Address</span>
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">City / Municipality <span class="text-danger">*</span></label>
+                            <select class="form-select" id="id_city" required onchange="populateBarangays(this.value)">
+                                <option value="" selected disabled>Select city / municipality</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Barangay <span class="text-danger">*</span></label>
+                            <select class="form-select" id="id_barangay" required disabled onchange="updateAddress()">
+                                <option value="" selected disabled>Select barangay</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <input type="hidden" name="address" id="id_address" value="{{ form.address.value|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-1">
+                        <div class="col-12">
+                            <label class="form-label">Complete Address</label>
+                            <div class="form-control" id="addressPreview" style="background:#f0fdf4; color:#166534; font-weight:600; min-height:40px; display:flex; align-items:center; gap:6px;">
+                                <i class="fa-solid fa-map-pin" style="color:#22c55e;"></i>
+                                <span id="addressPreviewText" style="color:#64748b; font-weight:400;">Select city and barangay above</span>
                             </div>
                         </div>
                     </div>
@@ -526,6 +548,108 @@
             });
         }, 500);
     });
+
+    // ── Negros Occidental City / Barangay Address Selector ──
+    window.negrosData = {
+        "Bacolod City":["Barangay 1 (Poblacion)","Barangay 2 (Poblacion)","Barangay 3 (Poblacion)","Barangay 4 (Poblacion)","Barangay 5 (Poblacion)","Barangay 6 (Poblacion)","Barangay 7 (Poblacion)","Barangay 8 (Poblacion)","Barangay 9 (Poblacion)","Barangay 10 (Poblacion)","Barangay 11 (Poblacion)","Barangay 12 (Poblacion)","Barangay 13 (Poblacion)","Barangay 14 (Poblacion)","Barangay 15 (Poblacion)","Barangay 16 (Poblacion)","Barangay 17 (Poblacion)","Barangay 18 (Poblacion)","Barangay 19 (Poblacion)","Barangay 20 (Poblacion)","Barangay 21 (Poblacion)","Barangay 22 (Poblacion)","Barangay 23 (Poblacion)","Barangay 24 (Poblacion)","Barangay 25 (Poblacion)","Barangay 26 (Poblacion)","Barangay 27 (Poblacion)","Barangay 28 (Poblacion)","Barangay 29 (Poblacion)","Barangay 30 (Poblacion)","Barangay 31 (Poblacion)","Barangay 32 (Poblacion)","Barangay 33 (Poblacion)","Barangay 34 (Poblacion)","Barangay 35 (Poblacion)","Barangay 36 (Poblacion)","Barangay 37 (Poblacion)","Barangay 38 (Poblacion)","Barangay 39 (Poblacion)","Barangay 40 (Poblacion)","Barangay 41 (Poblacion)","Alangilan","Alijis","Banago","Bata","Cabug","Estefania","Felisa","Granada","Handumanan","Mandalagan","Mansilingan","Montevista","Pahanocoy","Punta Taytay","Singcang-Airport","Sum-ag","Taculing","Tangub","Villamonte","Vista Alegre"],
+        "Bago City":["Abuanan","Alianza","Atipuluan","Bacong-Montilla","Bagroy","Balingasag","Binubuhan","Busay","Calumangan","Caridad","Don Jorge L. Araneta","Dulao","Ilijan","Lag-Asan","Ma-ao","Mailum","Malingin","Napoles","Pacol","Poblacion","Sagasa","Sampinit","Tabunan","Taloc"],
+        "Cadiz City":["Andres Bonifacio","Banquerohan","Barangay 1 Pob. (Zone 1)","Barangay 2 Pob. (Zone 2)","Barangay 3 Pob. (Zone 3)","Barangay 4 Pob. (Zone 4)","Barangay 5 Pob. (Zone 5)","Barangay 6 Pob. (Zone 6)","Burgos","Cabahug","Cadiz Viejo","Caduha-an","Celestino Villacin","Daga","V. F. Gustilo","Jerusalem","Luna","Mabini","Magsaysay","Sicaba","Tiglawigan","Tinampa-an"],
+        "Escalante City":["Alimango","Balintawak","Binaguiohan","Buenavista","Cervantes","Dian-ay","Hacienda Fe","Japitan","Jonobjonob","Langub","Libertad","Mabini","Magsaysay","Malasibog","Old Poblacion","Paitan","Pinapugasan","Rizal","Tamlang","Udtongan","Washington"],
+        "Himamaylan City":["Aguisan","Buenavista","Cabadiangan","Cabanbanan","Carabalan","Caradio-an","Libacao","Mambagaton","Nabali-an","Mahalang","San Antonio","Sara-et","Su-ay","Talaban","To-oy","Barangay I (Poblacion)","Barangay II (Poblacion)","Barangay III (Poblacion)","Barangay IV (Poblacion)"],
+        "Kabankalan City":["Bantayan","Binicuil","Camansi","Camingawan","Camugao","Carol-an","Daan Banua","Hilamonan","Inapoy","Linao","Locotan","Magballo","Oringao","Orong","Pinaguinpinan","Barangay 1 (Poblacion)","Barangay 2 (Poblacion)","Barangay 3 (Poblacion)","Barangay 4 (Poblacion)","Barangay 5 (Poblacion)","Barangay 6 (Poblacion)","Barangay 7 (Poblacion)","Barangay 8 (Poblacion)","Barangay 9 (Poblacion)","Salong","Tabugon","Tagoc","Tagukon","Talubangi","Tampalon","Tan-Awan","Tapi"],
+        "La Carlota City":["Ara-al","Ayungon","Balabag","Batuan","Cubay","Haguimit","La Granja","Nagasi","Barangay I (Poblacion)","Barangay II (Poblacion)","Barangay III (Poblacion)","Barangay RSB (Consuelo)","San Miguel","Yubo"],
+        "Sagay City":["Andres Bonifacio","Bato","Baviera","Bulanon","Campo Himoga-an","Campo Santiago","Colonia Divina","Rafaela Barrera","Fabrica","General Luna","Himoga-an Baybay","Lopez Jaena","Malubon","Maquiling","Molocaboc","Old Sagay","Paraiso","Plaridel","Poblacion I (Barangay 1)","Poblacion II (Barangay 2)","Puey","Rizal","Taba-ao","Tadlong","Vito"],
+        "San Carlos City":["Bagonbon","Buluangan","Codcod","Ermita (Sipaway)","Guadalupe","Nataban","Palampas","Barangay I (Poblacion)","Barangay II (Poblacion)","Barangay III (Poblacion)","Barangay IV (Poblacion)","Barangay V (Poblacion)","Barangay VI (Poblacion)","Prosperidad","Punao","Quezon","Rizal","San Juan (Sipaway)"],
+        "Silay City":["Barangay I (Poblacion)","Barangay II (Poblacion)","Barangay III (Cinco de Noviembre) (Poblacion)","Barangay IV (Poblacion)","Barangay V (Poblacion)","Barangay VI (Poblacion) (Hawaiian)","Bagtic","Balaring","Eustaquio Lopez","Guimbala-on","Guinhalaran","Kapitan Ramon","Lantad","Mambulac","Patag","Rizal"],
+        "Sipalay City":["Barangay 1 (Poblacion)","Barangay 2 (Poblacion)","Barangay 3 (Poblacion)","Barangay 4 (Poblacion)","Barangay 5 (Poblacion)","Cabadiangan","Camindangan","Canturay","Cartagena","Cayhagan","Gil Montilla","Mambaroto","Manlucahoc","Maricalum","Nabulao","Nauhang","San Jose"],
+        "Talisay City":["Bubog","Cabatangan","Concepcion","Dos Hermanas","Efigenio Lizares","Katilingban","Matab-ang","San Fernando","Zone 1 (Poblacion)","Zone 2 (Poblacion)","Zone 3 (Poblacion)","Zone 4 (Poblacion)","Zone 4-A (Poblacion)","Zone 5 (Poblacion)","Zone 6 (Poblacion)","Zone 7 (Poblacion)","Zone 8 (Poblacion)","Zone 9 (Poblacion)","Zone 10 (Poblacion)","Zone 11 (Poblacion)","Zone 12 (Poblacion)","Zone 12-A (Poblacion)","Zone 14 (Poblacion)","Zone 14-A (Poblacion)","Zone 14-B (Poblacion)","Zone 15 (Poblacion)","Zone 16 (Poblacion)"],
+        "Victorias City":["Barangay I (Poblacion)","Barangay II (Quezon; Pob.)","Barangay III (Poblacion)","Barangay IV (Poblacion)","Barangay V (Poblacion)","Barangay VI (Estrella Village/Salvacion; Pob.)","Barangay VI-A (Boulevard/Villa Miranda/Sitio Cubay/Pasil)","Barangay VII (Poblacion)","Barangay VIII (Old Simboryo)","Barangay IX (Daan Banwa)","Barangay X (Estado)","Barangay XI (Gawahon)","Barangay XII (Dacumon)","Barangay XIII (Gloryville)","Barangay XIV (Sayding)","Barangay XV West Caticlan","Barangay XV-A East Caticlan","Barangay XVI (Millsite)","Barangay XVI-A (New Barrio)","Barangay XVII (Garden)","Barangay XVIII (Palma)","Barangay XVIII-A (Golf)","Barangay XIX (Bacayan)","Barangay XIX-A (Canetown Subdivision)","Barangay XX (Cuaycong)","Barangay XXI (Relocation)"],
+        "Binalbagan":["Amontay","Bagroy","Bi-ao","Canmoros","Enclaro","Marina","Pagla-um (Poblacion)","Payao","Progreso","San Jose","San Juan","San Pedro (Poblacion)","San Teodoro","San Vicente","Santo Rosario (Poblacion)","Santol"],
+        "Calatrava":["Agpangi","Ani-e","Bagacay","Bantayanon","Buenavista","Cabungahan","Calampisawan","Cambayobo","Castellano","Cruz","Dolis","Hilub-Ang","Hinab-Ongan","Ilaya","Laga-an","Lalong","Lemery","Lipat-on","Lo-ok (Poblacion)","Ma-aslob","Macasilao","Malanog","Malatas","Marcelo","Mina-utok","Menchaca","Minapasuk","Mahilum","Paghumayan","Pantao","Patun-an","Pinocutan","Refugio","San Benito","San Isidro","Suba (Poblacion)","Telim","Tigbao","Tigbon","Winaswasan"],
+        "Candoni":["Agboy","Banga","Cabia-an","Caningay","Gatuslao","Haba","Payauan","Poblacion East","Poblacion West"],
+        "Cauayan":["Abaca","Baclao","Basak","Bulata","Caliling","Camalanda-an","Camindangan","Elihan","Guiljungan","Inayawan","Isio","Linaon","Lumbia","Mambugsay","Man-uling","Masaling","Molobolo","Poblacion","Sura","Talacdan","Tambad","Tiling","Tomina","Tuyom","Yaoyao"],
+        "Don Salvador Benedicto":["Bago (Lalung)","Bagong Silang (Marcelo)","Bunga","Igmaya-an","Kumaliskis","Pandanon","Pinowayan (Prosperidad)"],
+        "Enrique B. Magalona":["Alacaygan","Alicante","Batea","Canlusong","Consing","Cudangdang","Damgo","Gahit","Latasan","Madalag","Manta-angan","Nanca","Pasil","Poblacion I (Barangay 1)","Poblacion II (Barangay 2)","Poblacion III (Barangay 3)","San Isidro","San Jose","Santo Nino","Tabigue","Tanza","Tomongtong","Tuburan"],
+        "Hinigaran":["Anahaw","Aranda","Baga-as","Barangay I (Poblacion)","Barangay II (Poblacion)","Barangay III (Poblacion)","Barangay IV (Poblacion)","Bato","Calapi","Camalobalo","Camba-og","Cambugsa","Candumarao","Gargato","Himaya","Miranda","Nanunga","Narauis","Palayog","Paticui","Pilar","Quiwi","Tagda","Tuguis"],
+        "Hinoba-an":["Alim","Asia","Bacuyangan","Barangay I (Poblacion)","Barangay II (Poblacion)","Bulwangan","Culipapa","Damutan","Daug","Po-ok","San Rafael","Sangke","Talacagay"],
+        "Ilog":["Andulauan","Balicotoc","Bocana","Calubang","Canlamay","Consuelo","Dancalan","Delicioso","Galicia","Manalad","Pinggot","Barangay I (Poblacion)","Barangay II (Poblacion)","Tabu","Vista Alegre"],
+        "Isabela":["Amin","Banogbanog","Bulad","Bungahin","Cabcab","Camangcamang","Camp Clark","Cansalongon","Guintubhan","Libas","Limalima","Makilignit","Mansablay","Maytubig","Panaquiao","Barangay 1 (Poblacion)","Barangay 2 (Poblacion)","Barangay 3 (Poblacion)","Barangay 4 (Poblacion)","Barangay 5 (Poblacion)","Barangay 6 (Poblacion)","Barangay 7 (Poblacion)","Barangay 8 (Poblacion)","Barangay 9 (Poblacion)","Riverside","Rumirang","San Agustin","Sebucawan","Sikatuna","Tinongan"],
+        "La Castellana":["Biaknabato","Cabacungan","Cabagnaan","Camandag","Lalagsan","Manghanoy","Mansalanao","Masulog","Nato","Puso","Robles (Poblacion)","Sag-ang","Talaptap"],
+        "Manapla":["Chamberi","Barangay I (Poblacion)","Barangay I-A (Poblacion)","Barangay I-B (Poblacion)","Barangay II (Poblacion)","Barangay II-A (Poblacion)","Punta Mesa","Punta Salong","Purisima","San Pablo","Santa Teresa","Tortosa"],
+        "Moises Padilla":["Barangay 1 (Poblacion)","Barangay 2 (Poblacion)","Barangay 3 (Poblacion)","Barangay 4 (Poblacion)","Barangay 5 (Poblacion)","Barangay 6 (Poblacion)","Barangay 7 (Poblacion)","Crossing Magallon","Guinpana-an","Inolingan","Macagahay","Magallon Cadre","Montilla","Odiong","Quintin Remo"],
+        "Murcia":["Abo-abo","Alegria","Amayco","Blumentritt","Buenavista","Caliban","Canlandog","Cansilayan","Damsite","Iglau-an","Lopez Jaena","Minoyan","Pandanon (Silos)","San Miguel","Santa Cruz","Santa Rosa","Salvacion","Talotog","Zone I (Poblacion)","Zone II (Poblacion)","Zone III (Poblacion)","Zone IV (Poblacion)","Zone V (Poblacion)"],
+        "Pontevedra":["Antipolo","Barangay I (Poblacion)","Barangay II (Poblacion)","Barangay III (Poblacion)","Buenavista Gibong","Buenavista Rizal","Burgos","Cambarus","Canroma","General Malvar","Gomez","M. H. Del Pilar","Mabini","Miranda","Pandan","Recreo","San Isidro","San Juan","Zamora"],
+        "Pulupandan":["Barangay Zone 1 (Poblacion)","Barangay Zone 1-A (Poblacion)","Barangay Zone 2 (Poblacion)","Barangay Zone 3 (Poblacion)","Barangay Zone 4 (Poblacion)","Barangay Zone 4-A (Poblacion)","Barangay Zone 5 (Poblacion)","Barangay Zone 6 (Poblacion)","Barangay Zone 7 (Poblacion)","Canjusa","Crossing Pulupandan","Culo","Mabini","Pag-ayon","Palaka Norte","Palaka Sur","Patic","Tapong","Ubay","Utod"],
+        "San Enrique":["Bagonawa","Baliwagan","Batuan","Guintorilan","Nayon","Poblacion","Sibucao","Tabao Baybay","Tabao Rizal","Tibsok"],
+        "Toboso":["Bandilla","Bug-ang","General Luna","Magticol","Poblacion","Salamanca","San Isidro","San Jose","Tabun-ac"],
+        "Valladolid":["Alijis","Ayungon","Bagumbayan","Batuan","Bayabas","Central Tabao","Doldol","Guintorilan","Lacaron","Mabini","Pacol","Palaka","Paloma","Poblacion","Sagua Banua","Tabao Proper"]
+    };
+    window.populateBarangays = function(city) {
+        var brgySelect = document.getElementById('id_barangay');
+        brgySelect.innerHTML = '<option value="" selected disabled>Select barangay</option>';
+        if (window.negrosData[city]) {
+            window.negrosData[city].forEach(function(b) {
+                var opt = document.createElement('option');
+                opt.value = b; opt.textContent = b;
+                brgySelect.appendChild(opt);
+            });
+            brgySelect.disabled = false;
+        } else {
+            brgySelect.disabled = true;
+        }
+        updateAddress();
+    };
+    window.updateAddress = function() {
+        var city = document.getElementById('id_city').value;
+        var brgy = document.getElementById('id_barangay').value;
+        var hidden = document.getElementById('id_address');
+        var preview = document.getElementById('addressPreviewText');
+        if (city && brgy) {
+            var addr = 'Brgy. ' + brgy + ', ' + city + ', Negros Occidental';
+            hidden.value = addr;
+            preview.textContent = addr;
+            preview.style.color = '#166534';
+            preview.style.fontWeight = '600';
+        } else if (city) {
+            hidden.value = '';
+            preview.textContent = city + ', Negros Occidental — select barangay';
+            preview.style.color = '#64748b';
+            preview.style.fontWeight = '400';
+        } else {
+            hidden.value = '';
+            preview.textContent = 'Select city and barangay above';
+            preview.style.color = '#64748b';
+            preview.style.fontWeight = '400';
+        }
+    };
+    window.restoreAddressDropdowns = function(addrValue) {
+        if (!addrValue) return;
+        var parts = addrValue.split(', ');
+        if (parts.length >= 2) {
+            var savedCity = parts[parts.length - 2];
+            var savedBrgy = parts.slice(0, parts.length - 2).join(', ').replace(/^Brgy\.\s*/, '');
+            if (window.negrosData[savedCity]) {
+                document.getElementById('id_city').value = savedCity;
+                populateBarangays(savedCity);
+                if (savedBrgy) {
+                    document.getElementById('id_barangay').value = savedBrgy;
+                }
+                updateAddress();
+            }
+        }
+    };
+    // Populate city dropdown and restore saved address
+    (function() {
+        var citySelect = document.getElementById('id_city');
+        var cities = Object.keys(window.negrosData).sort();
+        cities.forEach(function(c) {
+            var opt = document.createElement('option');
+            opt.value = c; opt.textContent = c;
+            citySelect.appendChild(opt);
+        });
+        var saved = document.getElementById('id_address').value;
+        if (saved) restoreAddressDropdowns(saved);
+    })();
 
     let cameraStream = null;
     let currentField = null;
@@ -931,6 +1055,7 @@
                             fillField('id_email', d.email);
                             fillField('id_contact_number', d.contact_number);
                             fillField('id_address', d.address);
+                            restoreAddressDropdowns(d.address);
                             fillField('id_course', d.course);
                             fillField('id_year_level', d.year_level);
                             fillField('id_semester', d.semester);
