@@ -1047,18 +1047,21 @@
             });
             // Validate min 1 hour (2 slots) / max 4 hours (8 slots) per day
             var days = Object.keys(schedule);
+            var tooFew = [], tooMany = [];
             for (var i = 0; i < days.length; i++) {
                 var cnt = schedule[days[i]].length;
-                if (cnt < 2) {
-                    e.preventDefault();
-                    showScheduleAlert('warning', 'Minimum 1 hour per day!', days[i] + ' has only ' + (cnt * 0.5).toFixed(1) + ' hours. Please select at least 2 slots.');
-                    return;
-                }
-                if (cnt > 8) {
-                    e.preventDefault();
-                    showScheduleAlert('warning', 'Maximum 4 hours per day!', days[i] + ' has ' + (cnt * 0.5).toFixed(1) + ' hours. Please deselect some slots.');
-                    return;
-                }
+                if (cnt < 2) tooFew.push(days[i]);
+                if (cnt > 8) tooMany.push(days[i]);
+            }
+            if (tooFew.length > 0) {
+                e.preventDefault();
+                showScheduleAlert('warning', 'Minimum 1 hour per day!', tooFew.join(', ') + (tooFew.length > 1 ? ' have' : ' has') + ' only 30 minutes selected. Please select at least 2 slots per day.');
+                return;
+            }
+            if (tooMany.length > 0) {
+                e.preventDefault();
+                showScheduleAlert('warning', 'Maximum 4 hours per day!', tooMany.join(', ') + (tooMany.length > 1 ? ' exceed' : ' exceeds') + ' 4 hours. Please deselect some slots.');
+                return;
             }
             hidden.value = JSON.stringify(schedule);
         });
@@ -1220,12 +1223,16 @@ function closeScheduleModal() {
         var day = cb.getAttribute('data-day');
         daySlots[day] = (daySlots[day] || 0) + 1;
     });
+    var invalidDays = [];
     var days = Object.keys(daySlots);
     for (var i = 0; i < days.length; i++) {
         if (daySlots[days[i]] < 2) {
-            showScheduleAlert('warning', 'Minimum 1 hour per day!', days[i] + ' has only 30 minutes selected. Please select at least 2 consecutive slots (1 hour).');
-            return;
+            invalidDays.push(days[i]);
         }
+    }
+    if (invalidDays.length > 0) {
+        showScheduleAlert('warning', 'Minimum 1 hour per day!', invalidDays.join(', ') + (invalidDays.length > 1 ? ' have' : ' has') + ' only 30 minutes selected. Please select at least 2 consecutive slots (1 hour) per day.');
+        return;
     }
     document.getElementById('scheduleModal').style.display = 'none';
     var count = document.querySelectorAll('.avail-cb:checked').length;
