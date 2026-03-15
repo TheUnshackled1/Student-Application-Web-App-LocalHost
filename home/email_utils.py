@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def _html_wrap(body_html):
-    """Wrap body content in a styled HTML email template."""
+    """Wrap body content in a styled HTML email template with Gmail annotation."""
     return f"""\
 <!DOCTYPE html>
 <html>
@@ -232,7 +232,7 @@ def _applicant_name(application):
 
 
 def _send(subject, plain_message, html_message, recipient):
-    """Send HTML email with plain-text fallback and priority headers."""
+    """Send HTML email with plain-text fallback and priority/notification headers."""
     try:
         email = EmailMultiAlternatives(
             subject=subject,
@@ -241,11 +241,14 @@ def _send(subject, plain_message, html_message, recipient):
             to=[recipient],
         )
         email.attach_alternative(html_message, 'text/html')
-        # Priority headers to trigger push notifications
+        # Priority headers for push notifications on mobile/desktop clients
         email.extra_headers = {
             'X-Priority': '1',
             'X-MSMail-Priority': 'High',
             'Importance': 'High',
+            'X-Mailer': 'SWA-Application-System',
+            # Helps Gmail categorize as Primary (not Promotions/Updates)
+            'Reply-To': settings.DEFAULT_FROM_EMAIL,
         }
         email.send(fail_silently=False)
         logger.info('Email sent to %s: %s', recipient, subject)
