@@ -572,29 +572,25 @@
           </div>
           <div class="modal-body" style="padding:20px 24px;">
             {% if all_student_assistants %}
-            <div class="table-responsive">
-              <table class="table table-hover" style="font-size:13px; margin-bottom:0;">
-                <thead>
-                  <tr style="background:#f8fafc;">
-                    <th style="font-weight:600; color:#64748b; padding:10px 14px;">#</th>
-                    <th style="font-weight:600; color:#64748b; padding:10px 14px;">Name</th>
-                    <th style="font-weight:600; color:#64748b; padding:10px 14px;">Student ID</th>
-                    <th style="font-weight:600; color:#64748b; padding:10px 14px;">Assigned Office</th>
-                    <th style="font-weight:600; color:#64748b; padding:10px 14px;">Semester</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for sa in all_student_assistants %}
-                  <tr>
-                    <td style="padding:10px 14px; color:#475569;">{{ forloop.counter }}</td>
-                    <td style="padding:10px 14px; font-weight:600; color:#1e293b;">{{ sa.full_name }}</td>
-                    <td style="padding:10px 14px;"><span style="background:#f1f5f9; padding:3px 10px; border-radius:6px; font-weight:600; color:#334155; font-size:12px;">{% if user.is_staff or user.is_superuser %}{{ sa.student_id }}{% else %}{{ sa.student_id|mask_sid }}{% endif %}</span></td>
-                    <td style="padding:10px 14px; color:#475569;">{{ sa.assigned_office.name|default:"Unassigned" }}</td>
-                    <td style="padding:10px 14px; color:#475569;">{{ sa.get_semester_display }} {{ sa.academic_year }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              {% for sa in all_student_assistants %}
+              <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0;">
+                {% if sa.new_application and sa.new_application.id_picture %}
+                <img src="{{ sa.new_application.id_picture.url }}" alt="{{ sa.full_name }}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #16a34a;">
+                {% elif sa.renewal_application and sa.renewal_application.id_picture %}
+                <img src="{{ sa.renewal_application.id_picture.url }}" alt="{{ sa.full_name }}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #16a34a;">
+                {% else %}
+                <div style="width:40px; height:40px; border-radius:50%; background:#dcfce7; display:flex; align-items:center; justify-content:center;">
+                  <i class="fa-solid fa-user" style="color:#16a34a; font-size:14px;"></i>
+                </div>
+                {% endif %}
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:13px; font-weight:600; color:#1e293b;">{{ sa.full_name }}</div>
+                  <div style="font-size:11px; color:#64748b;">ID: {% if user.is_staff or user.is_superuser %}{{ sa.student_id }}{% else %}{{ sa.student_id|mask_sid }}{% endif %} &middot; {{ sa.assigned_office.name|default:"Unassigned" }}</div>
+                </div>
+                <span style="font-size:10px; font-weight:700; padding:3px 10px; border-radius:20px; background:#dcfce7; color:#16a34a; white-space:nowrap;">Approved</span>
+              </div>
+              {% endfor %}
             </div>
             {% else %}
             <div style="text-align:center; padding:40px 20px; color:#94a3b8;">
