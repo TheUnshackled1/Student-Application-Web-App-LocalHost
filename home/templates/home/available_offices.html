@@ -1092,31 +1092,55 @@ function showOfficeListModal(filter) {
     document.getElementById('officeListModalLabel').innerHTML = '<i class="fa-solid ' + c.icon + '" style="margin-right:8px;"></i> ' + c.title + ' (' + list.length + ')';
 
     var body = document.getElementById('officeListModalBody');
-    if (list.length === 0) {
+    if (list.length === 0 && filter !== 'all') {
         body.innerHTML = '<div style="text-align:center; padding:40px 20px; color:#94a3b8;"><i class="fa-solid fa-building-circle-xmark" style="font-size:36px; margin-bottom:12px; display:block;"></i><p style="font-size:14px; margin:0;">No offices in this category.</p></div>';
     } else {
-        var html = '<div class="table-responsive"><table class="table table-hover" style="font-size:13px; margin-bottom:0;"><thead><tr style="background:#f8fafc;">';
-        html += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">#</th>';
-        html += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">Office</th>';
-        html += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">Building</th>';
-        html += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">Slots</th>';
-        html += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">Status</th>';
-        html += '</tr></thead><tbody>';
-        list.forEach(function(o, i) {
-            var sColor = statusColor(o.status);
-            var sLabel = statusLabel(o.status);
-            var slotText = o.available + ' / ' + o.total_slots + ' available';
-            var pct = o.total_slots > 0 ? Math.round((o.filled / o.total_slots) * 100) : 0;
-            var barColor = o.status === 'open' ? '#22c55e' : (o.status === 'limited' ? '#f59e0b' : '#ef4444');
-            html += '<tr style="cursor:pointer;" onclick="document.getElementById(\'officeListModal\').querySelector(\'.btn-close\').click(); setTimeout(function(){ showOfficeDetail(' + o.id + '); },300);">';
-            html += '<td style="padding:10px 14px; color:#475569;">' + (i+1) + '</td>';
-            html += '<td style="padding:10px 14px; font-weight:600; color:#1e293b;"><i class="' + (o.icon || 'fa-solid fa-building') + '" style="color:' + sColor + '; margin-right:6px;"></i>' + o.name + '</td>';
-            html += '<td style="padding:10px 14px; color:#475569;">' + (o.building || '—') + '</td>';
-            html += '<td style="padding:10px 14px;"><div style="display:flex; align-items:center; gap:8px;"><div style="flex:1; height:6px; background:#e5e7eb; border-radius:3px; min-width:60px;"><div style="height:100%; width:' + pct + '%; background:' + barColor + '; border-radius:3px;"></div></div><span style="font-size:11px; color:#64748b; white-space:nowrap;">' + slotText + '</span></div></td>';
-            html += '<td style="padding:10px 14px;"><span style="background:' + sColor + '20; color:' + sColor + '; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap;">' + sLabel + '</span></td>';
-            html += '</tr>';
-        });
-        html += '</tbody></table></div>';
+        var html = '';
+
+        // Build table for a given list
+        function buildTable(items, startNum) {
+            var t = '<div class="table-responsive"><table class="table table-hover" style="font-size:13px; margin-bottom:0;"><thead><tr style="background:#f8fafc;">';
+            t += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">#</th>';
+            t += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">Office</th>';
+            t += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">Building</th>';
+            t += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">Slots</th>';
+            t += '<th style="font-weight:600; color:#64748b; padding:10px 14px;">Status</th>';
+            t += '</tr></thead><tbody>';
+            items.forEach(function(o, i) {
+                var sColor = statusColor(o.status);
+                var sLabel = statusLabel(o.status);
+                var slotText = o.available + ' / ' + o.total_slots + ' available';
+                var pct = o.total_slots > 0 ? Math.round((o.filled / o.total_slots) * 100) : 0;
+                var barColor = o.status === 'open' ? '#22c55e' : (o.status === 'limited' ? '#f59e0b' : '#ef4444');
+                t += '<tr style="cursor:pointer;" onclick="document.getElementById(\'officeListModal\').querySelector(\'.btn-close\').click(); setTimeout(function(){ showOfficeDetail(' + o.id + '); },300);">';
+                t += '<td style="padding:10px 14px; color:#475569;">' + (startNum + i) + '</td>';
+                t += '<td style="padding:10px 14px; font-weight:600; color:#1e293b;"><i class="' + (o.icon || 'fa-solid fa-building') + '" style="color:' + sColor + '; margin-right:6px;"></i>' + o.name + '</td>';
+                t += '<td style="padding:10px 14px; color:#475569;">' + (o.building || '\u2014') + '</td>';
+                t += '<td style="padding:10px 14px;"><div style="display:flex; align-items:center; gap:8px;"><div style="flex:1; height:6px; background:#e5e7eb; border-radius:3px; min-width:60px;"><div style="height:100%; width:' + pct + '%; background:' + barColor + '; border-radius:3px;"></div></div><span style="font-size:11px; color:#64748b; white-space:nowrap;">' + slotText + '</span></div></td>';
+                t += '<td style="padding:10px 14px;"><span style="background:' + sColor + '20; color:' + sColor + '; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap;">' + sLabel + '</span></td>';
+                t += '</tr>';
+            });
+            t += '</tbody></table></div>';
+            return t;
+        }
+
+        if (filter === 'all') {
+            html = buildTable(list, 1);
+        } else {
+            // Show filtered offices first
+            if (list.length > 0) {
+                html += buildTable(list, 1);
+            }
+            // Then show all other offices
+            var others = offices.filter(function(o) { return !c.filter(o); });
+            if (others.length > 0) {
+                html += '<h6 style="font-size:13px; font-weight:700; color:#64748b; margin:20px 0 10px; padding-top:14px; border-top:1px solid #e5e7eb;">' +
+                    '<i class="fa-solid fa-building" style="margin-right:6px;"></i> All Other Offices (' + others.length + ')' +
+                '</h6>';
+                html += buildTable(others, list.length + 1);
+            }
+        }
+
         body.innerHTML = html;
     }
     var m = new bootstrap.Modal(document.getElementById('officeListModal'));
