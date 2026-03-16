@@ -36,7 +36,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    "jet",
+    # "jet",
     "home",
     "django.contrib.admin",
     "django.contrib.auth",
