@@ -639,7 +639,7 @@
     "name": "Bsis Office",
     "building": "Lsa Building",
     "room": "3rd",
-    "hours": "Mon–Fri, 8:00 AM – 5:00 PM",
+    "hours": "Monâ€“Fri, 8:00 AM â€“ 5:00 PM",
     "head": "Danes Tumabing",
     "total_slots": 3,
     "latitude": 10.7426,
@@ -842,7 +842,7 @@
     "renewal_application": null,
     "author": 2,
     "note_type": "staff",
-    "content": "Availability schedule verified — matches Schedule of Classes.",
+    "content": "Availability schedule verified â€” matches Schedule of Classes.",
     "created_at": "2026-03-10T06:08:41.180Z"
   }
 },
@@ -866,7 +866,7 @@
     "renewal_application": null,
     "author": 2,
     "note_type": "staff",
-    "content": "Availability schedule verified — matches Schedule of Classes.",
+    "content": "Availability schedule verified â€” matches Schedule of Classes.",
     "created_at": "2026-03-14T17:00:46.219Z"
   }
 },
