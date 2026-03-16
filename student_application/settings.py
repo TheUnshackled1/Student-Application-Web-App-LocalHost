@@ -10,26 +10,28 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+import dj_database_url
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-3sy5%^@irja8y&j4i*)jf)(+#=p_n@e_o7!19%-l2-gws_980c"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ["*"]
+# ── Core ─────────────────────────────────────────────────────────
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-3sy5%^@irja8y&j4i*)jf)(+#=p_n@e_o7!19%-l2-gws_980c"
+)
+DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.devtunnels.ms",
     "https://*.vscode.dev",
+    "https://*.ondigitalocean.app",
 ]
 
 
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -80,14 +83,10 @@ WSGI_APPLICATION = "student_application.wsgi.application"
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "student_assistant_db",
-        "USER": "postgres",
-        "PASSWORD": "1234",
-        "HOST": "localhost",
-        "PORT": "5432",
-    }
+    "default": dj_database_url.config(
+        default="postgres://postgres:1234@localhost:5432/student_assistant_db",
+        conn_max_age=600,
+    )
 }
 
 
@@ -126,16 +125,37 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = []
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Media files (user uploads)
+# In production, use DigitalOcean Spaces via django-storages.
+# Locally, files are saved to disk.
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+if os.environ.get("DO_SPACES_BUCKET"):
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    }
+    AWS_ACCESS_KEY_ID = os.environ["DO_SPACES_KEY"]
+    AWS_SECRET_ACCESS_KEY = os.environ["DO_SPACES_SECRET"]
+    AWS_STORAGE_BUCKET_NAME = os.environ["DO_SPACES_BUCKET"]
+    AWS_S3_REGION_NAME = os.environ.get("DO_SPACES_REGION", "sgp1")
+    AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+    AWS_DEFAULT_ACL = "public-read"
+    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ── Encrypted Data Storage (Fernet symmetric encryption for backups) ──
-DATA_ENCRYPTION_KEY = "WAQ0AyjYw1kuHp2Xhr6-VKtyUO1NZPyPOLF0CJuiKLY="
+DATA_ENCRYPTION_KEY = os.environ.get("DATA_ENCRYPTION_KEY", "")
 
 # Authentication
 LOGIN_URL = "/"
@@ -152,9 +172,9 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "jtcoronel.chmsu@gmail.com"
-EMAIL_HOST_PASSWORD = "niybahwlsjezqobf"
-DEFAULT_FROM_EMAIL = "SWA Application System <jtcoronel.chmsu@gmail.com>"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = f"SWA Application System <{EMAIL_HOST_USER}>"
 
 # ══════════════════════════════════════════════════════════════
 #  Django Jazzmin — Admin Panel Configuration
