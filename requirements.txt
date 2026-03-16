@@ -5,6 +5,8 @@ cryptography==46.0.5
 dj-database-url==2.3.0
 Django==6.0.2
 django-jazzmin==3.0.4
+django-storages==1.14.4
+boto3==1.37.23
 gunicorn==23.0.0
 numpy==2.4.2
 opencv-python-headless==4.13.0.92

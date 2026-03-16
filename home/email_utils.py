@@ -3,6 +3,8 @@ Email utility functions for the SWA Application System.
 Sends confirmation and status-update emails to applicants.
 Uses HTML emails with priority headers for push notification support.
 """
+import os
+
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 import logging
@@ -270,7 +272,7 @@ def send_verification_email(user, request=None):
     if request:
         base = request.build_absolute_uri('/')[:-1]
     else:
-        base = 'http://localhost:8000'
+        base = os.environ.get('SITE_URL', 'http://localhost:8000').rstrip('/')
 
     link = f"{base}/verify-email/{uid}/{token}/"
     subject = 'SWA Application — Verify Your Email'
