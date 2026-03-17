@@ -2,3 +2,8 @@ env/
 backups/
 db.sqlite3
 *.enc
+__pycache__/
+*.pyc
+.env
+staticfiles/
+media/

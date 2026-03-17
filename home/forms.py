@@ -743,50 +743,8 @@ class ActiveSAStatusForm(AutoCapitalizeMixin, forms.ModelForm):
 
 
 # ================================================================
-#  STUDENT REGISTRATION & LOGIN FORMS
+#  STUDENT LOGIN FORM
 # ================================================================
-
-class StudentRegistrationForm(AutoCapitalizeMixin, forms.Form):
-    """Registration form for students."""
-    student_id = forms.CharField(
-        max_length=8, min_length=8,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control', 'placeholder': '12345678',
-            'inputmode': 'numeric', 'pattern': r'\d{8}',
-            'title': 'Student ID must be exactly 8 digits',
-        }),
-    )
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control', 'placeholder': 'name@example.com',
-        }),
-    )
-    first_name = forms.CharField(
-        max_length=150,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control', 'placeholder': 'First name',
-        }),
-    )
-    last_name = forms.CharField(
-        max_length=150,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control', 'placeholder': 'Last name',
-        }),
-    )
-
-    def clean_student_id(self):
-        val = self.cleaned_data['student_id']
-        if not val.isdigit():
-            raise ValidationError('Student ID must contain only digits.')
-        if StudentProfile.objects.filter(student_id=val).exists():
-            raise ValidationError('An account with this Student ID already exists.')
-        return val
-
-    def clean_email(self):
-        val = self.cleaned_data['email']
-        if User.objects.filter(email=val).exists():
-            raise ValidationError('An account with this email already exists.')
-        return val
 
 class StudentLoginForm(forms.Form):
     """Login form using student_id only."""

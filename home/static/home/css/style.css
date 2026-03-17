@@ -5710,6 +5710,27 @@ button.review-doc-link:hover {
   font-weight: 500;
   animation: trackAlertSlideIn 0.35s ease;
 }
+.track-app-alert-close {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.55);
+  color: currentColor;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.track-app-alert-close:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.05);
+}
+.track-app-alert-close i {
+  font-size: 0.85rem;
+}
 .track-app-alert--error {
   background: rgba(248, 113, 113, 0.12);
   color: #fecaca;

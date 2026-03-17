@@ -13,7 +13,6 @@ urlpatterns = [
     path('apply/validate-document/', views.validate_document, name='validate_document'),
 
     # ---- Student Auth & Dashboard ----
-    path('register/', views.student_register, name='student_register'),
     path('student/login/', views.student_login, name='student_login'),
     path('verify-email/<str:uidb64>/<str:token>/', views.verify_email, name='verify_email'),
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),

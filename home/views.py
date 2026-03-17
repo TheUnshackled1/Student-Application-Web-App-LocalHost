@@ -19,7 +19,7 @@ from .forms import (
     ReminderForm, UpcomingDateForm, AnnouncementForm, NewApplicationForm,
     RenewalApplicationForm, OfficeForm, AttendanceForm, PerformanceEvaluationForm,
     ActiveSAStatusForm, ScheduleResubmitForm, DocumentResubmitForm,
-    StudentRegistrationForm, StudentLoginForm, NoDutyDayForm,
+    StudentLoginForm, NoDutyDayForm,
     DAY_CHOICES, TIME_SLOT_CHOICES,
 )
 from .email_utils import (
@@ -2807,44 +2807,6 @@ def director_add_note(request, pk):
 #  STUDENT REGISTRATION & AUTHENTICATION
 # ================================================================
 
-def student_register(request):
-    """Registration page for students."""
-    if request.user.is_authenticated:
-        if hasattr(request.user, 'student_profile'):
-            return redirect('home:student_dashboard')
-        return redirect('home:home')
-
-    if request.method == 'POST':
-        form = StudentRegistrationForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            # Create user (no password — students log in by Student ID)
-            user = User.objects.create_user(
-                username=cd['student_id'],
-                email=cd['email'],
-                first_name=cd['first_name'],
-                last_name=cd['last_name'],
-            )
-            user.set_unusable_password()
-            user.save(update_fields=['password'])
-            # Create StudentProfile
-            StudentProfile.objects.create(
-                user=user,
-                student_id=cd['student_id'],
-                full_name=f"{cd['first_name']} {cd['last_name']}",
-                email_verified=True,
-            )
-            messages.success(
-                request,
-                'Registration successful! You can now log in with your Student ID.'
-            )
-            return redirect('home:student_login')
-    else:
-        form = StudentRegistrationForm()
-
-    return render(request, 'student/register.html', {'form': form})
-
-
 def verify_email(request, uidb64, token):
     """Email verification endpoint."""
     from django.contrib.auth.tokens import default_token_generator
@@ -2943,10 +2905,6 @@ def student_dashboard(request):
 
     profile = request.user.student_profile
     student_id = profile.student_id
-
-    # Run auto-expire check
-    auto_expire_student_assistants()
-    generate_absent_records_for_yesterday()
 
     today = _date.today()
 

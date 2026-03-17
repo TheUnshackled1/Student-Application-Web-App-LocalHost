@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-Custom Admin Animations for Django JET Reboot
+   Custom Admin Animations for Django Jazzmin (AdminLTE 3)
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Keyframes ── */
@@ -31,201 +31,137 @@ Custom Admin Animations for Django JET Reboot
     0%, 100% { transform: scale(1); }
     50%      { transform: scale(1.04); }
 }
-@keyframes shimmer {
-    0%   { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-@keyframes spinIn {
-    from { opacity: 0; transform: rotate(-8deg) scale(0.9); }
-    to   { opacity: 1; transform: rotate(0) scale(1); }
-}
 @keyframes borderGlow {
     0%, 100% { box-shadow: 0 0 4px rgba(66, 133, 244, 0.2); }
     50%      { box-shadow: 0 0 12px rgba(66, 133, 244, 0.45); }
 }
 
-/* ── Global Transitions ── */
-* {
-    transition-property: background-color, color, border-color, box-shadow, opacity;
-    transition-duration: 0.2s;
-    transition-timing-function: ease;
-}
-
 /* ── Page Load Fade-In ── */
-body {
+.content-wrapper {
     animation: fadeIn 0.4s ease-out;
 }
 
-/* ── Header / Branding ── */
-#branding,
-#header {
+/* ── Navbar ── */
+.main-header {
     animation: slideDown 0.5s ease-out;
-}
-#branding h1,
-#branding h2 {
-    animation: fadeInLeft 0.6s ease-out;
 }
 
 /* ── Sidebar ── */
-.sidebar,
-.cms-sidebar,
-#changelist-filter {
+.main-sidebar {
     animation: fadeInLeft 0.5s ease-out;
 }
-/* Sidebar link transitions (keep colors from theme) */
-.sidebar a {
-    position: relative;
+.nav-sidebar .nav-item {
+    animation: fadeInLeft 0.4s ease-out both;
+}
+.nav-sidebar .nav-item:nth-child(1) { animation-delay: 0.04s; }
+.nav-sidebar .nav-item:nth-child(2) { animation-delay: 0.08s; }
+.nav-sidebar .nav-item:nth-child(3) { animation-delay: 0.12s; }
+.nav-sidebar .nav-item:nth-child(4) { animation-delay: 0.16s; }
+.nav-sidebar .nav-item:nth-child(5) { animation-delay: 0.20s; }
+.nav-sidebar .nav-item:nth-child(6) { animation-delay: 0.24s; }
+.nav-sidebar .nav-item:nth-child(7) { animation-delay: 0.28s; }
+.nav-sidebar .nav-item:nth-child(8) { animation-delay: 0.32s; }
+.nav-sidebar .nav-item:nth-child(9) { animation-delay: 0.36s; }
+.nav-sidebar .nav-item:nth-child(10) { animation-delay: 0.40s; }
+
+.nav-sidebar .nav-link {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* ── Side Menu Items ── */
-.jet-sidebar-popup__item,
-.jet-sidemenu__item {
-    animation: fadeInLeft 0.4s ease-out both;
-}
-.jet-sidebar-popup__item:nth-child(1) { animation-delay: 0.04s; }
-.jet-sidebar-popup__item:nth-child(2) { animation-delay: 0.08s; }
-.jet-sidebar-popup__item:nth-child(3) { animation-delay: 0.12s; }
-.jet-sidebar-popup__item:nth-child(4) { animation-delay: 0.16s; }
-.jet-sidebar-popup__item:nth-child(5) { animation-delay: 0.20s; }
-.jet-sidebar-popup__item:nth-child(6) { animation-delay: 0.24s; }
-.jet-sidebar-popup__item:nth-child(7) { animation-delay: 0.28s; }
-.jet-sidebar-popup__item:nth-child(8) { animation-delay: 0.32s; }
-
 /* ── Content Area ── */
-#content,
-#content-main {
+.content {
     animation: fadeInUp 0.5s ease-out;
 }
 
-/* ── Dashboard Modules (JET) ── */
-.dashboard-module,
-.jet-index-dashboard__module,
-[class*="dashboard"] .module {
+/* ── Dashboard Cards / Info Boxes ── */
+.card,
+.info-box,
+.small-box {
     animation: scaleIn 0.45s ease-out both;
     transition: transform 0.3s ease, box-shadow 0.3s ease !important;
 }
-.dashboard-module:nth-child(1) { animation-delay: 0.05s; }
-.dashboard-module:nth-child(2) { animation-delay: 0.12s; }
-.dashboard-module:nth-child(3) { animation-delay: 0.19s; }
-.dashboard-module:nth-child(4) { animation-delay: 0.26s; }
-.dashboard-module:nth-child(5) { animation-delay: 0.33s; }
-.dashboard-module:nth-child(6) { animation-delay: 0.40s; }
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.12s; }
+.card:nth-child(3) { animation-delay: 0.19s; }
+.card:nth-child(4) { animation-delay: 0.26s; }
 
-.dashboard-module:hover,
-.jet-index-dashboard__module:hover,
-[class*="dashboard"] .module:hover {
+.card:hover,
+.info-box:hover,
+.small-box:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* ── Module Headers ── */
-.module h2,
-.module caption,
-.dashboard-module h3 {
+/* ── Card Headers ── */
+.card-header {
     position: relative;
     overflow: hidden;
 }
-.module h2::after {
+.card-header::after {
     content: '';
     position: absolute;
     bottom: 0; left: 0;
     width: 0; height: 2px;
-    background: linear-gradient(90deg, #4285f4, #34a853);
+    background: linear-gradient(90deg, #007bff, #28a745);
     transition: width 0.4s ease;
 }
-.module:hover h2::after {
+.card:hover .card-header::after {
     width: 100%;
 }
 
-/* ── Table Rows (Change-List) ── */
-#result_list tbody tr,
-#changelist table tbody tr {
+/* ── Table Rows ── */
+.table tbody tr {
     animation: fadeInUp 0.35s ease-out both;
-    transition: background-color 0.2s ease, transform 0.2s ease !important;
+    transition: background-color 0.2s ease !important;
 }
-#result_list tbody tr:nth-child(1)  { animation-delay: 0.02s; }
-#result_list tbody tr:nth-child(2)  { animation-delay: 0.04s; }
-#result_list tbody tr:nth-child(3)  { animation-delay: 0.06s; }
-#result_list tbody tr:nth-child(4)  { animation-delay: 0.08s; }
-#result_list tbody tr:nth-child(5)  { animation-delay: 0.10s; }
-#result_list tbody tr:nth-child(6)  { animation-delay: 0.12s; }
-#result_list tbody tr:nth-child(7)  { animation-delay: 0.14s; }
-#result_list tbody tr:nth-child(8)  { animation-delay: 0.16s; }
-#result_list tbody tr:nth-child(9)  { animation-delay: 0.18s; }
-#result_list tbody tr:nth-child(10) { animation-delay: 0.20s; }
-
-#result_list tbody tr:hover,
-#changelist table tbody tr:hover {
-    transform: scale(1.005);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
+.table tbody tr:nth-child(1)  { animation-delay: 0.02s; }
+.table tbody tr:nth-child(2)  { animation-delay: 0.04s; }
+.table tbody tr:nth-child(3)  { animation-delay: 0.06s; }
+.table tbody tr:nth-child(4)  { animation-delay: 0.08s; }
+.table tbody tr:nth-child(5)  { animation-delay: 0.10s; }
+.table tbody tr:nth-child(6)  { animation-delay: 0.12s; }
+.table tbody tr:nth-child(7)  { animation-delay: 0.14s; }
+.table tbody tr:nth-child(8)  { animation-delay: 0.16s; }
+.table tbody tr:nth-child(9)  { animation-delay: 0.18s; }
+.table tbody tr:nth-child(10) { animation-delay: 0.20s; }
 
 /* ── Buttons ── */
-.submit-row input,
-.submit-row button,
+.btn,
 input[type="submit"],
-.button,
-.addlink,
-.deletelink,
-a.button,
-.jet-popup__action,
 .object-tools a {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative;
     overflow: hidden;
 }
-.submit-row input:hover,
-.submit-row button:hover,
+.btn:hover,
 input[type="submit"]:hover,
-.button:hover,
-a.button:hover,
 .object-tools a:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
-.submit-row input:active,
+.btn:active,
 input[type="submit"]:active,
-.button:active,
-a.button:active,
 .object-tools a:active {
     transform: translateY(0);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
-/* ── Add / Delete Links ── */
-.addlink,
-.related-widget-wrapper-link {
-    transition: all 0.2s ease !important;
-}
-.addlink:hover,
-.related-widget-wrapper-link:hover {
-    transform: scale(1.12);
-}
-
 /* ── Breadcrumbs ── */
-.breadcrumbs {
+.content-header {
     animation: slideDown 0.4s ease-out;
 }
-.breadcrumbs a {
-    transition: color 0.2s ease, padding-left 0.2s ease !important;
-}
-.breadcrumbs a:hover {
-    color: #4285f4 !important;
-    padding-left: 2px;
+.breadcrumb-item a {
+    transition: color 0.2s ease !important;
 }
 
 /* ── Messages / Alerts ── */
-.messagelist li,
-ul.messagelist li {
+.alert {
     animation: fadeInRight 0.5s ease-out both;
 }
-.messagelist li:nth-child(1) { animation-delay: 0.05s; }
-.messagelist li:nth-child(2) { animation-delay: 0.15s; }
-.messagelist li:nth-child(3) { animation-delay: 0.25s; }
 
 /* ── Form Fieldsets ── */
-fieldset {
+fieldset,
+.card-body fieldset {
     animation: fadeInUp 0.5s ease-out both;
 }
 fieldset:nth-of-type(1) { animation-delay: 0.05s; }
@@ -242,88 +178,51 @@ fieldset:nth-of-type(3) { animation-delay: 0.25s; }
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* ── Change Form Tabs ── */
-.changeform-tabs-item,
-.jet-changeform-tabs__item {
+/* ── Tabs (horizontal_tabs changeform) ── */
+.nav-tabs .nav-item .nav-link {
     transition: all 0.25s ease !important;
 }
-.changeform-tabs-item:hover,
-.jet-changeform-tabs__item:hover {
+.nav-tabs .nav-item .nav-link:hover {
     transform: translateY(-1px);
 }
 
 /* ── Input Focus Glow ── */
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"]:focus,
-input[type="number"]:focus,
-input[type="url"]:focus,
-input[type="date"]:focus,
-textarea:focus,
+.form-control:focus,
 select:focus {
     animation: borderGlow 1.5s ease-in-out infinite;
-    outline: none;
 }
 
 /* ── Login Page ── */
-#login-form {
+.login-box,
+.login-card-body {
     animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-#login-form input[type="text"],
-#login-form input[type="password"] {
-    transition: all 0.3s ease !important;
-}
-#login-form input[type="text"]:focus,
-#login-form input[type="password"]:focus {
-    transform: scale(1.02);
-}
-#login-form input[type="submit"] {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-#login-form input[type="submit"]:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* ── Pagination ── */
-.paginator,
 .pagination {
     animation: fadeIn 0.5s ease-out 0.3s both;
 }
-.paginator a,
-.pagination a {
+.pagination .page-link {
     transition: all 0.2s ease !important;
 }
-.paginator a:hover,
-.pagination a:hover {
+.pagination .page-link:hover {
     transform: scale(1.1);
 }
 
-/* ── Filter List ── */
-#changelist-filter li {
-    animation: fadeInLeft 0.3s ease-out both;
-    transition: padding-left 0.2s ease !important;
-}
-#changelist-filter li:nth-child(1) { animation-delay: 0.03s; }
-#changelist-filter li:nth-child(2) { animation-delay: 0.06s; }
-#changelist-filter li:nth-child(3) { animation-delay: 0.09s; }
-#changelist-filter li:nth-child(4) { animation-delay: 0.12s; }
-#changelist-filter li:nth-child(5) { animation-delay: 0.15s; }
-#changelist-filter li:hover {
-    padding-left: 4px;
+/* ── Object Tools ── */
+.object-tools {
+    animation: fadeInRight 0.4s ease-out;
 }
 
-/* ── Tooltip / Popover Animations ── */
-.jet-popup,
-.jet-tooltip {
-    animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+/* ── Help Text ── */
+.help-block,
+.helptext {
+    animation: fadeIn 0.6s ease-out 0.3s both;
 }
 
-/* ── Loading Shimmer (decorative class) ── */
-.admin-shimmer {
-    background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.15) 50%, transparent 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.8s infinite;
+/* ── Checkbox Animation ── */
+input[type="checkbox"]:checked {
+    animation: pulse 0.3s ease;
 }
 
 /* ── Smooth Scrollbar ── */
@@ -342,405 +241,10 @@ select:focus {
     background: rgba(0, 0, 0, 0.35);
 }
 
-/* ── Object Tool Buttons ── */
-.object-tools {
-    animation: fadeInRight 0.4s ease-out;
-}
-.object-tools li {
-    animation: fadeInRight 0.35s ease-out both;
-}
-.object-tools li:nth-child(1) { animation-delay: 0.05s; }
-.object-tools li:nth-child(2) { animation-delay: 0.12s; }
-.object-tools li:nth-child(3) { animation-delay: 0.19s; }
-
-/* ── Help Text ── */
-.help,
-.helptext {
-    animation: fadeIn 0.6s ease-out 0.3s both;
-}
-
-/* ── Recent Actions ── */
-#recent-actions-module li,
-.jet-index-dashboard__recent-actions li {
-    animation: fadeInLeft 0.35s ease-out both;
-    transition: padding-left 0.2s ease !important;
-}
-#recent-actions-module li:nth-child(1) { animation-delay: 0.04s; }
-#recent-actions-module li:nth-child(2) { animation-delay: 0.08s; }
-#recent-actions-module li:nth-child(3) { animation-delay: 0.12s; }
-#recent-actions-module li:nth-child(4) { animation-delay: 0.16s; }
-#recent-actions-module li:nth-child(5) { animation-delay: 0.20s; }
-#recent-actions-module li:hover {
-    padding-left: 4px;
-}
-
-/* ── App Module Icons (stagger) ── */
-.app-icon,
-.jet-sidebar-popup__icon {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-.app-icon:hover,
-.jet-sidebar-popup__icon:hover {
-    transform: rotate(8deg) scale(1.15);
-}
-
-/* ── Checkbox / Toggle ── */
-input[type="checkbox"] {
-    transition: all 0.15s ease !important;
-}
-input[type="checkbox"]:checked {
-    animation: pulse 0.3s ease;
-}
-
-/* ── Actions Bar (dropdown + run button) ── */
-.actions,
-#changelist .actions,
-.changelist-form-container .actions {
-    position: relative;
-    z-index: 100;
-}
-.actions select,
-#changelist .actions select {
-    position: relative;
-    z-index: 101;
-    pointer-events: auto !important;
-    cursor: pointer;
-}
-.actions .button,
-#changelist .actions .button,
-#changelist .actions input[type="submit"] {
-    position: relative;
-    z-index: 101;
-    pointer-events: auto !important;
-    cursor: pointer;
-}
-
 /* ── Calendar & Date Widgets ── */
 .calendarbox,
-.clockbox,
-.calendar {
+.clockbox {
     animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Text Color Fixes — Readability Overrides
-   Scoped carefully: sidebar = light text on dark bg,
-   content area = dark text on light bg.
-   ═══════════════════════════════════════════════════════════ */
-
-/* ── Body / Content Area Text ── */
-#content,
-#content-main {
-    color: #1a1a2e !important;
-}
-
-/* ── Breadcrumbs ── */
-.breadcrumbs {
-    color: #2c3e50 !important;
-}
-.breadcrumbs a {
-    color: #1565c0 !important;
-    font-weight: 500;
-}
-.breadcrumbs a:hover {
-    color: #0d47a1 !important;
-}
-
-/* ── Section Titles in Content Area ── */
-#content-main .module caption,
-#content-main .module table caption,
-#content-main h2 {
-    color: #1a1a2e !important;
-    font-weight: 700 !important;
-}
-
-/* ── Column Headers in Content Area ── */
-#content-main th,
-#content-main .module thead th,
-#content-main .module thead th a {
-    color: #37474f !important;
-    font-weight: 600 !important;
-}
-
-/* ── Model Name Links in Content Area ── */
-#content-main td a {
-    color: #1565c0 !important;
-    font-weight: 500;
-}
-#content-main td a:hover {
-    color: #0d47a1 !important;
-    text-decoration: underline;
-}
-
-/* ── "Add" and "Change" Links in Content Area ── */
-#content-main .addlink,
-#content-main .changelink,
-#content-main .viewlink {
-    color: #2e7d32 !important;
-    font-weight: 500;
-}
-#content-main .addlink:hover,
-#content-main .changelink:hover,
-#content-main .viewlink:hover {
-    color: #1b5e20 !important;
-}
-
-/* ── Table Cell Text in Content Area ── */
-#content-main td {
-    color: #263238 !important;
-}
-
-/* ── Recent Actions (in content area) ── */
-#content-main .module li {
-    color: #37474f !important;
-}
-#content-main .module li a {
-    color: #1565c0 !important;
-    font-weight: 500;
-}
-#content-main .module li a:hover {
-    color: #0d47a1 !important;
-}
-
-/* ── Recent Actions – action type labels ── */
-#content-main .mini.deletelink,
-#content-main .mini.addlink,
-#content-main .mini.changelink {
-    color: #546e7a !important;
-}
-
-/* ── Module / Dashboard Headers in Content Area ── */
-#content-main .module > h2,
-#content-main .module > h3,
-#content-main .module > caption {
-    color: #1a1a2e !important;
-    font-weight: 700 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Sidebar — Light text on dark background (#333C47)
-   Match JET's light-gray theme palette
-   ═══════════════════════════════════════════════════════════ */
-
-/* ── Sidebar Section Titles (AUTHENTICATION AND AUTHORIZATION, HOME, BOOKMARKS) ── */
-.sidebar .sidebar-title,
-.sidebar .sidebar-title a,
-.sidebar .sidebar-title .sidebar-title-link {
-    color: #e0e6ed !important;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* ── Sidebar Links (model names like Groups, Users, Announcements, etc.) ── */
-.sidebar .sidebar-link,
-.sidebar .sidebar-link-label,
-.sidebar .sidebar-link a,
-.sidebar a.sidebar-link {
-    color: #b8c5d6 !important;
-    font-weight: 400;
-}
-.sidebar .sidebar-link:hover,
-.sidebar .sidebar-link:hover .sidebar-link-label,
-.sidebar a.sidebar-link:hover {
-    color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-/* ── Sidebar Top Icons (Home, View site) ── */
-.sidebar .sidebar-section .sidebar-link.icon,
-.sidebar .sidebar-section .sidebar-link.icon .sidebar-link-label,
-.sidebar .sidebar-section .sidebar-link.icon .sidebar-link-icon {
-    color: #b8c5d6 !important;
-}
-.sidebar .sidebar-section .sidebar-link.icon:hover,
-.sidebar .sidebar-section .sidebar-link.icon:hover .sidebar-link-label {
-    color: #ffffff !important;
-}
-
-/* ── Sidebar Bookmarks Section ── */
-.sidebar .sidebar-section.last .sidebar-title {
-    color: #e0e6ed !important;
-}
-.sidebar .bookmark-item,
-.sidebar .bookmark-item .sidebar-link-label {
-    color: #b8c5d6 !important;
-}
-.sidebar .bookmark-item:hover,
-.sidebar .bookmark-item:hover .sidebar-link-label {
-    color: #ffffff !important;
-}
-
-/* ── Sidebar Arrows ── */
-.sidebar .sidebar-right-arrow {
-    color: #636c79 !important;
-}
-.sidebar .sidebar-link:hover .sidebar-right-arrow {
-    color: #fdbb5e !important;
-}
-
-/* ── Sidebar Pin / Star Icons ── */
-.sidebar .sidebar-left-pin,
-.sidebar .sidebar-left-unpin {
-    color: #7d8ca1 !important;
-}
-
-/* ── Sidebar "Hide/Show applications" Link ── */
-.sidebar .sidebar-center-link,
-.sidebar .apps-hide-label {
-    color: #7d8ca1 !important;
-    font-size: 12px;
-}
-.sidebar .sidebar-center-link:hover {
-    color: #fdbb5e !important;
-}
-
-/* ── Sidebar Popup (expanded app model list) ── */
-.sidebar-popup .sidebar-popup-title {
-    color: #37474f !important;
-    font-weight: 700;
-}
-.sidebar-popup .sidebar-popup-list-item-link {
-    color: #546e7a !important;
-}
-.sidebar-popup .sidebar-popup-list-item-link:hover {
-    color: #ffffff !important;
-    background-color: #1cacfc !important;
-}
-.sidebar-popup .sidebar-popup-list-item.current .sidebar-popup-list-item-link {
-    color: #1cacfc !important;
-    font-weight: 600;
-}
-
-/* ── Sidebar Bookmarks "+" Button ── */
-.sidebar .bookmarks-add,
-.sidebar .sidebar-right-plus {
-    color: #7d8ca1 !important;
-}
-.sidebar .bookmarks-add:hover,
-.sidebar .sidebar-right-plus:hover {
-    color: #fdbb5e !important;
-}
-
-/* ── Sidebar Edit (Settings Cog) ── */
-.sidebar .sidebar-right-edit {
-    color: #7d8ca1 !important;
-}
-.sidebar .sidebar-right-edit:hover {
-    color: #fdbb5e !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Header — White text on dark header
-   ═══════════════════════════════════════════════════════════ */
-#branding h1,
-#branding h1 a,
-#branding h2 {
-    color: #ffffff !important;
-}
-#header {
-    color: #ffffff !important;
-}
-#header a,
-#header a:visited,
-#user-tools,
-#user-tools a {
-    color: rgba(255, 255, 255, 0.9) !important;
-}
-#header a:hover,
-#user-tools a:hover {
-    color: #ffffff !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Login Page
-   ═══════════════════════════════════════════════════════════ */
-#login-form label {
-    color: #1a1a2e !important;
-    font-weight: 600;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Forms / Fieldsets / Help
-   ═══════════════════════════════════════════════════════════ */
-.help,
-.helptext,
-p.help {
-    color: #546e7a !important;
-}
-fieldset h2,
-fieldset legend {
-    color: #1a1a2e !important;
-    font-weight: 700 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Change-List Table
-   ═══════════════════════════════════════════════════════════ */
-#result_list th a,
-#changelist table thead th a {
-    color: #1a1a2e !important;
-    font-weight: 600 !important;
-}
-#result_list td,
-#result_list td a,
-#changelist table tbody td,
-#changelist table tbody td a {
-    color: #263238 !important;
-}
-#result_list td a:hover,
-#changelist table tbody td a:hover {
-    color: #1565c0 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Buttons / Actions
-   ═══════════════════════════════════════════════════════════ */
-.submit-row input,
-.submit-row button,
-input[type="submit"] {
-    color: #ffffff !important;
-}
-.object-tools a {
-    color: #ffffff !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Messages
-   ═══════════════════════════════════════════════════════════ */
-.messagelist .success {
-    color: #1b5e20 !important;
-}
-.messagelist .warning {
-    color: #e65100 !important;
-}
-.messagelist .error {
-    color: #b71c1c !important;
-}
-.messagelist .info {
-    color: #0d47a1 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Pagination / Misc
-   ═══════════════════════════════════════════════════════════ */
-.paginator,
-p.paginator {
-    color: #37474f !important;
-}
-
-/* ── Filter sidebar (right side in changelist) ── */
-#changelist-filter h2,
-#changelist-filter h3 {
-    color: #1a1a2e !important;
-    font-weight: 700 !important;
-}
-#changelist-filter li a {
-    color: #37474f !important;
-}
-#changelist-filter li a:hover,
-#changelist-filter li .selected a {
-    color: #1565c0 !important;
 }
 
 /* ── Responsive: Reduce Animations on reduced-motion preference ── */

@@ -1,0 +1,1123 @@
+[
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2026-02-16T02:03:14.430Z",
+    "user": 1,
+    "content_type": 4,
+    "object_id": "2",
+    "object_repr": "staff",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2026-02-16T02:03:23.334Z",
+    "user": 1,
+    "content_type": 4,
+    "object_id": "2",
+    "object_repr": "staff",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Staff status\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 3,
+  "fields": {
+    "action_time": "2026-02-16T02:03:55.077Z",
+    "user": 1,
+    "content_type": 4,
+    "object_id": "2",
+    "object_repr": "staff",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Staff status\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 4,
+  "fields": {
+    "action_time": "2026-02-18T11:37:48.962Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "2",
+    "object_repr": "Ebenezer Masa (12345678)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 5,
+  "fields": {
+    "action_time": "2026-02-18T11:37:48.962Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "1",
+    "object_repr": "John Tyrone Coronel (20230321)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 6,
+  "fields": {
+    "action_time": "2026-02-22T05:13:29.696Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "4",
+    "object_repr": "Ebenezer Masa (20230503)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 7,
+  "fields": {
+    "action_time": "2026-02-22T05:13:29.696Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "3",
+    "object_repr": "John Tyrone Coronel (20230321)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 8,
+  "fields": {
+    "action_time": "2026-02-24T12:46:12.205Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "5",
+    "object_repr": "John Tyrone Coronel (20230321)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 9,
+  "fields": {
+    "action_time": "2026-03-03T16:40:09.574Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "6",
+    "object_repr": "John Tyrone Coronel (20230321)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 10,
+  "fields": {
+    "action_time": "2026-03-05T00:48:49.386Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "8",
+    "object_repr": "Ramsky Clark Insoma (22332312)",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Student id\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 11,
+  "fields": {
+    "action_time": "2026-03-05T00:50:22.422Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "11",
+    "object_repr": "John Tyrone Coronel (20230321)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 12,
+  "fields": {
+    "action_time": "2026-03-09T06:58:02.304Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "12",
+    "object_repr": "John Tyrone Coronel (20230321)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 13,
+  "fields": {
+    "action_time": "2026-03-09T06:58:02.304Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "10",
+    "object_repr": "GRACEE PLATINO (20230343)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 14,
+  "fields": {
+    "action_time": "2026-03-09T06:58:02.304Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "9",
+    "object_repr": "Dhenby Grace Tabuada (20230452)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 15,
+  "fields": {
+    "action_time": "2026-03-09T06:58:02.304Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "8",
+    "object_repr": "Ramsky Clark Insoma (22332312)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 16,
+  "fields": {
+    "action_time": "2026-03-09T06:58:02.304Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "7",
+    "object_repr": "Ebenezer Masa (20230503)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 17,
+  "fields": {
+    "action_time": "2026-03-10T05:44:13.923Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "13",
+    "object_repr": "Dhenby Grace Tabuada (20230452)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$42wk18JS3coFzMVHVSR71w$v8zsEekGU+UM5bXkshA3F3z314sc4llGINkbKOxyAtM=",
+    "last_login": "2026-03-16T05:07:24.025Z",
+    "is_superuser": true,
+    "username": "director",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-02-16T01:48:48.065Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$bdwJULBEtSpsI3Edxs3w97$sqUrI7h2iqH3QCsQJN9m/tuwsARNJ2cl19lY0hmQlJk=",
+    "last_login": "2026-03-16T14:59:57.603Z",
+    "is_superuser": false,
+    "username": "staff",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-02-16T02:03:13Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "!3oanWbxUREL9yIwrhexdHY9i9maWX0zFn2XdOTG4",
+    "last_login": "2026-03-08T14:51:35.871Z",
+    "is_superuser": false,
+    "username": "20230343",
+    "first_name": "GRACEE",
+    "last_name": "PLATINO",
+    "email": "graceeplatino3@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-06T16:28:49.123Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 4,
+  "fields": {
+    "password": "!1c7opqGHZyuaS3pp6asWWfEqILLIxoAJpxDTTMGB",
+    "last_login": "2026-03-16T05:06:12.735Z",
+    "is_superuser": false,
+    "username": "20230321",
+    "first_name": "John Tyrone",
+    "last_name": "Coronel",
+    "email": "jtcoronel.chmsu@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-08T16:37:03.808Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 5,
+  "fields": {
+    "password": "!R0I88KhrpTSCEwL9sCpsTm7a0wldaekWe56d82R4",
+    "last_login": "2026-03-14T03:28:45.638Z",
+    "is_superuser": false,
+    "username": "20230452",
+    "first_name": "Dhenby Grace",
+    "last_name": "Tabuada",
+    "email": "d.tabuada.chmsu@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-09T07:03:12.867Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "214lbgum2o87rfcqj3dy5wbfv2ga14fn",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAUBf-FtSGFcktx6d5vIPcBUjU0Ke3K-O_apAvdnpk5LxVxW0vcWlriJOqsjDr9boT8SHUHcsd6mzXPdV0m0ruiD9r0dZb0vBzu30HBVr41IVjHoyAQQKAcsPdeDBvJ4AHEeqE-DS50Y8eZkhnQZ3bEAmAsJvX-AP1ROL8:1vxwmP:5MmVjXCXYy7I5LAgjjZWkXly-oDc-W2q51LInoPnQeA",
+    "expire_date": "2026-03-19T00:41:29.845Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "77rq4gtt800kitzg25mj96h3k98c66ie",
+  "fields": {
+    "session_data": ".eJxVjM0OwiAQhN-FsyEuhD-P3n0GAruLVA0kpT0Z39026UFPk8z3zbxFTOtS4zp4jhOJi1Di9NvlhE9uO6BHavcusbdlnrLcFXnQIW-d-HU93L-Dmkbd1p4Ik3YIdM5QWOWAwVkD6KhoSAhKKxV0IcPE2m8BCNarzNZwwCw-XwWDOMA:1w0Vdr:hAjXP1RbGHvlGJpnkomulMVUopWw9iRhQhv_KMGYhHY",
+    "expire_date": "2026-03-26T02:19:15.955Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "8fwe7pz4986hrmttrsi74kytpbjtorgi",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAUBf-FtSGFcktx6d5vIPcBUjU0Ke3K-O_apAvdnpk5LxVxW0vcWlriJOqsjDr9boT8SHUHcsd6mzXPdV0m0ruiD9r0dZb0vBzu30HBVr41IVjHoyAQQKAcsPdeDBvJ4AHEeqE-DS50Y8eZkhnQZ3bEAmAsJvX-AP1ROL8:1vsbp4:ojdFvi9gcYXW0s-UjN7yDH2eEuKbhhpUFhHFW_JqC3c",
+    "expire_date": "2026-03-04T07:18:10.436Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "8s3hv7gco7bux1st2n16f1kmvm706u54",
+  "fields": {
+    "session_data": "eyJ0cmFja2VkX3N0dWRlbnRfaWRzIjpbIjIwMjMwMzIxIl19:1w2A4v:1jRs5NO_u_O2KLjdPlz6l9yCoDTMGNmPk6zjYQqmIXQ",
+    "expire_date": "2026-03-16T16:12:01.797Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "gmhfdyci3j5iua7h7ec4nctv4qgeaxmr",
+  "fields": {
+    "session_data": ".eJxVjM0OwiAQhN-FsyEuhD-P3n0GAruLVA0kpT0Z39026UFPk8z3zbxFTOtS4zp4jhOJi1Di9NvlhE9uO6BHavcusbdlnrLcFXnQIW-d-HU93L-Dmkbd1p4Ik3YIdM5QWOWAwVkD6KhoSAhKKxV0IcPE2m8BCNarzNZwwCw-XwWDOMA:1w0Vim:VAkpH31EZ04Dz8mzM8Z1vcIe6hKrRlcgyw1mrJjKT2Y",
+    "expire_date": "2026-03-12T02:54:20.234Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "gr8mbv283ar0o6wnvcaki4yljqte46ha",
+  "fields": {
+    "session_data": "eyJhcHBsaWNhdGlvbl9wayI6OSwidHJhY2tlZF9zdHVkZW50X2lkcyI6WyIyMDIzMDQ1MiJdfQ:1vwwZM:VSbu8vyZg3QBP4w4EiAcbaVoPl9KxZmTxZOBKDrEEPE",
+    "expire_date": "2026-03-16T06:15:52.909Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "jmrdu4aboym6392ot6h8khwcsu81lj31",
+  "fields": {
+    "session_data": ".eJxVjM0OwiAQhN-FsyEuhD-P3n0GAruLVA0kpT0Z39026UFPk8z3zbxFTOtS4zp4jhOJi1Di9NvlhE9uO6BHavcusbdlnrLcFXnQIW-d-HU93L-Dmkbd1p4Ik3YIdM5QWOWAwVkD6KhoSAhKKxV0IcPE2m8BCNarzNZwwCw-XwWDOMA:1vzqD1:wp7uniVrG8zly0NCq0qAx4FWFEtz56nEa7KZhD5ST3M",
+    "expire_date": "2026-03-24T06:04:47.780Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "k9x4gtnn9pwb6v8mpi8g8dcuc11yok8o",
+  "fields": {
+    "session_data": ".eJxVjM0OwiAQhN-FsyEuhD-P3n0GAruLVA0kpT0Z39026UFPk8z3zbxFTOtS4zp4jhOJi1Di9NvlhE9uO6BHavcusbdlnrLcFXnQIW-d-HU93L-Dmkbd1p4Ik3YIdM5QWOWAwVkD6KhoSAhKKxV0IcPE2m8BCNarzNZwwCw-XwWDOMA:1w1Fqy:hpi99O1oT5ioWRC7C71OYaPSJIVxAOOKJ4e95ZQPx_M",
+    "expire_date": "2026-03-14T04:09:52.214Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "lpcc95q1m3cph787z2ikryovkx8kk9un",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAQRf-FtSG8BMale7-BMANI1UBS2pXx322TLnR7zzn3zUJclxrWkecwJXZhhp1-N4z0zG0H6RHbvXPqbZkn5LvCDzr4raf8uh7u30GNo251FuTOXoIxUKSKRKQJhSWdHSZTPKaslPCyOLAWkAA2aqMFobSSLrHPF-wTN60:1vzINl:nRYnSsV9edYFMYwxAt40JfAgKVByFE0kmr6b_1H6rS4",
+    "expire_date": "2026-03-22T17:57:37.619Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "mltx77ulyreubiexblyo6g7591ji3xdz",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hCsZYa6dN8zkBkYpGogKe3KeHfbpAvd_vfefytP65L92mT2U1RXZdXpd2MKTyk7iA8q96pDLcs8sd4VfdCmxxrldTvcv4NMLW81IxoWSsjBQhRETKaDkLB3kKxJF-x6mwywnI3j4ADBDhZpEwlpIPX5AvF4N8k:1vzUgL:v45vX4udtdvjOCT8cqLwXcZyHcFFKPy1szGcNNd_Am0",
+    "expire_date": "2026-03-23T07:05:37.595Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "peof055zk9e0n63x1e0flejml9rei9zi",
+  "fields": {
+    "session_data": "eyJhcHBsaWNhdGlvbl9wayI6OCwidHJhY2tlZF9zdHVkZW50X2lkcyI6WyIyMzMyMzEyIl19:1vwwXj:0dn7lHIrq8wKAzjRYegvuXhMi6XwQ2wuecxpieG-AyU",
+    "expire_date": "2026-03-16T06:14:11.613Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "r63x6vvp6pjvn0rbn2x7ms46gkrwclea",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAUBf-FtSGFcktx6d5vIPcBUjU0Ke3K-O_apAvdnpk5LxVxW0vcWlriJOqsjDr9boT8SHUHcsd6mzXPdV0m0ruiD9r0dZb0vBzu30HBVr41IVjHoyAQQKAcsPdeDBvJ4AHEeqE-DS50Y8eZkhnQZ3bEAmAsJvX-AP1ROL8:1vzqIM:5xliEP-FQiLkQUZiKKc2FqHJDLE4lkBBxJu_A9SuGuY",
+    "expire_date": "2026-03-24T06:10:18.984Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "rl84mmvloulxoah0m4shkls2cf8oiqne",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAQRf-FtSG8BMale7-BMANI1UBS2pXx322TLnR7zzn3zUJclxrWkecwJXZhhp1-N4z0zG0H6RHbvXPqbZkn5LvCDzr4raf8uh7u30GNo251FuTOXoIxUKSKRKQJhSWdHSZTPKaslPCyOLAWkAA2aqMFobSSLrHPF-wTN60:1vzHD7:Pm2l02PDGuEZgnEtoiqv9kVS3sRRqTxaXYmyYp70XF4",
+    "expire_date": "2026-03-22T16:42:33.020Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "s73d5t8irl3ny1cjw9kqiajac89pblz2",
+  "fields": {
+    "session_data": ".eJxVjM0OwiAQhN-FsyEuhD-P3n0GAruLVA0kpT0Z39026UFPk8z3zbxFTOtS4zp4jhOJi1Di9NvlhE9uO6BHavcusbdlnrLcFXnQIW-d-HU93L-Dmkbd1p4Ik3YIdM5QWOWAwVkD6KhoSAhKKxV0IcPE2m8BCNarzNZwwCw-XwWDOMA:1w1SQk:kWCcNOUpb6Hj9ZPdU-d6WVbjQ8NMEV2N1GaaPwk9yP8",
+    "expire_date": "2026-03-14T17:35:38.683Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "t0ug9rybuw3u6nuk26ru7th47qnlcztg",
+  "fields": {
+    "session_data": ".eJxNjksOwjAMBa9ivEaoUFbsuAESK4RQ5SYGLNK0ih2qCnF3wmfB_s3MeyANQxBHJn1shhtultUcLZG7sW_UsudojXjFzRFX1aqu6nWNpzlqbjtRfVOanWMtCzz0OUHkEf6kcCWFljnCBzFjDz_inEOYZrALTMowkhiMVwkM09vje5e7UlegxMUg8QKJ78JjMVgPno1TJ_E35yAXaSWITVCKBPvvediWl2oUbYHPFyiyVvc:1vwwab:1WNOgsDGDJhaQ0JQrbDkkzoMId7k8z71IPDKBrHxYso",
+    "expire_date": "2026-03-16T06:17:09.375Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "t5l5tmt97jy20fskv576a1gv6kvcyq7g",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hCsZYa6dN8zkBkYpGogKe3KeHfbpAvd_vfefytP65L92mT2U1RXZdXpd2MKTyk7iA8q96pDLcs8sd4VfdCmxxrldTvcv4NMLW81IxoWSsjBQhRETKaDkLB3kKxJF-x6mwywnI3j4ADBDhZpEwlpIPX5AvF4N8k:1w0CRh:MbccdvWurgyKBjznwILXaZ3BAoPZj6X6nIFn9Cw7ATY",
+    "expire_date": "2026-03-25T05:49:25.419Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "u6jbpljqgcyozjmsge6au67ulmx5ygao",
+  "fields": {
+    "session_data": ".eJxVjDsOgzAQBe-yNbKMg71AmT4niCJr_QsOyCBsqih3D0g0tG_mzRdoWaZoqcQ56WWEvm4qKCvZ0Tudy-Z8Kjq6DP0TBBc33kgBrwo0bWXQW_brTqEHCZfNHIF0APeh9J6ZnVNZo2GHwk6a2WN2frqf7iUwUB72t0HkxlNAY6VyHhEDF8oGbFoVJA83FI0MXBlf89bYVqGSnUTaRULqCH5_G-dJwQ:1vzqKD:YcEzygtDKhtn_bSGg2pl1QVi_C9aOneAdcXly-5HaLg",
+    "expire_date": "2026-03-24T06:12:13.135Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "ugk1a3rjzaje64v7584wqsblu5akf8ux",
+  "fields": {
+    "session_data": ".eJxVjM0OwiAQhN-FsyEuhD-P3n0GAruLVA0kpT0Z39026UFPk8z3zbxFTOtS4zp4jhOJi1Di9NvlhE9uO6BHavcusbdlnrLcFXnQIW-d-HU93L-Dmkbd1p4Ik3YIdM5QWOWAwVkD6KhoSAhKKxV0IcPE2m8BCNarzNZwwCw-XwWDOMA:1vyYLh:0hX-m_s1dB-7QHP6HINMnvQNfHNCN9qGaQje4PI2CRI",
+    "expire_date": "2026-03-20T16:48:25.165Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "vic07z756shnf292rsc20kb45vf1ndhk",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAUBf-FtSGFcktx6d5vIPcBUjU0Ke3K-O_apAvdnpk5LxVxW0vcWlriJOqsjDr9boT8SHUHcsd6mzXPdV0m0ruiD9r0dZb0vBzu30HBVr41IVjHoyAQQKAcsPdeDBvJ4AHEeqE-DS50Y8eZkhnQZ3bEAmAsJvX-AP1ROL8:1w0j9M:fualTgLAKGMN1zzliyMLsvpJ8fAombMqYvkcDR7YPk4",
+    "expire_date": "2026-03-12T17:14:40.839Z"
+  }
+},
+{
+  "model": "home.office",
+  "pk": 1,
+  "fields": {
+    "name": "Registrars Office",
+    "building": "Administration Building",
+    "room": "Ground Floor, Room 101",
+    "hours": "Mon-Fri, 8:00 AM - 5:00 PM",
+    "head": "Dr. Maria Santos",
+    "total_slots": 4,
+    "latitude": 10.74265,
+    "longitude": 122.9705,
+    "icon": "fa-solid fa-file-lines",
+    "description": "Handles student records, enrollment, and academic document processing.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 2,
+  "fields": {
+    "name": "Library",
+    "building": "Library Building",
+    "room": "1st and 2nd Floor",
+    "hours": "Mon-Sat, 7:30 AM - 6:00 PM",
+    "head": "Ms. Elena Reyes",
+    "total_slots": 6,
+    "latitude": 10.7432,
+    "longitude": 122.97065,
+    "icon": "fa-solid fa-book-open",
+    "description": "University library with digital resources, reading areas, and research support.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 3,
+  "fields": {
+    "name": "Guidance Office",
+    "building": "Student Services Building",
+    "room": "2nd Floor, Room 205",
+    "hours": "Mon-Fri, 8:00 AM - 5:00 PM",
+    "head": "Dr. Roberto Cruz",
+    "total_slots": 3,
+    "latitude": 10.74285,
+    "longitude": 122.96955,
+    "icon": "fa-solid fa-comments",
+    "description": "Counseling, career guidance, and student welfare services.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 4,
+  "fields": {
+    "name": "Deans Office",
+    "building": "Academic Building",
+    "room": "3rd Floor, Room 301",
+    "hours": "Mon-Fri, 8:00 AM - 5:00 PM",
+    "head": "Dr. Antonio Garcia",
+    "total_slots": 2,
+    "latitude": 10.74245,
+    "longitude": 122.97105,
+    "icon": "fa-solid fa-user-graduate",
+    "description": "Academic administration, curriculum management, and faculty coordination.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 5,
+  "fields": {
+    "name": "Accounting Office",
+    "building": "Administration Building",
+    "room": "Ground Floor, Room 102",
+    "hours": "Mon-Fri, 8:00 AM - 4:00 PM",
+    "head": "Ms. Grace Tan",
+    "total_slots": 3,
+    "latitude": 10.7427,
+    "longitude": 122.9704,
+    "icon": "fa-solid fa-calculator",
+    "description": "Budget management, payroll processing, and financial reporting.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 6,
+  "fields": {
+    "name": "Cashiers Office",
+    "building": "Administration Building",
+    "room": "Ground Floor, Room 103",
+    "hours": "Mon-Fri, 8:00 AM - 4:00 PM",
+    "head": "Ms. Ana Lim",
+    "total_slots": 3,
+    "latitude": 10.742468404864821,
+    "longitude": 122.96974553263573,
+    "icon": "fa-solid fa-coins",
+    "description": "Tuition payments, financial aid processing, and fee collection.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 7,
+  "fields": {
+    "name": "Student Affairs Office",
+    "building": "Student Services Building",
+    "room": "1st Floor, Room 102",
+    "hours": "Mon-Fri, 8:00 AM - 5:00 PM",
+    "head": "Dr. Linda Magtanong",
+    "total_slots": 5,
+    "latitude": 10.74275,
+    "longitude": 122.9694,
+    "icon": "fa-solid fa-people-group",
+    "description": "Student organizations, activities, scholarships, and SA program management.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 8,
+  "fields": {
+    "name": "ICT Office",
+    "building": "College of Computer Studies",
+    "room": "2nd Floor, Room 201",
+    "hours": "Mon-Fri, 8:00 AM - 5:00 PM",
+    "head": "Engr. Mark Villanueva",
+    "total_slots": 4,
+    "latitude": 10.743,
+    "longitude": 122.97005,
+    "icon": "fa-solid fa-laptop-code",
+    "description": "ICT support, network administration, and systems maintenance.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 9,
+  "fields": {
+    "name": "Research Office",
+    "building": "Academic Building",
+    "room": "2nd Floor, Room 210",
+    "hours": "Mon-Fri, 8:00 AM - 5:00 PM",
+    "head": "Dr. Jose Ramos",
+    "total_slots": 2,
+    "latitude": 10.74235,
+    "longitude": 122.9709,
+    "icon": "fa-solid fa-flask",
+    "description": "Research coordination, publication support, and academic research management.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 10,
+  "fields": {
+    "name": "HR Office",
+    "building": "Administration Building",
+    "room": "2nd Floor, Room 201",
+    "hours": "Mon-Fri, 8:00 AM - 5:00 PM",
+    "head": "Ms. Patricia Cruz",
+    "total_slots": 2,
+    "latitude": 10.742871817588053,
+    "longitude": 122.97115607504448,
+    "icon": "fa-solid fa-user-tie",
+    "description": "Human resources management, employee records, and recruitment.",
+    "is_active": true
+  }
+},
+{
+  "model": "home.office",
+  "pk": 11,
+  "fields": {
+    "name": "Bsis Office",
+    "building": "Lsa Building",
+    "room": "3rd",
+    "hours": "Mon–Fri, 8:00 AM – 5:00 PM",
+    "head": "Danes Tumabing",
+    "total_slots": 3,
+    "latitude": 10.7426,
+    "longitude": 122.9703,
+    "icon": "fa-solid fa-laptop-code",
+    "description": "",
+    "is_active": true
+  }
+},
+{
+  "model": "home.studentprofile",
+  "pk": 1,
+  "fields": {
+    "user": 3,
+    "student_id": "20230343",
+    "full_name": "GRACEE PLATINO",
+    "email_verified": true,
+    "created_at": "2026-03-06T16:28:49.138Z"
+  }
+},
+{
+  "model": "home.studentprofile",
+  "pk": 2,
+  "fields": {
+    "user": 4,
+    "student_id": "20230321",
+    "full_name": "John Tyrone Coronel",
+    "email_verified": true,
+    "created_at": "2026-03-08T16:37:03.824Z"
+  }
+},
+{
+  "model": "home.studentprofile",
+  "pk": 3,
+  "fields": {
+    "user": 5,
+    "student_id": "20230452",
+    "full_name": "Dhenby Grace Tabuada",
+    "email_verified": true,
+    "created_at": "2026-03-09T07:03:12.898Z"
+  }
+},
+{
+  "model": "home.upcomingdate",
+  "pk": 2,
+  "fields": {
+    "title": "Test",
+    "date": "2026-02-28",
+    "is_active": true,
+    "expires_at": "2026-02-28"
+  }
+},
+{
+  "model": "home.newapplication",
+  "pk": 14,
+  "fields": {
+    "user": null,
+    "first_name": "Dhenby Grace",
+    "middle_initial": "C",
+    "last_name": "Tabuada",
+    "extension_name": "",
+    "date_of_birth": "2004-09-23",
+    "gender": "female",
+    "contact_number": "09123456789",
+    "email": "d.tabuada.chmsu@gmail.com",
+    "address": "Carlos Hilado Memorial State University, Mabini Street, Zone 1, Talisay, Negros Occidental, Negros Island Region, 6115, Philippines",
+    "student_id": "20230452",
+    "course": "CCS",
+    "year_level": 3,
+    "semester": "1st",
+    "gpa": null,
+    "application_form": "applications/new/application_sample.pdf",
+    "id_picture": "",
+    "barangay_clearance": "applications/new/barangay_sample.pdf",
+    "parents_itr": "applications/new/birth_sample.docx.pdf",
+    "enrolment_form": "applications/new/INROLMENT-FORM.pdf",
+    "schedule_classes": "applications/new/CLASS-SCHEDULE.docx.pdf",
+    "proof_insurance": "applications/new/INSURANCE.docx.pdf",
+    "grades_last_sem": "applications/new/RECENT-GRADES.docx.pdf",
+    "official_time": "applications/new/application_sample_zMVI4ci.pdf",
+    "preferred_office": 11,
+    "availability_schedule": {
+      "Monday": [
+        "8:00 AM - 8:30 AM",
+        "9:30 AM - 10:00 AM"
+      ],
+      "Friday": [
+        "8:00 AM - 8:30 AM",
+        "9:30 AM - 10:00 AM"
+      ],
+      "Tuesday": [
+        "9:00 AM - 9:30 AM",
+        "10:30 AM - 11:00 AM"
+      ],
+      "Thursday": [
+        "9:00 AM - 9:30 AM",
+        "10:30 AM - 11:00 AM"
+      ],
+      "Wednesday": [
+        "11:30 AM - 12:00 PM",
+        "1:00 PM - 1:30 PM"
+      ]
+    },
+    "schedule_verified": true,
+    "schedule_mismatch_note": "",
+    "staff_notes": "",
+    "director_notes": "",
+    "requested_documents_note": "",
+    "returned_documents": {},
+    "interview_date": null,
+    "assigned_office": "Bsis Office",
+    "start_date": "2026-03-10",
+    "submitted_at": "2026-03-10T06:06:48.350Z",
+    "status": "approved"
+  }
+},
+{
+  "model": "home.newapplication",
+  "pk": 15,
+  "fields": {
+    "user": null,
+    "first_name": "John Tyrone",
+    "middle_initial": "P",
+    "last_name": "Coronel",
+    "extension_name": "",
+    "date_of_birth": "2008-03-14",
+    "gender": "male",
+    "contact_number": "09649926003",
+    "email": "jtcoronel.chmsu@gmail.com",
+    "address": "Brgy. Zone 12 (Poblacion), Talisay City, Negros Occidental",
+    "student_id": "20230321",
+    "course": "Ccs",
+    "year_level": 2,
+    "semester": "1st",
+    "gpa": null,
+    "application_form": "applications/new/application_sample_wFkHCBY.pdf",
+    "id_picture": "applications/new/fe739600-6f22-4bc7-8fdd-be53bc6870cb.jpeg",
+    "barangay_clearance": "applications/new/barangay_sample_E44G8n4.pdf",
+    "parents_itr": "applications/new/application_sample_zMVI4ci_7Tzp82q.pdf",
+    "enrolment_form": "applications/new/INROLMENT-FORM_MkFgP9D.pdf",
+    "schedule_classes": "applications/new/CLASS-SCHEDULE_FoFGsyZ.docx.pdf",
+    "proof_insurance": "applications/new/INSURANCE_oZw4ROw.docx.pdf",
+    "grades_last_sem": "applications/new/RECENT-GRADES_rrZLwih.docx.pdf",
+    "official_time": "",
+    "preferred_office": 11,
+    "availability_schedule": {
+      "Monday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM"
+      ],
+      "Tuesday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM",
+        "8:30 AM - 9:00 AM",
+        "9:00 AM - 9:30 AM",
+        "9:30 AM - 10:00 AM",
+        "10:00 AM - 10:30 AM",
+        "10:30 AM - 11:00 AM",
+        "11:00 AM - 11:30 AM"
+      ],
+      "Wednesday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM"
+      ],
+      "Thursday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM",
+        "8:30 AM - 9:00 AM",
+        "9:00 AM - 9:30 AM",
+        "9:30 AM - 10:00 AM",
+        "10:00 AM - 10:30 AM",
+        "10:30 AM - 11:00 AM"
+      ],
+      "Friday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM",
+        "10:00 AM - 10:30 AM",
+        "10:30 AM - 11:00 AM",
+        "12:00 PM - 12:30 PM"
+      ]
+    },
+    "schedule_verified": true,
+    "schedule_mismatch_note": "",
+    "staff_notes": "",
+    "director_notes": "",
+    "requested_documents_note": "",
+    "returned_documents": {},
+    "interview_date": "2026-03-14T17:04:00Z",
+    "assigned_office": "Bsis Office",
+    "start_date": "2026-03-15",
+    "submitted_at": "2026-03-14T16:33:24.580Z",
+    "status": "approved"
+  }
+},
+{
+  "model": "home.applicationnote",
+  "pk": 20,
+  "fields": {
+    "new_application": 14,
+    "renewal_application": null,
+    "author": 2,
+    "note_type": "staff",
+    "content": "Availability schedule verified — matches Schedule of Classes.",
+    "created_at": "2026-03-10T06:08:41.180Z"
+  }
+},
+{
+  "model": "home.applicationnote",
+  "pk": 21,
+  "fields": {
+    "new_application": 14,
+    "renewal_application": null,
+    "author": 2,
+    "note_type": "staff",
+    "content": "test!",
+    "created_at": "2026-03-11T05:49:02.304Z"
+  }
+},
+{
+  "model": "home.applicationnote",
+  "pk": 22,
+  "fields": {
+    "new_application": 15,
+    "renewal_application": null,
+    "author": 2,
+    "note_type": "staff",
+    "content": "Availability schedule verified — matches Schedule of Classes.",
+    "created_at": "2026-03-14T17:00:46.219Z"
+  }
+},
+{
+  "model": "home.applicationnote",
+  "pk": 23,
+  "fields": {
+    "new_application": 15,
+    "renewal_application": null,
+    "author": 1,
+    "note_type": "director",
+    "content": "Nice!",
+    "created_at": "2026-03-14T17:01:44.367Z"
+  }
+},
+{
+  "model": "home.activestudentassistant",
+  "pk": 9,
+  "fields": {
+    "new_application": 14,
+    "renewal_application": null,
+    "student_id": "20230452",
+    "full_name": "Dhenby Grace C. Tabuada",
+    "email": "d.tabuada.chmsu@gmail.com",
+    "course": "CCS",
+    "assigned_office": 11,
+    "semester": "1st",
+    "academic_year": "",
+    "start_date": "2026-03-10",
+    "end_date": "2026-06-30",
+    "total_hours": "0.00",
+    "required_hours": 200,
+    "status": "active",
+    "created_at": "2026-03-10T06:11:19.920Z",
+    "duty_schedule": {
+      "Monday": [
+        "8:00 AM - 8:30 AM",
+        "9:30 AM - 10:00 AM"
+      ],
+      "Friday": [
+        "8:00 AM - 8:30 AM",
+        "9:30 AM - 10:00 AM"
+      ],
+      "Tuesday": [
+        "9:00 AM - 9:30 AM",
+        "10:30 AM - 11:00 AM"
+      ],
+      "Thursday": [
+        "9:00 AM - 9:30 AM",
+        "10:30 AM - 11:00 AM"
+      ],
+      "Wednesday": [
+        "11:30 AM - 12:00 PM",
+        "1:00 PM - 1:30 PM"
+      ]
+    }
+  }
+},
+{
+  "model": "home.activestudentassistant",
+  "pk": 10,
+  "fields": {
+    "new_application": 15,
+    "renewal_application": null,
+    "student_id": "20230321",
+    "full_name": "John Tyrone P. Coronel",
+    "email": "jtcoronel.chmsu@gmail.com",
+    "course": "Ccs",
+    "assigned_office": 11,
+    "semester": "1st",
+    "academic_year": "",
+    "start_date": "2026-03-15",
+    "end_date": "2026-07-03",
+    "total_hours": "0.00",
+    "required_hours": 200,
+    "status": "active",
+    "created_at": "2026-03-14T17:05:08.917Z",
+    "duty_schedule": {
+      "Monday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM"
+      ],
+      "Tuesday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM",
+        "8:30 AM - 9:00 AM",
+        "9:00 AM - 9:30 AM",
+        "9:30 AM - 10:00 AM",
+        "10:00 AM - 10:30 AM",
+        "10:30 AM - 11:00 AM",
+        "11:00 AM - 11:30 AM"
+      ],
+      "Wednesday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM"
+      ],
+      "Thursday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM",
+        "8:30 AM - 9:00 AM",
+        "9:00 AM - 9:30 AM",
+        "9:30 AM - 10:00 AM",
+        "10:00 AM - 10:30 AM",
+        "10:30 AM - 11:00 AM"
+      ],
+      "Friday": [
+        "7:30 AM - 8:00 AM",
+        "8:00 AM - 8:30 AM",
+        "10:00 AM - 10:30 AM",
+        "10:30 AM - 11:00 AM",
+        "12:00 PM - 12:30 PM"
+      ]
+    }
+  }
+},
+{
+  "model": "home.dutyreminder",
+  "pk": 1,
+  "fields": {
+    "student_assistant": 9,
+    "date": "2026-03-13",
+    "shift": "8:00 AM - 8:30 AM",
+    "reminder_type": "absent",
+    "sent_at": "2026-03-14T03:28:45.685Z"
+  }
+},
+{
+  "model": "home.dutyreminder",
+  "pk": 2,
+  "fields": {
+    "student_assistant": 9,
+    "date": "2026-03-13",
+    "shift": "9:30 AM - 10:00 AM",
+    "reminder_type": "absent",
+    "sent_at": "2026-03-14T03:28:49.040Z"
+  }
+},
+{
+  "model": "home.dutyreminder",
+  "pk": 3,
+  "fields": {
+    "student_assistant": 10,
+    "date": "2026-03-16",
+    "shift": "7:30 AM - 8:30 AM",
+    "reminder_type": "absent",
+    "sent_at": "2026-03-16T05:06:12.805Z"
+  }
+},
+{
+  "model": "home.attendancerecord",
+  "pk": 3,
+  "fields": {
+    "student_assistant": 9,
+    "date": "2026-03-10",
+    "shift": "9:00 AM - 9:30 AM",
+    "time_in": null,
+    "time_out": null,
+    "status": "absent",
+    "remarks": "",
+    "logged_by": null,
+    "created_at": "2026-03-11T06:28:40.969Z"
+  }
+},
+{
+  "model": "home.attendancerecord",
+  "pk": 4,
+  "fields": {
+    "student_assistant": 9,
+    "date": "2026-03-10",
+    "shift": "10:30 AM - 11:00 AM",
+    "time_in": null,
+    "time_out": null,
+    "status": "absent",
+    "remarks": "",
+    "logged_by": null,
+    "created_at": "2026-03-11T06:28:40.998Z"
+  }
+},
+{
+  "model": "home.attendancerecord",
+  "pk": 5,
+  "fields": {
+    "student_assistant": 9,
+    "date": "2026-03-11",
+    "shift": "11:30 AM - 12:00 PM",
+    "time_in": null,
+    "time_out": null,
+    "status": "absent",
+    "remarks": "",
+    "logged_by": null,
+    "created_at": "2026-03-11T16:03:35.443Z"
+  }
+},
+{
+  "model": "home.attendancerecord",
+  "pk": 6,
+  "fields": {
+    "student_assistant": 9,
+    "date": "2026-03-11",
+    "shift": "1:00 PM - 1:30 PM",
+    "time_in": null,
+    "time_out": null,
+    "status": "absent",
+    "remarks": "",
+    "logged_by": null,
+    "created_at": "2026-03-11T16:03:35.452Z"
+  }
+},
+{
+  "model": "home.attendancerecord",
+  "pk": 7,
+  "fields": {
+    "student_assistant": 9,
+    "date": "2026-03-13",
+    "shift": "8:00 AM - 8:30 AM",
+    "time_in": null,
+    "time_out": null,
+    "status": "absent",
+    "remarks": "",
+    "logged_by": null,
+    "created_at": "2026-03-14T03:28:45.674Z"
+  }
+},
+{
+  "model": "home.attendancerecord",
+  "pk": 8,
+  "fields": {
+    "student_assistant": 9,
+    "date": "2026-03-13",
+    "shift": "9:30 AM - 10:00 AM",
+    "time_in": null,
+    "time_out": null,
+    "status": "absent",
+    "remarks": "",
+    "logged_by": null,
+    "created_at": "2026-03-14T03:28:49.021Z"
+  }
+},
+{
+  "model": "home.attendancerecord",
+  "pk": 9,
+  "fields": {
+    "student_assistant": 10,
+    "date": "2026-03-16",
+    "shift": "7:30 AM - 8:30 AM",
+    "time_in": null,
+    "time_out": null,
+    "status": "absent",
+    "remarks": "",
+    "logged_by": null,
+    "created_at": "2026-03-16T05:06:12.797Z"
+  }
+}
+]

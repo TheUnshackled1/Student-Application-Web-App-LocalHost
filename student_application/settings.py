@@ -10,44 +10,48 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+import dj_database_url
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-3sy5%^@irja8y&j4i*)jf)(+#=p_n@e_o7!19%-l2-gws_980c"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ["*"]
+# ── Core ─────────────────────────────────────────────────────────
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-3sy5%^@irja8y&j4i*)jf)(+#=p_n@e_o7!19%-l2-gws_980c"
+)
+DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.devtunnels.ms",
     "https://*.vscode.dev",
+    "https://*.ondigitalocean.app",
+    "https://*.onrender.com",
 ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    # "jet",
-    "home",
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "home",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -86,14 +90,10 @@ WSGI_APPLICATION = "student_application.wsgi.application"
 #     }
 # }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'student_assistant_db',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',  # Use 'localhost' for local development
-        'PORT': '5432',       # The default PostgreSQL port
-    }
+    "default": dj_database_url.config(
+        default="postgres://postgres:1234@localhost:5432/student_assistant_db",
+        conn_max_age=600,
+    )
 }
 
 
@@ -132,16 +132,40 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = []
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 # Media files (user uploads)
+# In production, use DigitalOcean Spaces via django-storages.
+# Locally, files are saved to disk.
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+if os.environ.get("DO_SPACES_BUCKET"):
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    }
+    AWS_ACCESS_KEY_ID = os.environ["DO_SPACES_KEY"]
+    AWS_SECRET_ACCESS_KEY = os.environ["DO_SPACES_SECRET"]
+    AWS_STORAGE_BUCKET_NAME = os.environ["DO_SPACES_BUCKET"]
+    AWS_S3_REGION_NAME = os.environ.get("DO_SPACES_REGION", "sgp1")
+    AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+    AWS_DEFAULT_ACL = "public-read"
+    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ── Encrypted Data Storage (Fernet symmetric encryption for backups) ──
-DATA_ENCRYPTION_KEY = "WAQ0AyjYw1kuHp2Xhr6-VKtyUO1NZPyPOLF0CJuiKLY="
+DATA_ENCRYPTION_KEY = os.environ.get("DATA_ENCRYPTION_KEY", "")
 
 # Authentication
 LOGIN_URL = "/"
@@ -158,12 +182,130 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "jtcoronel.chmsu@gmail.com"
-EMAIL_HOST_PASSWORD = "niybahwlsjezqobf"
-DEFAULT_FROM_EMAIL = "SWA Application System <jtcoronel.chmsu@gmail.com>"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = f"SWA Application System <{EMAIL_HOST_USER}>"
 
-# ── Django JET Configuration ──
-JET_DEFAULT_THEME = "light-gray"
-JET_SIDE_MENU_COMPACT = True
-JET_CHANGE_FORM_SIBLING_LINKS = True
-JET_INDEX_DASHBOARD = "student_application.dashboard.CustomIndexDashboard"
+# ══════════════════════════════════════════════════════════════
+#  Django Jazzmin — Admin Panel Configuration
+# ══════════════════════════════════════════════════════════════
+
+JAZZMIN_SETTINGS = {
+    # ── Window / Tab title ──
+    "site_title": "SWA Admin",
+    "site_header": "SWA Application System",
+    "site_brand": "SWA Admin",
+    "site_logo": None,
+    "login_logo": None,
+    "site_logo_classes": "img-circle",
+    "site_icon": None,
+    "welcome_sign": "Welcome to SWA Application System",
+    "copyright": "Carlos Hilado Memorial State University",
+
+    # ── Search bar ──
+    "search_model": ["auth.User", "home.NewApplication", "home.RenewalApplication"],
+
+    # ── Top Menu (navbar links) ──
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Student Site", "url": "/", "new_window": True},
+        {"name": "Staff Dashboard", "url": "/staff/", "new_window": True},
+        {"name": "Director Dashboard", "url": "/director/", "new_window": True},
+        {"model": "auth.User"},
+    ],
+
+    # ── Side Menu ──
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": [
+        "auth",
+        "home.NewApplication",
+        "home.RenewalApplication",
+        "home.ActiveStudentAssistant",
+        "home.AttendanceRecord",
+        "home.PerformanceEvaluation",
+        "home.Office",
+        "home.StudentProfile",
+        "home.Announcement",
+        "home.Reminder",
+        "home.UpcomingDate",
+        "home.ApplicationNote",
+        "home.NoDutyDay",
+    ],
+
+    # ── Icons (Font Awesome 5) ──
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "home.NewApplication": "fas fa-file-alt",
+        "home.RenewalApplication": "fas fa-redo-alt",
+        "home.ActiveStudentAssistant": "fas fa-user-graduate",
+        "home.AttendanceRecord": "fas fa-clipboard-check",
+        "home.PerformanceEvaluation": "fas fa-star-half-alt",
+        "home.Office": "fas fa-building",
+        "home.StudentProfile": "fas fa-id-card",
+        "home.Document": "fas fa-file-upload",
+        "home.ApplicationStep": "fas fa-tasks",
+        "home.Announcement": "fas fa-bullhorn",
+        "home.Reminder": "fas fa-bell",
+        "home.UpcomingDate": "fas fa-calendar-alt",
+        "home.ApplicationNote": "fas fa-sticky-note",
+        "home.NoDutyDay": "fas fa-calendar-times",
+        "home.DutyReminder": "fas fa-clock",
+    },
+    "default_icon_parents": "fas fa-folder",
+    "default_icon_children": "fas fa-circle",
+
+    # ── Related Modal ──
+    "related_modal_active": True,
+
+    # ── Custom CSS/JS ──
+    "custom_css": "home/css/admin_animations.css",
+    "custom_js": None,
+
+    # ── Misc ──
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
+    "language_chooser": False,
+}
+
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": False,
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}
