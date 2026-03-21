@@ -23,7 +23,6 @@ def encrypt_file(input_path, output_path):
 
 
 def decrypt_file(input_path, output_path):
-    """Read *input_path*, decrypt its contents, write to *output_path*."""
     fernet = get_fernet()
     with open(input_path, 'rb') as f:
         ciphertext = f.read()
