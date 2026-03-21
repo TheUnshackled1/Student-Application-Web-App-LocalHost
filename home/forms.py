@@ -9,9 +9,6 @@ from .models import (
 import json
 
 
-# ── Auto-capitalize mixin ──
-
-# Fields that should NOT be title-cased
 _SKIP_CAPITALIZE = {
     'email', 'password', 'password1', 'password2', 'username',
     'student_id', 'contact_number', 'availability_schedule',
