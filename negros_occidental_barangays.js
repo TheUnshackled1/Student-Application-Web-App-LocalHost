@@ -1,8 +1,4 @@
-/**
- * Complete mapping of all cities and municipalities in Negros Occidental, Philippines
- * to their respective barangays.
- * Source: Wikipedia (English)
- */
+
 
 const negrosOccidentalBarangays = {
   // ==================== CITIES (13) ====================
