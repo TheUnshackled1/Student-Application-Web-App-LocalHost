@@ -5,7 +5,6 @@ from datetime import date as _date, timedelta
 
 
 class Office(models.Model):
-    """Campus office that can accept student assistants."""
     name = models.CharField(max_length=200, unique=True)
     building = models.CharField(max_length=200)
     room = models.CharField(max_length=200, blank=True, default='')
