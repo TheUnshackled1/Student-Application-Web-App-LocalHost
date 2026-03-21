@@ -1,8 +1,4 @@
-"""
-Email utility functions for the SWA Application System.
-Sends confirmation and status-update emails to applicants.
-Uses HTML emails with priority headers for push notification support.
-"""
+
 import os
 
 from django.core.mail import EmailMultiAlternatives
