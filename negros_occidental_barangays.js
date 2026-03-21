@@ -1,5 +1,3 @@
-
-
 const negrosOccidentalBarangays = {
   // ==================== CITIES (13) ====================
 
