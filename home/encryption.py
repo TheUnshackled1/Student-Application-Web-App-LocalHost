@@ -1,10 +1,4 @@
-"""
-Fernet symmetric encryption utility for database backup encryption at rest.
 
-Uses a key from Django settings (DATA_ENCRYPTION_KEY) to encrypt / decrypt
-files so that backup copies of db.sqlite3 and JSON data dumps are not
-readable without the key.
-"""
 
 from cryptography.fernet import Fernet
 from django.conf import settings
