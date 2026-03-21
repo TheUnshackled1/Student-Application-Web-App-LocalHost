@@ -14,7 +14,6 @@ def get_fernet():
 
 
 def encrypt_file(input_path, output_path):
-    """Read *input_path*, encrypt its contents, write to *output_path*."""
     fernet = get_fernet()
     with open(input_path, 'rb') as f:
         plaintext = f.read()
