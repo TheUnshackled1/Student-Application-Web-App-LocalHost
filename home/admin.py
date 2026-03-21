@@ -7,9 +7,7 @@ from .models import (
 )
 
 
-# ══════════════════════════════════════════════════
-#  Admin Site Branding
-# ══════════════════════════════════════════════════
+
 
 admin.site.site_header = "SWA Application System"
 admin.site.site_title = "SWA Admin"
