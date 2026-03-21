@@ -3,7 +3,6 @@ from django.conf import settings
 
 
 def get_fernet():
-    """Return a Fernet instance using the configured encryption key."""
     key = getattr(settings, 'DATA_ENCRYPTION_KEY', None)
     if not key:
         raise ValueError(
