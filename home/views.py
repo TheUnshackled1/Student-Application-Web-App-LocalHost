@@ -42,14 +42,6 @@ from django.core.files.base import ContentFile
 
 
 def _inject_camera_photos(request, doc_fields):
-    """Move camera-captured photos from hidden POST fields into request.FILES.
-
-    For each document field, check if ``<field>_photo`` exists in POST data
-    (a filename saved by process_camera_photo). If the corresponding file
-    input is empty (no regular upload), open the camera photo from disk and
-    inject it as an InMemoryUploadedFile so the form sees a normal file.
-    """
-    # request.FILES may be immutable; ensure we can write to it
     mutable_before = getattr(request.FILES, '_mutable', None)
     if mutable_before is not None:
         request.FILES._mutable = True
