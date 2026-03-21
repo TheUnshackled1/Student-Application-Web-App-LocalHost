@@ -7,8 +7,6 @@ from .models import (
 )
 
 
-
-
 admin.site.site_header = "SWA Application System"
 admin.site.site_title = "SWA Admin"
 admin.site.index_title = "Administration Dashboard"
