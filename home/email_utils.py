@@ -1,4 +1,3 @@
-
 import os
 
 from django.core.mail import EmailMultiAlternatives
