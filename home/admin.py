@@ -112,8 +112,6 @@ class NewApplicationAdmin(admin.ModelAdmin):
     )
 
 
-
-
 class RenewalNoteInline(admin.TabularInline):
     model = ApplicationNote
     fk_name = 'renewal_application'
