@@ -228,8 +228,6 @@ class AttendanceRecordAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
-
-
 @admin.register(PerformanceEvaluation)
 class PerformanceEvaluationAdmin(admin.ModelAdmin):
     list_display = ('student_assistant', 'evaluation_period', 'overall_rating',
