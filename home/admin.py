@@ -6,13 +6,9 @@ from .models import (
     ApplicationNote, NoDutyDay, DutyReminder,
 )
 
-
 admin.site.site_header = "SWA Application System"
 admin.site.site_title = "SWA Admin"
 admin.site.index_title = "Administration Dashboard"
-
-
-
 
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
