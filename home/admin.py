@@ -177,9 +177,7 @@ class OfficeAdmin(admin.ModelAdmin):
     )
 
 
-# ══════════════════════════════════════════════════
-#  Active Student Assistants
-# ══════════════════════════════════════════════════
+
 
 class AttendanceInline(admin.TabularInline):
     model = AttendanceRecord
