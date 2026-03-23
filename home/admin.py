@@ -219,9 +219,7 @@ class ActiveStudentAssistantAdmin(admin.ModelAdmin):
     )
 
 
-# ══════════════════════════════════════════════════
-#  Attendance Records
-# ══════════════════════════════════════════════════
+
 
 @admin.register(AttendanceRecord)
 class AttendanceRecordAdmin(admin.ModelAdmin):
