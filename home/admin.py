@@ -177,8 +177,6 @@ class OfficeAdmin(admin.ModelAdmin):
     )
 
 
-
-
 class AttendanceInline(admin.TabularInline):
     model = AttendanceRecord
     extra = 0
