@@ -112,9 +112,7 @@ class NewApplicationAdmin(admin.ModelAdmin):
     )
 
 
-# ══════════════════════════════════════════════════
-#  Renewal Applications
-# ══════════════════════════════════════════════════
+
 
 class RenewalNoteInline(admin.TabularInline):
     model = ApplicationNote
