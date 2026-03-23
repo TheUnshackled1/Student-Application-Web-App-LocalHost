@@ -19,10 +19,6 @@ class StudentProfileAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
 
 
-# ══════════════════════════════════════════════════
-#  Documents & Application Steps
-# ══════════════════════════════════════════════════
-
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     list_display = ('name', 'student', 'status', 'uploaded_at')
