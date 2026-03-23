@@ -65,8 +65,6 @@ class AnnouncementAdmin(admin.ModelAdmin):
     date_hierarchy = 'published_at'
 
 
-
-
 class ApplicationNoteInline(admin.TabularInline):
     model = ApplicationNote
     fk_name = 'new_application'
