@@ -12,9 +12,7 @@ admin.site.site_title = "SWA Admin"
 admin.site.index_title = "Administration Dashboard"
 
 
-# ══════════════════════════════════════════════════
-#  Student Profile
-# ══════════════════════════════════════════════════
+
 
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
