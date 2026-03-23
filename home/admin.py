@@ -247,8 +247,6 @@ class NoDutyDayAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
-
-
 @admin.register(ApplicationNote)
 class ApplicationNoteAdmin(admin.ModelAdmin):
     list_display = ('id', 'note_type', 'author', 'new_application', 'renewal_application', 'created_at')
