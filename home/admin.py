@@ -257,9 +257,7 @@ class ApplicationNoteAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
-# ══════════════════════════════════════════════════
-#  Duty Reminders
-# ══════════════════════════════════════════════════
+
 
 @admin.register(DutyReminder)
 class DutyReminderAdmin(admin.ModelAdmin):
