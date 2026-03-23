@@ -35,9 +35,6 @@ class ApplicationStepAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
-# ══════════════════════════════════════════════════
-#  Content Management (Dates, Reminders, Announcements)
-# ══════════════════════════════════════════════════
 
 @admin.register(UpcomingDate)
 class UpcomingDateAdmin(admin.ModelAdmin):
