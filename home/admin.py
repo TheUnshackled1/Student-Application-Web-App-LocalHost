@@ -156,9 +156,7 @@ class RenewalApplicationAdmin(admin.ModelAdmin):
     )
 
 
-# ══════════════════════════════════════════════════
-#  Offices
-# ══════════════════════════════════════════════════
+
 
 @admin.register(Office)
 class OfficeAdmin(admin.ModelAdmin):
