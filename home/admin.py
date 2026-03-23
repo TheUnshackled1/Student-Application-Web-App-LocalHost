@@ -188,7 +188,7 @@ class EvaluationInline(admin.TabularInline):
     model = PerformanceEvaluation
     extra = 0
     fields = ('evaluation_period', 'work_quality', 'punctuality', 'initiative',
-              'cooperation', 'communication', 'overall_rating', 'recommendation_status', 'evaluated_by')
+            'cooperation', 'communication', 'overall_rating', 'recommendation_status', 'evaluated_by')
     readonly_fields = ('overall_rating',)
 
 
