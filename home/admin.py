@@ -228,9 +228,7 @@ class AttendanceRecordAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
-# ══════════════════════════════════════════════════
-#  Performance Evaluations
-# ══════════════════════════════════════════════════
+
 
 @admin.register(PerformanceEvaluation)
 class PerformanceEvaluationAdmin(admin.ModelAdmin):
