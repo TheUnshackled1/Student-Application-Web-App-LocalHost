@@ -247,9 +247,7 @@ class NoDutyDayAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
-# ══════════════════════════════════════════════════
-#  Application Notes (Audit Log)
-# ══════════════════════════════════════════════════
+
 
 @admin.register(ApplicationNote)
 class ApplicationNoteAdmin(admin.ModelAdmin):
