@@ -111,7 +111,6 @@ class NewApplicationAdmin(admin.ModelAdmin):
         }),
     )
 
-
 class RenewalNoteInline(admin.TabularInline):
     model = ApplicationNote
     fk_name = 'renewal_application'
@@ -140,12 +139,12 @@ class RenewalApplicationAdmin(admin.ModelAdmin):
         }),
         ('Assignment & Schedule', {
             'fields': ('previous_office', 'preferred_office', 'hours_rendered', 'supervisor_name',
-                       'availability_schedule', 'schedule_verified', 'schedule_mismatch_note')
+                    'availability_schedule', 'schedule_verified', 'schedule_mismatch_note')
         }),
         ('Documents', {
             'classes': ('collapse',),
             'fields': ('id_picture', 'enrolment_form', 'schedule_classes',
-                       'grades_last_sem', 'official_time', 'recommendation_letter', 'evaluation_form')
+                    'grades_last_sem', 'official_time', 'recommendation_letter', 'evaluation_form')
         }),
         ('Workflow', {
             'fields': ('status', 'interview_date', 'assigned_office', 'start_date', 'submitted_at')
