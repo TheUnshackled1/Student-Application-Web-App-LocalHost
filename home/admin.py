@@ -87,20 +87,20 @@ class NewApplicationAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Personal Information', {
             'fields': ('user', 'first_name', 'middle_initial', 'last_name', 'extension_name',
-                       'date_of_birth', 'gender', 'contact_number', 'email', 'address')
+                    'date_of_birth', 'gender', 'contact_number', 'email', 'address')
         }),
         ('Academic Information', {
             'fields': ('student_id', 'course', 'year_level', 'semester', 'gpa')
         }),
         ('Office Preference & Schedule', {
             'fields': ('preferred_office', 'availability_schedule', 'schedule_verified',
-                       'schedule_mismatch_note')
+                    'schedule_mismatch_note')
         }),
         ('Documents', {
             'classes': ('collapse',),
             'fields': ('application_form', 'id_picture', 'barangay_clearance',
-                       'parents_itr', 'enrolment_form', 'schedule_classes',
-                       'proof_insurance', 'grades_last_sem', 'official_time')
+                    'parents_itr', 'enrolment_form', 'schedule_classes',
+                    'proof_insurance', 'grades_last_sem', 'official_time')
         }),
         ('Workflow', {
             'fields': ('status', 'interview_date', 'assigned_office', 'start_date', 'submitted_at')
