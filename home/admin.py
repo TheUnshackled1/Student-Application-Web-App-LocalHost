@@ -156,8 +156,6 @@ class RenewalApplicationAdmin(admin.ModelAdmin):
     )
 
 
-
-
 @admin.register(Office)
 class OfficeAdmin(admin.ModelAdmin):
     list_display = ('name', 'building', 'room', 'head', 'total_slots', 'is_active')
