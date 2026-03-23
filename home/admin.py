@@ -256,9 +256,6 @@ class ApplicationNoteAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     list_per_page = 25
 
-
-
-
 @admin.register(DutyReminder)
 class DutyReminderAdmin(admin.ModelAdmin):
     list_display = ('student_assistant', 'date', 'shift', 'reminder_type', 'sent_at')
