@@ -219,8 +219,6 @@ class ActiveStudentAssistantAdmin(admin.ModelAdmin):
     )
 
 
-
-
 @admin.register(AttendanceRecord)
 class AttendanceRecordAdmin(admin.ModelAdmin):
     list_display = ('student_assistant', 'date', 'shift', 'time_in', 'time_out', 'status', 'logged_by')
