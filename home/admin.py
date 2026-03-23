@@ -238,10 +238,6 @@ class PerformanceEvaluationAdmin(admin.ModelAdmin):
     readonly_fields = ('overall_rating', 'evaluated_at')
 
 
-# ══════════════════════════════════════════════════
-#  No-Duty Days
-# ══════════════════════════════════════════════════
-
 @admin.register(NoDutyDay)
 class NoDutyDayAdmin(admin.ModelAdmin):
     list_display = ('date', 'reason', 'office', 'created_by', 'created_at')
