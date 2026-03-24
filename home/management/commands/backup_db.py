@@ -1,14 +1,4 @@
-"""
-Management command: backup_db
-Creates an encrypted backup of the SQLite database, a JSON data dump,
-and (optionally) all media files.
 
-Usage:
-    python manage.py backup_db
-    python manage.py backup_db --output-dir C:\\backups
-    python manage.py backup_db --no-encrypt
-    python manage.py backup_db --no-media
-"""
 
 import os
 import shutil
