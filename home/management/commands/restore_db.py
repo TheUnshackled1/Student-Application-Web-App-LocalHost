@@ -1,11 +1,4 @@
-"""
-Management command: restore_db
-Restores the SQLite database from an encrypted (or plain) backup.
 
-Usage:
-    python manage.py restore_db backups/backup_20260313_120000
-    python manage.py restore_db backups/backup_20260313_120000 --no-media
-"""
 
 import os
 import shutil
