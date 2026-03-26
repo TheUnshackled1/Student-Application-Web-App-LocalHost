@@ -56,5 +56,4 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f'  Media restored → {media_dest}'))
             else:
                 self.stdout.write(self.style.WARNING('  No media folder in backup, skipping.'))
-
         self.stdout.write(self.style.SUCCESS('\n  Restore complete.'))
