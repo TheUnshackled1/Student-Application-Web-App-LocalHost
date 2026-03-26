@@ -88,10 +88,8 @@ class Command(BaseCommand):
                 continue
             if sa.end_date and today > sa.end_date:
                 continue
-
             raw_slots = (sa.duty_schedule or {}).get(day_name, [])
             merged_shifts = _merge_consecutive_slots(raw_slots)
-
             for shift_label in merged_shifts:
                 slot_start, slot_end = _parse_slot_times(shift_label)
                 if not slot_start:
@@ -100,7 +98,6 @@ class Command(BaseCommand):
                 shift_start_dt = datetime.combine(today, slot_start)
                 now_dt = datetime.combine(today, now_time)
                 minutes_until = (shift_start_dt - now_dt).total_seconds() / 60
-
                 if 0 < minutes_until <= 5:
                     _, created = DutyReminder.objects.get_or_create(
                         student_assistant=sa,
