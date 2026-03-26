@@ -9,9 +9,7 @@ from home.email_utils import (
     send_consecutive_absence_alert, send_late_threshold_alert,
 )
 import logging
-
 logger = logging.getLogger(__name__)
-
 
 def _parse_slot_times(slot_label):
     from datetime import datetime
