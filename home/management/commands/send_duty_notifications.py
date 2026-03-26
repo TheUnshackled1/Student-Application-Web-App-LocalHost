@@ -72,15 +72,12 @@ class Command(BaseCommand):
         no_duty_office_ids = set(
             NoDutyDay.objects.filter(date=today).values_list('office_id', flat=True)
         )
-
         active_sas = ActiveStudentAssistant.objects.filter(
             status='active',
             duty_schedule__isnull=False,
         ).select_related('assigned_office')
-
         reminders_sent = 0
         absent_sent = 0
-
         for sa in active_sas:
             if sa.assigned_office_id in no_duty_office_ids:
                 continue
