@@ -114,12 +114,10 @@ class Command(BaseCommand):
                             self.stdout.write(
                                 f'  Reminder sent to {sa.full_name} for {shift_label}'
                             )
-
                 if now_time > slot_end:
                     has_record = AttendanceRecord.objects.filter(
                         student_assistant=sa, date=today, shift=shift_label,
                     ).exclude(status='absent').exists()
-
                     if not has_record:
                         record, rec_created = AttendanceRecord.objects.get_or_create(
                             student_assistant=sa,
