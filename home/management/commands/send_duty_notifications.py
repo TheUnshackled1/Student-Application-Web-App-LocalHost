@@ -52,23 +52,19 @@ def _merge_consecutive_slots(raw_slots):
 
 class Command(BaseCommand):
     help = 'Send 5-minute shift reminders and absent notifications via email.'
-
     def handle(self, *args, **options):
         ph_now = timezone.localtime()
         today = ph_now.date()
         now_time = ph_now.time()
         day_name = ph_now.strftime('%A')
-
         # Skip weekends
         if today.weekday() >= 5:
             self.stdout.write('Weekend — no notifications to send.')
             return
-
         # Check for global no-duty day
         if NoDutyDay.objects.filter(date=today, office__isnull=True).exists():
             self.stdout.write('Global no-duty day — skipping.')
             return
-
         no_duty_office_ids = set(
             NoDutyDay.objects.filter(date=today).values_list('office_id', flat=True)
         )
